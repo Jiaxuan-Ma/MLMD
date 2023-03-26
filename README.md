@@ -1,10 +1,1 @@
-"""
-.
-├── Home.py
-├── configs
-
-Easy-to-Matter
-├── package
-|   ├── __init__.py
-|   ├── module.py
-"""
+pip install -r requirements.txt
