@@ -1,9 +1,4 @@
 """
-.
-├── Home.py
-├── configs
+test vscode
 
-├── package
-|   ├── __init__.py
-|   ├── module.py
 """
