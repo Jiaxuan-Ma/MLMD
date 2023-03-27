@@ -185,11 +185,7 @@ if st.session_state["authentication_status"]:
                 Embedded_method = st.checkbox('Embedded method',False)
                 if Embedded_method:
                     cv = st.number_input('cv',1,10,5)
-                    # option_threshold_number = st.slider('threshold number',0,20,5)
-                    # feature_importance = fs.model.fit(fs.features, fs.targets).feature_importances_.sort(reverse = True)
-                    # feature_importance_max =np.float((fs.model.fit(fs.features, fs.targets).feature_importances_).max())
-                    # st.write(feature_importance)
-                    # range_threshold = st.slider('threshold range',0.0, feature_importance_max,(0.0, feature_importance_max))
+
 
             with st.container():
                 button_train = st.button('train', use_container_width=True)
