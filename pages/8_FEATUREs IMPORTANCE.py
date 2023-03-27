@@ -185,10 +185,12 @@ if st.session_state["authentication_status"]:
                 Embedded_method = st.checkbox('Embedded method',False)
                 if Embedded_method:
                     cv = st.number_input('cv',1,10,5)
-                    option_threshold_number = st.slider('threshold number',0,20,5)
-                    feature_importance_max =np.float((fs.model.fit(fs.features, fs.targets).feature_importances_).max())
-                    range_threshold = st.slider('threshold range',0.0, feature_importance_max,(0.0, feature_importance_max))
-    
+                    # option_threshold_number = st.slider('threshold number',0,20,5)
+                    # feature_importance = fs.model.fit(fs.features, fs.targets).feature_importances_.sort(reverse = True)
+                    # feature_importance_max =np.float((fs.model.fit(fs.features, fs.targets).feature_importances_).max())
+                    # st.write(feature_importance)
+                    # range_threshold = st.slider('threshold range',0.0, feature_importance_max,(0.0, feature_importance_max))
+
             with st.container():
                 button_train = st.button('train', use_container_width=True)
             if button_train:
@@ -203,17 +205,27 @@ if st.session_state["authentication_status"]:
                 # fs.model.fit(fs.features,fs.targets).feature_importance_
                 if Embedded_method:
                     
-                    threshold  = np.linspace(range_threshold[0], range_threshold[1],option_threshold_number)
-                    score = []
-                    for i in threshold:
-                        x_embedded = SelectFromModel(fs.model, threshold=i).fit_transform(fs.features, fs.targets)
-                        once = CVS(fs.model, fs.features, fs.targets, cv = cv).mean() 
-                        score.append(once)
-                    fig, ax = plt.subplots()
-                    ax = plt.plot(threshold, score)
-                    plt.xlabel("feature importance")
-                    plt.ylabel("r2")
-                    st.pyplot(fig)
+                    threshold  = fs.cumulative_importance
+
+                feature_importances = fs.feature_importances.set_index('feature',drop = False)
+
+                features = []
+                scores = []
+                cumuImportance = []
+                for i in range(1, len(fs.features.columns) + 1):
+                    features.append(feature_importances.iloc[:i, 0].values.tolist())
+                    X_selected = fs.features[features[-1]]
+                    score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+
+                    cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                    scores.append(score)
+                cumu_importance = np.array(cumuImportance)
+                scores = np.array(scores) 
+                fig, ax = plt.subplots()
+                ax = plt.plot(cumu_importance, scores,'o-')
+                plt.xlabel("feature importance")
+                plt.ylabel("r2")
+                st.pyplot(fig)
 
         elif inputs['model'] == 'RandomForestRegressor':
                     
@@ -240,18 +252,27 @@ if st.session_state["authentication_status"]:
 
                         if Embedded_method:
                             
-                            threshold  = np.linspace(range_threshold[0], range_threshold[1],option_threshold_number)
-                            score = []
-                            for i in threshold:
-                                x_embedded = SelectFromModel(fs.model, threshold=i).fit_transform(fs.features, fs.targets)
-                                once = CVS(fs.model, fs.features, fs.targets, cv = cv).mean() 
-                                score.append(once)
-                            fig, ax = plt.subplots()
-                            ax = plt.plot(threshold, score)
-                            plt.xlabel("feature importance")
-                            plt.ylabel("r2")
-                            st.pyplot(fig)
+                                threshold  = fs.cumulative_importance
 
+                        feature_importances = fs.feature_importances.set_index('feature',drop = False)
+
+                        features = []
+                        scores = []
+                        cumuImportance = []
+                        for i in range(1, len(fs.features.columns) + 1):
+                            features.append(feature_importances.iloc[:i, 0].values.tolist())
+                            X_selected = fs.features[features[-1]]
+                            score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+
+                            cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                            scores.append(score)
+                        cumu_importance = np.array(cumuImportance)
+                        scores = np.array(scores) 
+                        fig, ax = plt.subplots()
+                        ax = plt.plot(cumu_importance, scores,'o-')
+                        plt.xlabel("feature importance")
+                        plt.ylabel("r2")
+                        st.pyplot(fig)
 
         st.write('---')
 
