@@ -702,6 +702,16 @@ class customPlot:
         # img_path = os.path.join(target_dir, 'Feature Correlations.png')
         # fig.savefig(img_path)
         st.pyplot(fig)
+    def corr_feature_target_mir(self, options_selected, corr_mir):
+        assert len(options_selected) >= 4, "options insufficient !"
+        self.map_fontsize_options(options_selected)
+        color = self.map_color_options(options_selected)
+        fig, ax = plt.subplots()
+        ax = plt.barh(corr_mir.index, corr_mir['mutual info'], color=color)
+        plt.xlabel('Correlation')
+        plt.title('Feature Correlations')
+        plt.legend()
+        st.pyplot(fig)
 
     def corr_cofficient(self, options_selected, is_mask, corr_matrix):
         assert len(options_selected) >= 4, "options insufficient !"

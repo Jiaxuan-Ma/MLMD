@@ -68,7 +68,10 @@ if st.session_state["authentication_status"]:
         # according the feature and target correlation to drop feature
         with col1:  
             corr_method = st.selectbox("correlation method",["pearson","spearman","kendall","MIR"], key=15)  
-            option_dropped_threshold = st.slider('corr threshold f_t',0.0, 1.0,0.0)
+            if corr_method != "MIR":
+                option_dropped_threshold = st.slider('corr threshold f_t',0.0, 1.0,0.0)
+            if corr_method == 'MIR':
+                options_seed = st.checkbox('random state 1024',True)
             with st.expander('PLOT PARAMETERS'):
                 options_selected = [plot.set_title_fontsize(11),plot.set_label_fontsize(12),
                     plot.set_tick_fontsize(13),plot.set_legend_fontsize(14),plot.set_color('bin color',19,16)]
@@ -93,10 +96,14 @@ if st.session_state["authentication_status"]:
                     tmp_download_link = download_button(data, f'features dropped low corr feature.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
             else:
-                corr_mir  = MIR(fs.features, target_selected)
+                if options_seed:
+                    corr_mir  = MIR(fs.features, target_selected, random_state=1024)
+                else:
+                    corr_mir = MIR(fs.features, target_selected)
                 corr_mir = pd.DataFrame(corr_mir).set_index(pd.Index(list(fs.features.columns)))
                 corr_mir.rename(columns={0: 'mutual info'}, inplace=True)
-                st.write(corr_mir)  
+                plot.corr_feature_target_mir(options_selected, corr_mir)
+ 
         st.write('---')
 
 elif st.session_state["authentication_status"] is False:
