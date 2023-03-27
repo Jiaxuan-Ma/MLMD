@@ -237,21 +237,18 @@ if st.session_state["authentication_status"]:
 
                         fs.identify_zero_low_importance(option_cumulative_importance)
                         fs.feature_importance_select_show()
-   
+
                         if Embedded_method:
-                            threshold_list = []
-                            cumu_thres = 0
+                            
                             threshold  = np.linspace(range_threshold[0], range_threshold[1],option_threshold_number)
                             score = []
                             for i in threshold:
                                 x_embedded = SelectFromModel(fs.model, threshold=i).fit_transform(fs.features, fs.targets)
                                 once = CVS(fs.model, fs.features, fs.targets, cv = cv).mean() 
                                 score.append(once)
-                                cumu_thres += i
-                                threshold_list.append(cumu_thres)
                             fig, ax = plt.subplots()
-                            ax = plt.plot(threshold_list, score)
-                            plt.xlabel("cumulative feature importance")
+                            ax = plt.plot(threshold, score)
+                            plt.xlabel("feature importance")
                             plt.ylabel("r2")
                             st.pyplot(fig)
 
