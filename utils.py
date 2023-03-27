@@ -614,8 +614,8 @@ class customPlot:
                             hist_kws={"color": color[1],"alpha":1})
         plt.title(target_name + " Statistics ")
         plt.legend()
-        img_path = os.path.join(target_dir, target_name+' Statistics.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, target_name+' Statistics.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
     def feature_hist_kde(self, options_selected, feature_name, feature_value):
@@ -627,8 +627,8 @@ class customPlot:
                             hist_kws={"color": color[1],"alpha":1})
         plt.title(feature_name + " Statistics ")
         plt.legend()
-        img_path = os.path.join(target_dir, feature_name+' Statistics.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, feature_name+' Statistics.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
     def featureSets_statistics_hist(self, options_selected, IDs, Counts):
@@ -643,8 +643,8 @@ class customPlot:
         plt.ylabel("Frequency")
         plt.tight_layout()
         plt.legend()
-        img_path = os.path.join(target_dir, 'Recipes Statistics.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'Recipes Statistics.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
     def feature_distribution(self,options_selected,feature_name, feature_value):
@@ -661,8 +661,8 @@ class customPlot:
         plt.ylabel("Frequency")
         plt.xlabel("Atomic Percentage (at.%)")
         plt.legend()
-        img_path = os.path.join(target_dir, feature_name +'Data Distribution.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, feature_name +'Data Distribution.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
     def features_and_targets(self,options_selected, data, features, targets):
@@ -671,8 +671,8 @@ class customPlot:
         color = self.map_color_options(options_selected)
         fig = sns.PairGrid(data, x_vars=features, y_vars=targets).map(sns.regplot,ci=None,scatter_kws={"color": color[0]}, line_kws={"color": color[1]})
         plt.legend()
-        img_path = os.path.join(target_dir, 'Features and Targets.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'Features and Targets.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
     def targets_and_targets(self,options_selected, data, targets):
@@ -686,8 +686,8 @@ class customPlot:
             fig.axes[i, i].set_visible(False)
         # plt.title(" Targets and Targets ")
         plt.legend()
-        img_path = os.path.join(target_dir, 'Targets and Targets.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'Targets and Targets.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
     def corr_feature_target(self, options_selected, corr):
@@ -699,8 +699,8 @@ class customPlot:
         plt.xlabel('Correlation')
         plt.title('Feature Correlations')
         plt.legend()
-        img_path = os.path.join(target_dir, 'Feature Correlations.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'Feature Correlations.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
     def corr_cofficient(self, options_selected, is_mask, corr_matrix):
@@ -713,14 +713,14 @@ class customPlot:
             mask[np.triu_indices_from(mask)] = True
             ax = sns.heatmap(corr_matrix, mask=mask, cmap=cmap, linewidths=0.5,square = True, annot=True)
             plt.legend()
-            img_path = os.path.join(target_dir, 'Correlation Matrix.png')
-            fig.savefig(img_path)
+            # img_path = os.path.join(target_dir, 'Correlation Matrix.png')
+            # fig.savefig(img_path)
             st.pyplot(fig)
         else:
             ax = sns.heatmap(corr_matrix,cmap = cmap, linewidths=0.5,square = True, annot=True)
             plt.legend()
-            img_path = os.path.join(target_dir, 'Correlation Cofficient.png')
-            fig.savefig(img_path)
+            # img_path = os.path.join(target_dir, 'Correlation Cofficient.png')
+            # fig.savefig(img_path)
             st.pyplot(fig)
 
     def feature_missing(self,options_selected, record_missing, missing_stats):
@@ -737,8 +737,8 @@ class customPlot:
         plt.ylabel("Count of Features")
         plt.tight_layout()
         plt.legend()
-        img_path = os.path.join(target_dir, 'Fraction of Missing Values Histogram.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'Fraction of Missing Values Histogram.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)    
 
     def feature_nunique(self, options_selected, record_single_unique, unique_stats):
@@ -755,8 +755,8 @@ class customPlot:
         plt.ylabel('Frequency')
         plt.tight_layout()
         plt.legend()
-        img_path = os.path.join(target_dir, 'Number of Unique Values Histogram.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'Number of Unique Values Histogram.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)    
 
     def feature_importance(self,record_zero_importance, feature_importances,
@@ -794,8 +794,8 @@ class customPlot:
         plt.xlabel('Normalized Importance'); 
         plt.title('Feature Importances')
         plt.legend()
-        img_path = os.path.join(target_dir, 'Number of Unique Values Histogram.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'Number of Unique Values Histogram.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)   
 
     def pred_vs_actual(self,actual,pred):
@@ -814,8 +814,8 @@ class customPlot:
         plt.xlabel("Actual")
         plt.ylabel("Predicted")
         plt.legend()
-        img_path = os.path.join(target_dir, 'prediction vs label.png')
-        fig.savefig(img_path)
+        # img_path = os.path.join(target_dir, 'prediction vs label.png')
+        # fig.savefig(img_path)
         st.pyplot(fig)
 
 class FeatureSelector:
