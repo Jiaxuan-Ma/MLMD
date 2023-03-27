@@ -31,7 +31,7 @@ def show():
     # st.write("preprocessing")
     # inputs["Normalize"] = st.selectbox('normalize method', ['Z-Score Standardization','Min-Max Scale'])
     
-    st.info('TO SOLVE **CLASSIFICATION**')
+    st.info('TO SOLVE **FEATURE IMPORTANCE**')
     
     # st.write('training')
 
