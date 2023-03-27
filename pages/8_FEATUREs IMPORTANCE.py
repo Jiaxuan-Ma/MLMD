@@ -199,33 +199,30 @@ if st.session_state["authentication_status"]:
 
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
-                # st.write(fs.feature_importances['cumulative_importance'])
-                # st.write(fs.feature_importances['normalized_importance'])
-                # x_embedded = SelectFromModel(fs.model, threshold=option_importance_threshold).fit_transform(fs.features,fs.targets)
-                # fs.model.fit(fs.features,fs.targets).feature_importance_
+
                 if Embedded_method:
                     
                     threshold  = fs.cumulative_importance
 
-                feature_importances = fs.feature_importances.set_index('feature',drop = False)
+                    feature_importances = fs.feature_importances.set_index('feature',drop = False)
 
-                features = []
-                scores = []
-                cumuImportance = []
-                for i in range(1, len(fs.features.columns) + 1):
-                    features.append(feature_importances.iloc[:i, 0].values.tolist())
-                    X_selected = fs.features[features[-1]]
-                    score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+                    features = []
+                    scores = []
+                    cumuImportance = []
+                    for i in range(1, len(fs.features.columns) + 1):
+                        features.append(feature_importances.iloc[:i, 0].values.tolist())
+                        X_selected = fs.features[features[-1]]
+                        score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
 
-                    cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
-                    scores.append(score)
-                cumu_importance = np.array(cumuImportance)
-                scores = np.array(scores) 
-                fig, ax = plt.subplots()
-                ax = plt.plot(cumu_importance, scores,'o-')
-                plt.xlabel("feature importance")
-                plt.ylabel("r2")
-                st.pyplot(fig)
+                        cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                        scores.append(score)
+                    cumu_importance = np.array(cumuImportance)
+                    scores = np.array(scores) 
+                    fig, ax = plt.subplots()
+                    ax = plt.plot(cumu_importance, scores,'o-')
+                    plt.xlabel("feature importance")
+                    plt.ylabel("r2")
+                    st.pyplot(fig)
 
         elif inputs['model'] == 'RandomForestRegressor':
                     
@@ -237,7 +234,7 @@ if st.session_state["authentication_status"]:
                         Embedded_method = st.checkbox('Embedded method',False)
                         if Embedded_method:
                             cv = st.number_input('cv',1,10,5)
-                            option_threshold_number = st.slider('threshold number',0,20,5)
+                          
                             feature_importance_max =np.float((fs.model.fit(fs.features, fs.targets).feature_importances_).max())
                             range_threshold = st.slider('threshold range',0.0, feature_importance_max,(0.0, feature_importance_max))
             
@@ -252,27 +249,27 @@ if st.session_state["authentication_status"]:
 
                         if Embedded_method:
                             
-                                threshold  = fs.cumulative_importance
+                            threshold  = fs.cumulative_importance
 
-                        feature_importances = fs.feature_importances.set_index('feature',drop = False)
+                            feature_importances = fs.feature_importances.set_index('feature',drop = False)
 
-                        features = []
-                        scores = []
-                        cumuImportance = []
-                        for i in range(1, len(fs.features.columns) + 1):
-                            features.append(feature_importances.iloc[:i, 0].values.tolist())
-                            X_selected = fs.features[features[-1]]
-                            score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+                            features = []
+                            scores = []
+                            cumuImportance = []
+                            for i in range(1, len(fs.features.columns) + 1):
+                                features.append(feature_importances.iloc[:i, 0].values.tolist())
+                                X_selected = fs.features[features[-1]]
+                                score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
 
-                            cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
-                            scores.append(score)
-                        cumu_importance = np.array(cumuImportance)
-                        scores = np.array(scores) 
-                        fig, ax = plt.subplots()
-                        ax = plt.plot(cumu_importance, scores,'o-')
-                        plt.xlabel("feature importance")
-                        plt.ylabel("r2")
-                        st.pyplot(fig)
+                                cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                                scores.append(score)
+                            cumu_importance = np.array(cumuImportance)
+                            scores = np.array(scores) 
+                            fig, ax = plt.subplots()
+                            ax = plt.plot(cumu_importance, scores,'o-')
+                            plt.xlabel("feature importance")
+                            plt.ylabel("r2")
+                            st.pyplot(fig)
 
         st.write('---')
 
