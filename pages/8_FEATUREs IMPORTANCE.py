@@ -89,109 +89,131 @@ if st.session_state["authentication_status"]:
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
 
-        elif inputs['model'] == 'Permutation':
+        # elif inputs['model'] == 'Permutation':
 
-            st.write('you found me')
+        #     st.write('you found me')
 
-        elif inputs['model'] == 'LinearRegressor':
+        # elif inputs['model'] == 'LinearRegressor':
             
 
-            fs.model = SelectFromModel(estimator=LinearR())
+        #     fs.model = SelectFromModel(estimator=LinearR())
 
-            with col2:
-                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
-            with st.container():
-                button_train = st.button('train', use_container_width=True)
-            if button_train:
+        #     with col2:
+        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+        #     with st.container():
+        #         button_train = st.button('train', use_container_width=True)
+        #     if button_train:
 
-                # fs.model.fit(fs.features, fs.targets)
+        #         # fs.model.fit(fs.features, fs.targets)
 
-                fs.LinearRegressor()
-                # st.write(fs.feature_importances)
-                fs.identify_zero_low_importance(option_cumulative_importance)
-                fs.feature_importance_select_show()
+        #         fs.LinearRegressor()
+        #         # st.write(fs.feature_importances)
+        #         fs.identify_zero_low_importance(option_cumulative_importance)
+        #         fs.feature_importance_select_show()
 
-        elif inputs['model'] == 'LassoCV':
+        # elif inputs['model'] == 'LassoCV':
             
             
-            fs.model = LassoCV()
+        #     fs.model = LassoCV()
 
-            with col2:
-                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+        #     with col2:
+        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
             
-            with st.container():
-                button_train = st.button('train', use_container_width=True)
-            if button_train:
+        #     with st.container():
+        #         button_train = st.button('train', use_container_width=True)
+        #     if button_train:
 
-                # fs.model.fit(fs.features, fs.targets)
+        #         # fs.model.fit(fs.features, fs.targets)
 
-                fs.LassoCV()
+        #         fs.LassoCV()
 
-                fs.identify_zero_low_importance(option_cumulative_importance)
-                fs.feature_importance_select_show()
+        #         fs.identify_zero_low_importance(option_cumulative_importance)
+        #         fs.feature_importance_select_show()
         
-        elif inputs['model'] == 'ExtraTressClassifier':
+        # elif inputs['model'] == 'ExtraTressClassifier':
             
 
-            fs.model = ETR(n_estimators = inputs['nestimators'], 
-                                        max_features=inputs['max features'],
-                                        random_state=inputs['random state'])
+        #     fs.model = ETR(n_estimators = inputs['nestimators'], 
+        #                                 max_features=inputs['max features'],
+        #                                 random_state=inputs['random state'])
 
-            with col2:
-                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+        #     with col2:
+        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
 
-            with st.container():
-                button_train = st.button('train', use_container_width=True)
-            if button_train:
+        #     with st.container():
+        #         button_train = st.button('train', use_container_width=True)
+        #     if button_train:
 
-                fs.model.fit(fs.features, fs.targets)
+        #         fs.model.fit(fs.features, fs.targets)
 
-                fs.EXtraTreesClassifier()
+        #         fs.EXtraTreesClassifier()
 
-                fs.identify_zero_low_importance(option_cumulative_importance)
-                fs.feature_importance_select_show()
+        #         fs.identify_zero_low_importance(option_cumulative_importance)
+        #         fs.feature_importance_select_show()
 
 
-        elif inputs['model'] == 'RFECVsvr':
+        # elif inputs['model'] == 'RFECVsvr':
 
-            if inputs['kernel'] == 'linear':
-                estimator = SVR(kernel = "linear")
+        #     if inputs['kernel'] == 'linear':
+        #         estimator = SVR(kernel = "linear")
 
-            if inputs['kernel'] == 'rbf':
-                estimator = SVR(kernel = 'rbf')
+        #     if inputs['kernel'] == 'rbf':
+        #         estimator = SVR(kernel = 'rbf')
 
-            fs.model = RFECV(estimator=estimator, step=inputs['step'],cv=inputs['cv'])
-            with col2:
-                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+        #     fs.model = RFECV(estimator=estimator, step=inputs['step'],cv=inputs['cv'])
+        #     with col2:
+        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
 
-            with st.container():
-                button_train = st.button('train', use_container_width=True)
-            if button_train:
+        #     with st.container():
+        #         button_train = st.button('train', use_container_width=True)
+        #     if button_train:
 
-                # fs.model.fit(fs.features, fs.targets)
+        #         # fs.model.fit(fs.features, fs.targets)
 
-                fs.RFECVsvr()
+        #         fs.RFECVsvr()
 
-                fs.identify_zero_low_importance(option_cumulative_importance)
-                fs.feature_importance_select_show()
+        #         fs.identify_zero_low_importance(option_cumulative_importance)
+        #         fs.feature_importance_select_show()
 
         elif inputs['model'] == 'RandomForestClassifier':
             
-            with col2:
+            fs.model = RFC()
 
-                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+            with col2:
+                
+                option_cumulative_importance = st.slider('cumulative importance',0.5, 1.0, 0.95)
+                Embedded_method = st.checkbox('Embedded method',False)
+                if Embedded_method:
+                    cv = st.number_input('cv',1,10,5)
+                    option_threshold_number = st.slider('threshold number',0,20,5)
+                    feature_importance_max =np.float((fs.model.fit(fs.features, fs.targets).feature_importances_).max())
+                    range_threshold = st.slider('threshold range',0.0, feature_importance_max,(0.0, feature_importance_max))
     
             with st.container():
                 button_train = st.button('train', use_container_width=True)
             if button_train:
 
-                fs.model = RFC()
-                # fs.model.fit(fs.features, fs.targets)
-
                 fs.RandomForestClassifier()
 
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
+                # st.write(fs.feature_importances['cumulative_importance'])
+                # st.write(fs.feature_importances['normalized_importance'])
+                # x_embedded = SelectFromModel(fs.model, threshold=option_importance_threshold).fit_transform(fs.features,fs.targets)
+                # fs.model.fit(fs.features,fs.targets).feature_importance_
+                if Embedded_method:
+                    
+                    threshold  = np.linspace(range_threshold[0], range_threshold[1],option_threshold_number)
+                    score = []
+                    for i in threshold:
+                        x_embedded = SelectFromModel(fs.model, threshold=i).fit_transform(fs.features, fs.targets)
+                        once = CVS(fs.model, fs.features, fs.targets, cv = cv).mean() 
+                        score.append(once)
+                    fig, ax = plt.subplots()
+                    ax = plt.plot(threshold, score)
+                    plt.xlabel("feature importance")
+                    plt.ylabel("r2")
+                    st.pyplot(fig)
 
 
 
