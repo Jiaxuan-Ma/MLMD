@@ -154,7 +154,38 @@ if st.session_state["authentication_status"]:
                 
                     clf_res  = clf.model.fit(clf.features, clf.targets)
                     oob_score = clf_res.oob_score_
-                    st.write(f'oob score : {oob_score}')                      
+                    st.write(f'oob score : {oob_score}')              
+
+
+        if inputs['model'] == 'LogisticRegression':
+
+            with col2:
+                with st.expander('Operator'):
+                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    if data_process == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                    elif data_process == 'cross val score':
+                        cv = st.number_input('cv',1,10,5)
+                        scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
+
+            if st.button('train'):
+                if data_process == 'train test split':
+                            
+                    clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                   random_state=inputs['random state'],class_weight=inputs['class weight'], l1_ratio= inputs['l1 ratio'])   
+                    clf.LogisticRegreesion()
+                    
+                    st.write('plot.........................')
+
+                    plot = customPlot()
+                elif data_process == 'cross val score':
+                    clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                   random_state=inputs['random state'],class_weight=inputs['class weight'], l1_ratio= inputs['l1 ratio'])    
+                     
+                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
+
+                    st.write('cross val score:', cvs)                
 
         st.write('---')
 

@@ -39,6 +39,7 @@ from sklearn.ensemble import RandomForestRegressor as RFR
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.ensemble import ExtraTreesRegressor as ETR
 from sklearn.linear_model import LinearRegression as LinearR
+from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import LassoCV
 
 from sklearn.feature_selection import RFE
@@ -51,7 +52,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.feature_selection import f_regression
 from sklearn.feature_selection import mutual_info_classif
 from sklearn.feature_selection import mutual_info_regression as MIR
-
+from sklearn.metrics import accuracy_score
 
 
 import graphviz
@@ -1262,6 +1263,13 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
 
+        st.info('train process is over')
+        st.write('test score: {}'.format(self.score))
+    def LogisticRegreesion(self):
+        
+        self.model.fit(self.Xtrain, self.Ytrain)
+        # self.coef = self.model.coef_
+        self.score = accuracy_score(self.model.predict(self.Xtest),self.Ytest)
         st.info('train process is over')
         st.write('test score: {}'.format(self.score))
 
