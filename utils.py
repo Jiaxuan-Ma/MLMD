@@ -1238,6 +1238,28 @@ class FeatureSelector:
 
         st.info('train process is over')
         feature_importance_values = abs(self.model.feature_importances_)
+
+        self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
+    
+    def LogisticRegression(self):
+        # One hot encoding
+        features = pd.get_dummies(self.features)
+        # Extract feature names
+        feature_names = list(features.columns)
+        # Conbert to np array
+        features = np.array(self.features)
+        # targets = np.array(self.targets).reshape((-1,))
+        
+        # Empty array for feature importances
+        feature_importance_values = np.zeros(len(feature_names))
+
+        progress_text = "Operation in progress. Please wait."
+
+        self.model.fit(self.features, self.targets.astype('int'))
+
+        st.info('train process is over')
+        feature_importance_values = np.squeeze(abs(self.model.coef_))
+     
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
 
 class CLASSIFIER:

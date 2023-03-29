@@ -23,22 +23,14 @@ if st.session_state["authentication_status"]:
 
     colored_header(label="LETs GO ",description=" ",color_name="violet-70")
 
-    col1, col2 = st.columns([2,2])
-    with col1:
-        P1 = card(
-        title="CONTINUOUS TARGETs!",
-        text=" ",
-        image=  "https://tse1-mm.cn.bing.net/th/id/R-C.75ddb34c910f531307d15a3c8cfabd99?rik=UjB2rVbX41xGiQ&riu=http%3a%2f%2fpic.zsucai.com%2ffiles%2f2013%2f0830%2fxiaguang1.jpg&ehk=qLHz0WQu%2bbLSDyX04QscddrbMoX%2bm5wAR8hHIyiGvvA%3d&risl=&pid=ImgRaw&r=0")
-        if P1:
-            switch_page("CONTINUOUS TARGETs")
+
+    P1 = card(
+    title="DATA VISUALIZATION!",
+    text=" ",
+    image=  "https://tse1-mm.cn.bing.net/th/id/R-C.75ddb34c910f531307d15a3c8cfabd99?rik=UjB2rVbX41xGiQ&riu=http%3a%2f%2fpic.zsucai.com%2ffiles%2f2013%2f0830%2fxiaguang1.jpg&ehk=qLHz0WQu%2bbLSDyX04QscddrbMoX%2bm5wAR8hHIyiGvvA%3d&risl=&pid=ImgRaw&r=0")
+    if P1:
+        switch_page("CONTINUOUS TARGETs")
         
-    with col2:
-        P2 = card(
-        title="DISCRETE TARGETs!",
-        text=" ",
-        image="")
-        if P2:
-            switch_page("DISCRETE TARGETs")
 
 
 elif st.session_state["authentication_status"] is False:

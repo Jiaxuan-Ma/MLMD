@@ -12,6 +12,10 @@ credentials:
       email: 2282882173@qq.com
       name: 2282882173@qq.com
       password: $2b$12$xAiPvytn0B88891qOeb19u5/dw79BNzF8CMngcdcLneJI7TfcBNH6
+    huang_dongyang@shu.edu.cn:
+      email: huang_dongyang@shu.edu.cn
+      name: huang_dongyang@shu.edu.cn
+      password: $2b$12$kOY/90./vYno4AtdIRgBbe5Cdk/pQAw87dvsebHN5p2Sy6Wqxgx96
     mjx@shu.edu.cn:
       email: mjx@shu.edu.cn
       name: mjx@shu.edu.cn

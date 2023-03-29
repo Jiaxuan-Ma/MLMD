@@ -120,7 +120,7 @@ if st.session_state["authentication_status"]:
 
                     st.write('mean cross val score:', cvs.mean())
 
-        if inputs['model'] == 'RandomForestRrgressor':
+        if inputs['model'] == 'RandomForestRegressor':
             with col2:
                 with st.expander('Operator'):
                     operator = st.selectbox('data operator', ('train test split','cross val score','oob score'))
