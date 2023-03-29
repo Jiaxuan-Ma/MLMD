@@ -41,7 +41,7 @@ def show():
         with st.expander("Hyper Parameter"):
             inputs['penalty'] = st.selectbox('penalty',('l2','l1','elasticnet','None'))
         
-            inputs['C'] = st.number_input('C', 0.000001, 100000.0, 1.0)
+            inputs['C'] = st.number_input('C', 0.01, 100.0, 1.0)
             inputs['solver'] = st.selectbox('solver',('lbfgs','liblinear','newton-cg','newton-cholesky','sag','saga'))
             inputs['max iter'] = st.number_input('max iter', 0, 100000, 100)
             inputs['multi class'] = st.selectbox('multi class',('auto','ovr','multinomial'))
@@ -56,12 +56,12 @@ def show():
             else:
                 inputs['random state'] = None
        
-        with st.expander("Unbalanced Data"):
-            inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
-            if inputs['unbalanced data']:
-                inputs['class weight'] = st.selectbox('class weight',(None,'balanced'))
-            else:
-                inputs['class weight'] = None
+        # with st.expander("Unbalanced Data"):
+        #     inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
+        #     if inputs['unbalanced data']:
+        #         inputs['class weight'] = st.selectbox('class weight',(None,'balanced'))
+        #     else:
+        #         inputs['class weight'] = None
 
     return inputs,col2
 

@@ -177,7 +177,9 @@ if st.session_state["authentication_status"]:
 
         elif inputs['model'] == 'RandomForestClassifier':
             
-            fs.model = RFC()
+            fs.model =  RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],
+                            min_samples_leaf=inputs['min samples leaf'], min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
+                    
             st.write(fs.model)
             with col2:
                 
@@ -222,7 +224,9 @@ if st.session_state["authentication_status"]:
 
         elif inputs['model'] == 'RandomForestRegressor':
                     
-                    fs.model = RFR()
+                    fs.model = RFR(criterion = inputs['criterion'], n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                    min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
+                                                    n_jobs=inputs['njobs'])
                     st.write(fs.model)
                     with col2:
                         
@@ -231,8 +235,8 @@ if st.session_state["authentication_status"]:
                         if Embedded_method:
                             cv = st.number_input('cv',1,10,5)
                           
-                            feature_importance_max =np.float((fs.model.fit(fs.features, fs.targets).feature_importances_).max())
-                            range_threshold = st.slider('threshold range',0.0, feature_importance_max,(0.0, feature_importance_max))
+                            # feature_importance_max =np.float((fs.model.fit(fs.features, fs.targets).feature_importances_).max())
+                            # range_threshold = st.slider('threshold range',0.0, feature_importance_max,(0.0, feature_importance_max))
             
                     with st.container():
                         button_train = st.button('train', use_container_width=True)
@@ -270,7 +274,7 @@ if st.session_state["authentication_status"]:
         elif inputs['model'] == 'LogisticRegression':
 
             fs.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
-                                   random_state=inputs['random state'],class_weight=inputs['class weight'], l1_ratio= inputs['l1 ratio'])   
+                                   random_state=inputs['random state'], l1_ratio= inputs['l1 ratio'])   
             st.write(fs.model)
             with col2:
                 
@@ -287,6 +291,7 @@ if st.session_state["authentication_status"]:
                 fs.LogisticRegression()
 
                 fs.identify_zero_low_importance(option_cumulative_importance)
+                
                 fs.feature_importance_select_show()
 
                 if Embedded_method:

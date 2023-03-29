@@ -1258,8 +1258,9 @@ class FeatureSelector:
         self.model.fit(self.features, self.targets.astype('int'))
 
         st.info('train process is over')
+        # st.write(self.model.coef_)
         feature_importance_values = np.squeeze(abs(self.model.coef_))
-     
+        # st.write(feature_importance_values.shape)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
 
 class CLASSIFIER:

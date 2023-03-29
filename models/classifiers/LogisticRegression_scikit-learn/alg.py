@@ -56,12 +56,12 @@ def show():
             else:
                 inputs['random state'] = None
        
-        with st.expander("Unbalanced Data"):
-            inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
-            if inputs['unbalanced data']:
-                inputs['class weight'] = st.selectbox('class weight',(None,'balanced'))
-            else:
-                inputs['class weight'] = None
+        # with st.expander("Unbalanced Data"):
+        #     inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
+        #     if inputs['unbalanced data']:
+        #         inputs['class weight'] = st.selectbox('class weight',(None,'balanced'))
+        #     else:
+        #         inputs['class weight'] = None
 
     return inputs,col2
 

@@ -86,8 +86,8 @@ if st.session_state["authentication_status"]:
                 if data_process == 'train test split':
                             
                     clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
-                                                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'],
-                                                            class_weight=inputs['class weight'], min_weight_fraction_leaf=inputs['min weight fraction leaf'])   
+                                                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
+                                                               
                     clf.DecisionTreeClassifier()
                     
                     st.write('plot.........................')
@@ -100,8 +100,8 @@ if st.session_state["authentication_status"]:
                         graph.render('Tree graph', view=True)
                 elif data_process == 'cross val score':
                     clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
-                                                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'],
-                                                            class_weight=inputs['class weight'], min_weight_fraction_leaf=inputs['min weight fraction leaf'])   
+                                                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
+                                                            
                     cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
 
                     st.write('cross val score:', cvs)
@@ -127,8 +127,7 @@ if st.session_state["authentication_status"]:
                 if data_process == 'train test split':
 
                     clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                min_samples_split=inputs['min samples split'],class_weight=inputs['class weight'],min_weight_fraction_leaf=inputs['min weight fraction leaf'],
-                                                oob_score=inputs['oob score'], warm_start=inputs['warm start'])
+                                                min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                     
                     clf.RandomForestClassifier()
                     st.write('plot......................')
@@ -138,8 +137,7 @@ if st.session_state["authentication_status"]:
 
  
                     clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                min_samples_split=inputs['min samples split'],class_weight=inputs['class weight'],min_weight_fraction_leaf=inputs['min weight fraction leaf'],
-                                                oob_score=inputs['oob score'], warm_start=inputs['warm start'])
+                                                min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                 
      
                     cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv,scoring=scoring)
@@ -149,8 +147,7 @@ if st.session_state["authentication_status"]:
                 elif data_process == 'oob score':
  
                     clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                min_samples_split=inputs['min samples split'],class_weight=inputs['class weight'],min_weight_fraction_leaf=inputs['min weight fraction leaf'],
-                                                oob_score=inputs['oob score'], warm_start=inputs['warm start'])
+                                                min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                 
                     clf_res  = clf.model.fit(clf.features, clf.targets)
                     oob_score = clf_res.oob_score_

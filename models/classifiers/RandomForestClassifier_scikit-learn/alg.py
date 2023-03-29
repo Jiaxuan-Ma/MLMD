@@ -58,14 +58,14 @@ def show():
             else:
                 inputs['random state'] = None
              # graph parameter
-        with st.expander("Unbalanced Data"):
-            inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
-            if inputs['unbalanced data']:
-                inputs['class weight'] = st.selectbox('class weight',(None,'balanced','balanced_subsample'))
-                inputs['min weight fraction leaf'] = st.slider('min weight fraction leaf',0.0, 1.0, 0.0)
-            else:
-                inputs['class weight'] = None
-                inputs['min weight fraction leaf'] = 0.0
+        # with st.expander("Unbalanced Data"):
+        #     inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
+        #     if inputs['unbalanced data']:
+        #         inputs['class weight'] = st.selectbox('class weight',(None,'balanced','balanced_subsample'))
+        #         inputs['min weight fraction leaf'] = st.slider('min weight fraction leaf',0.0, 1.0, 0.0)
+        #     else:
+        #         inputs['class weight'] = None
+        #         inputs['min weight fraction leaf'] = 0.0
 
     return inputs,col2
 
