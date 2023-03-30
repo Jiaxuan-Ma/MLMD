@@ -20,6 +20,7 @@ from streamlit_lottie import st_lottie_spinner
 import numpy as np
 import pandas as pd
 
+from imblearn.over_sampling import SMOTE
 
 import lightgbm as lgb
 

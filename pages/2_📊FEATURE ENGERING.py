@@ -94,6 +94,15 @@ if st.session_state["authentication_status"]:
     image="https://ts1.cn.mm.bing.net/th/id/R-C.93e546731d5bc64544905c1e58d6e546?rik=DJf0wHkmD9sG8A&pid=ImgRaw&r=0")
     if P7:
         switch_page("FEATUREs IMPORTANCE")
+    
+    colored_header(label="DATA ENHANCEMENT",description=" ",color_name="violet-70")
+    
+    P8 = card(
+    title="DATA ENHANCEMENT!",
+    text="",
+    image="https://ts1.cn.mm.bing.net/th/id/R-C.c8844d225dd6253fb78f4acd4fd95020?rik=BA0CggiG0Im1gw&riu=http%3a%2f%2fpic.221600.cn%2fforum%2f201408%2f15%2f002316cigtttxa8gcjbjki.jpg&ehk=qImHVhtZQI%2bhaRNaqmm08TykmhQ5hl6bqoUWhiknTgg%3d&risl=&pid=ImgRaw&r=0")
+    if P8:
+        switch_page("DATA ENHANCEMENT")
 
 elif st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
