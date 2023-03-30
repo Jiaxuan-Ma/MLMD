@@ -38,6 +38,13 @@ if st.session_state["authentication_status"]:
         image= "https://images.alphacoders.com/112/112121.jpg")
         if P2:
             switch_page("TUNE RANDOM FOREST PARAMETERs")
+ 
+    P3= card(
+    title="TUNE LOGISTICS REGRESSION PARAMETERs!",
+    text="",
+    image= "https://images.alphacoders.com/112/112121.jpg")
+    if P3:
+        switch_page("TUNE LOGISTICS REGRESSION PARAMETERs")
     
         
 elif st.session_state["authentication_status"] is False:

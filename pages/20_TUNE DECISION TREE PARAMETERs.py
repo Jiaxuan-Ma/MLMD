@@ -89,7 +89,9 @@ if st.session_state["authentication_status"]:
                         step = st.number_input('step',1,10,2)
                         cv = st.number_input('cv',1,10,5)
                         scoring = st.selectbox('scoring',('r2','neg_mean_absolute_error','neg_mean_squared_error'))
-                    if st.button('train'):
+                    with st.container():
+                        button_train = st.button('train', use_container_width=True)
+                    if button_train:
                         scorel = []
                         for i in range(max_depth[0],max_depth[1],step):
          
