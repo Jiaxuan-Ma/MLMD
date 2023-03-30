@@ -79,7 +79,7 @@ if st.session_state["authentication_status"]:
 
         inputs, col2,tab2 =  template_alg.show()
         
-        if inputs['model'] == 'RandomForestRrgressor':
+        if inputs['model'] == 'RandomForestRegressor':
             
             if inputs['tune_parameter'] == 'nestimators':
                 with col2:

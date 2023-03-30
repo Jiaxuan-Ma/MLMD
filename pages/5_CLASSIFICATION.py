@@ -165,12 +165,13 @@ if st.session_state["authentication_status"]:
                     elif data_process == 'cross val score':
                         cv = st.number_input('cv',1,10,5)
                         scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
-
-            if st.button('train'):
+            with st.container():
+                button_train = st.button('train', use_container_width=True)
+            if button_train:
                 if data_process == 'train test split':
                             
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
-                                   random_state=inputs['random state'],class_weight=inputs['class weight'], l1_ratio= inputs['l1 ratio'])   
+                                   random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
                     clf.LogisticRegreesion()
                     
                     st.write('plot.........................')
@@ -178,7 +179,7 @@ if st.session_state["authentication_status"]:
                     plot = customPlot()
                 elif data_process == 'cross val score':
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
-                                   random_state=inputs['random state'],class_weight=inputs['class weight'], l1_ratio= inputs['l1 ratio'])    
+                                   random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])    
                      
                     cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
 
