@@ -4,7 +4,7 @@ import streamlit as st
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "LogisticRegression",
+    "model": "K-means",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 
@@ -31,7 +31,7 @@ def show():
     # st.write("preprocessing")
     # inputs["Normalize"] = st.selectbox('normalize method', ['Z-Score Standardization','Min-Max Scale'])
     
-    st.info('TO SOLVE **CLASSIFICATION**')
+    st.info('TO SOLVE **CLUSTER**')
     
     # st.write('training')
 
@@ -39,32 +39,16 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['penalty'] = st.selectbox('penalty',('l2','l1','elasticnet','None'))
-        
-            inputs['C'] = st.number_input('C', 0.000001, 100000.0, 1.0)
-            
-            inputs['max iter'] = st.number_input('max iter', 0, 100000, 100)
-            inputs['multi class'] = st.selectbox('multi class',('auto','ovr','multinomial'))
-            if inputs['penalty'] == 'elasticnet':
-                inputs['l1 ratio'] = st.slider('l1 ratio',0.0, 1.0, 0.5) 
-            else:
-                inputs['l1 ratio'] = None
+            inputs['n clusters'] = st.number_input('n clusters',2, 100, 3)
+
+            inputs['max iter'] = st.number_input('max iter', 1, 10000, 300)
 
             random_state = st.checkbox('random state 1024',True)
             if random_state:
                 inputs['random state'] = 1024
             else:
                 inputs['random state'] = None
-            if inputs['penalty'] == 'l1' or inputs['penalty'] == 'elasticnet':
-                inputs['solver'] = st.selectbox('solver',['saga'])
-            else:
-                inputs['solver'] = st.selectbox('solver',('lbfgs','liblinear','newton-cg','newton-cholesky','sag','saga'))
-        # with st.expander("Unbalanced Data"):
-        #     inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
-        #     if inputs['unbalanced data']:
-        #         inputs['class weight'] = st.selectbox('class weight',(None,'balanced'))
-        #     else:
-        #         inputs['class weight'] = None
+  
 
     return inputs,col2
 

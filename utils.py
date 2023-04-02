@@ -54,6 +54,11 @@ from sklearn.feature_selection import f_regression
 from sklearn.feature_selection import mutual_info_classif
 from sklearn.feature_selection import mutual_info_regression as MIR
 from sklearn.metrics import accuracy_score
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_samples
+
+
 
 
 import graphviz
@@ -1331,3 +1336,26 @@ class REGRESSOR:
         self.Ypred = self.model.predict(self.Xtest)
         self.score = self.model.score(self.Xtest, self.Ytest)
         st.write('test score R2: {}'.format(self.score))
+
+class CLUSTER():
+
+    def __init__(self, features, targets) -> None:
+        # origin features and targets
+        self.features = features
+        self.targets = targets   
+
+        self.pred = None
+        self.model = None
+
+        self.score = None
+
+    def K_means(self):
+
+        self.model.fit(self.features)
+        # self.score = self.model.score(self.Xtest, self.Ytest)
+        self.score = silhouette_score(self.features, self.model.labels_)
+        st.info('train process is over')
+        st.write('silhouette score: {}'.format(self.score))
+        # st.write('cluster centers: {}'.format(self.model.cluster_centers_))
+
+    
