@@ -1,1 +1,1 @@
-pip3 install -r requirments.txt
+pip install -r requirments.txt
