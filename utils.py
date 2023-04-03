@@ -46,6 +46,7 @@ from sklearn.linear_model import LassoCV
 from sklearn.feature_selection import RFE
 from sklearn.feature_selection import RFECV
 from sklearn.svm import SVR
+from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.impute import SimpleImputer
@@ -57,7 +58,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.metrics import silhouette_samples
-
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 
 
 
@@ -1299,6 +1301,14 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         # self.coef = self.model.coef_
         self.score = accuracy_score(self.model.predict(self.Xtest),self.Ytest)
+        st.info('train process is over')
+        st.write('test score: {}'.format(self.score))
+
+    def SupportVector(self):
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+
         st.info('train process is over')
         st.write('test score: {}'.format(self.score))
 
