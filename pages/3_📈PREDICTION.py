@@ -42,25 +42,13 @@ if st.session_state["authentication_status"]:
         if P2:
             switch_page("CLASSIFICATION")
 
+    P3 = card(
+    title="CLUSTER!",
+    text="",
+    image="https://tse1-mm.cn.bing.net/th/id/OIP-C.yIRNIl3WJT-3j0rNT9lQIAHaEo?w=283&h=180&c=7&r=0&o=5&dpr=1.4&pid=1.7")
+    if P3:
+        switch_page("CLUSTER")
 
-    col1, col2 = st.columns([2,2])
-    with col1:
-
-        P3 = card(
-        title="CLUSTER!",
-        text="",
-        image="https://tse1-mm.cn.bing.net/th/id/OIP-C.yIRNIl3WJT-3j0rNT9lQIAHaEo?w=283&h=180&c=7&r=0&o=5&dpr=1.4&pid=1.7")
-        if P3:
-            switch_page("CLUSTER")
-
-
-    with col2:
-        P4 = card(
-        title="TUNE PARAMETERs!",
-        text="",
-        image= "https://tse1-mm.cn.bing.net/th/id/OIP-C.URx5TJAByHUUCrx1z0U9igHaE8?pid=ImgDet&rs=1")
-        if P4:
-            switch_page("TUNE PARAMETERs")
 
 elif st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
