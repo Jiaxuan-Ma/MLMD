@@ -164,20 +164,18 @@ if st.session_state["authentication_status"]:
                     data_process = st.selectbox('data process', ('train test split','cross val score'))
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                         if preprocess == 'StandardScaler':
-                            ss = StandardScaler()
-                            ss.fit(clf.Xtrain)
-                            clf.Xtrain = ss.transform(clf.Xtrain)
-                            clf.Xtest = (clf.Xtest - ss.mean_)/ss.var_
-
+                            clf.features = StandardScaler().fit_transform(clf.features)
                         if preprocess == 'MinMaxScaler':
-                            mms = MinMaxScaler()
-                            mms.fit(clf.Xtrain)
-                            clf.Xtrain = mms.transform(clf.Xtrain)
-                            clf.Xtest = (clf.Xtest - mms.data_min_)/(mms.data_max_-mms.data_min_)
-
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
                     elif data_process == 'cross val score':
+
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
                         cv = st.number_input('cv',1,10,5)
                         scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
             with st.container():
@@ -196,15 +194,6 @@ if st.session_state["authentication_status"]:
                 elif data_process == 'cross val score':
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
-                    if preprocess == 'StandardScaler':
-                        ss = StandardScaler()
-                        ss.fit(clf.features)
-                        clf.features = ss.transform(clf.features)
-
-                    if preprocess == 'MinMaxScaler':
-                        mms = MinMaxScaler()
-                        mms.fit(clf.features)
-                        clf.features = mms.transform(clf.features)
                      
                     cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
 
@@ -218,20 +207,17 @@ if st.session_state["authentication_status"]:
                     data_process = st.selectbox('data process', ('train test split','cross val score'))
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                         if preprocess == 'StandardScaler':
-                            ss = StandardScaler()
-                            ss.fit(clf.Xtrain)
-                            clf.Xtrain = ss.transform(clf.Xtrain)
-                            clf.Xtest = (clf.Xtest - ss.mean_)/ss.var_
-
+                            clf.features = StandardScaler().fit_transform(clf.features)
                         if preprocess == 'MinMaxScaler':
-                            mms = MinMaxScaler()
-                            mms.fit(clf.Xtrain)
-                            clf.Xtrain = mms.transform(clf.Xtrain)
-                            clf.Xtest = (clf.Xtest - mms.data_min_)/(mms.data_max_-mms.data_min_)
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
 
                     elif data_process == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
                         cv = st.number_input('cv',1,10,5)
                         scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
             with st.container():
@@ -249,16 +235,6 @@ if st.session_state["authentication_status"]:
             
                 elif data_process == 'cross val score':
                     clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'])
-
-                    if preprocess == 'StandardScaler':
-                        ss = StandardScaler()
-                        ss.fit(clf.features)
-                        clf.features = ss.transform(clf.features)
-
-                    if preprocess == 'MinMaxScaler':
-                        mms = MinMaxScaler()
-                        mms.fit(clf.features)
-                        clf.features = mms.transform(clf.features)
                                                                                              
                     cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
                     st.write('cross val score:', cvs)     
