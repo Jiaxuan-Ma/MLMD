@@ -42,6 +42,7 @@ from sklearn.ensemble import ExtraTreesRegressor as ETR
 from sklearn.linear_model import LinearRegression as LinearR
 from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import LassoCV
+from sklearn.neighbors import KNeighborsRegressor
 
 from sklearn.feature_selection import RFE
 from sklearn.feature_selection import RFECV
@@ -1359,7 +1360,19 @@ class REGRESSOR:
         self.Ypred = self.model.predict(self.Xtest)
         self.score = self.model.score(self.Xtest, self.Ytest)
         st.write('test score R2: {}'.format(self.score))
+        
+    def KNeighborsRegressor(self):
 
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        st.write('test score R2: {}'.format(self.score))
 
 class CLUSTER():
 

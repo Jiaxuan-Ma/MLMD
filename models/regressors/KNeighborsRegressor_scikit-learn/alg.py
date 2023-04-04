@@ -4,7 +4,7 @@ import streamlit as st
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "SupportVector",
+    "model": "KNeighborsRegressor",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 
@@ -39,8 +39,9 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['kernel'] = st.selectbox('kernel',['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'])
-            inputs['C'] = st.number_input('C', 1, 1000, 1)
+            inputs['n neighbors'] = st.number_input('n neighbors', 1, 1000, 1)
+            # inputs['min samples split'] = st.number_input('min samples split', 2, 1000, 2)
+            
             random_state = st.checkbox('random state 1024',True)
             if random_state:
                 inputs['random state'] = 1024
