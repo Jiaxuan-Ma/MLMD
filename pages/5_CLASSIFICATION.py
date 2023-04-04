@@ -259,8 +259,7 @@ if st.session_state["authentication_status"]:
                         mms = MinMaxScaler()
                         mms.fit(clf.features)
                         clf.features = mms.transform(clf.features)
-                                 
-                                                            
+                                                                                             
                     cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
                     st.write('cross val score:', cvs)     
 
