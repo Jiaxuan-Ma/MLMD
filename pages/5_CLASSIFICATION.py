@@ -82,17 +82,25 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                         scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
 
-            if st.button('train'):
+            with st.container():
+                button_train = st.button('train', use_container_width=True)
+            if button_train:
                 if data_process == 'train test split':
                             
                     clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
                                                             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
                                                                
                     clf.DecisionTreeClassifier()
-                    
-                    st.write('plot.........................')
 
                     plot = customPlot()
+                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
+                    plot.confusion_matrix(cm)
+                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
                     if inputs['tree graph']:
                         class_names = list(set(clf.targets.astype(str).tolist()))
                         dot_data = tree.export_graphviz(clf.model,out_file=None, feature_names=list(clf.features), class_names=class_names,filled=True, rounded=True)
@@ -130,9 +138,17 @@ if st.session_state["authentication_status"]:
                                                 min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                     
                     clf.RandomForestClassifier()
-                    st.write('plot......................')
+                    
                     plot = customPlot()
+                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
+                    plot.confusion_matrix(cm)
 
+                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)        
                 elif data_process == 'cross val score':
 
  
@@ -188,9 +204,15 @@ if st.session_state["authentication_status"]:
                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
                     clf.LogisticRegreesion()
                     
-                    st.write('plot.........................')
-
                     plot = customPlot()
+                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
+                    plot.confusion_matrix(cm)
+                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
                 elif data_process == 'cross val score':
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
@@ -225,16 +247,23 @@ if st.session_state["authentication_status"]:
             if button_train:
                 if data_process == 'train test split':
                             
-                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'])
+                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
                                                                
                     clf.SupportVector()
                     
-                    st.write('plot.........................')
-
                     plot = customPlot()
+                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
+                    plot.confusion_matrix(cm)
+                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
             
                 elif data_process == 'cross val score':
-                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'])
+                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
                                                                                              
                     cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
                     st.write('cross val score:', cvs)     

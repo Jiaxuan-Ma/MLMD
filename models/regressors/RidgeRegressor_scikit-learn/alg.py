@@ -4,7 +4,7 @@ import streamlit as st
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "DecisionTreeRegressor",
+    "model": "RidgeRegressor",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 
@@ -39,27 +39,13 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            # inputs['criterion'] = st.selectbox('criterion',('squared_error','friedman_mse','absolute_error','poisson'))
-            inputs['splitter'] = st.selectbox('splitter',('best','random'))
-            max_depth = st.checkbox('max depth', None)
-            inputs['max depth'] = None
-            if max_depth:
-                inputs['max depth'] = st.number_input('max depth',1, 10000, 3)
-            inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 1000, 1)
-            inputs['min samples split'] = st.number_input('min samples split', 2, 1000, 2)
-
+            inputs['alpha'] = st.number_input('alpha',0, 100, 1)
             random_state = st.checkbox('random state 1024',True)
             if random_state:
                 inputs['random state'] = 1024
             else:
                 inputs['random state'] = None
-             
-        # graph parameter
-        with st.expander("Tree Graph"):
-            inputs['tree graph'] = st.checkbox('tree graph', False)
-            if inputs['tree graph']:
-                inputs['filled'] = st.selectbox('filled',('True','False'))
-                inputs['rounded'] = st.selectbox('rounded',('True','False'))
+
 
     return inputs,col2
 

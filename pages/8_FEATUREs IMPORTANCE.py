@@ -124,51 +124,6 @@ if st.session_state["authentication_status"]:
 
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
-        
-        # elif inputs['model'] == 'ExtraTressClassifier':
-            
-
-        #     fs.model = ETR(n_estimators = inputs['nestimators'], 
-        #                                 max_features=inputs['max features'],
-        #                                 random_state=inputs['random state'])
-
-        #     with col2:
-        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
-
-        #     with st.container():
-        #         button_train = st.button('train', use_container_width=True)
-        #     if button_train:
-
-        #         fs.model.fit(fs.features, fs.targets)
-
-        #         fs.EXtraTreesClassifier()
-
-        #         fs.identify_zero_low_importance(option_cumulative_importance)
-        #         fs.feature_importance_select_show()
-
-
-        # elif inputs['model'] == 'RFECVsvr':
-
-        #     if inputs['kernel'] == 'linear':
-        #         estimator = SVR(kernel = "linear")
-
-        #     if inputs['kernel'] == 'rbf':
-        #         estimator = SVR(kernel = 'rbf')
-
-        #     fs.model = RFECV(estimator=estimator, step=inputs['step'],cv=inputs['cv'])
-        #     with col2:
-        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
-
-        #     with st.container():
-        #         button_train = st.button('train', use_container_width=True)
-        #     if button_train:
-
-        #         # fs.model.fit(fs.features, fs.targets)
-
-        #         fs.RFECVsvr()
-
-        #         fs.identify_zero_low_importance(option_cumulative_importance)
-        #         fs.feature_importance_select_show()
 
         elif inputs['model'] == 'RandomForestClassifier':
             

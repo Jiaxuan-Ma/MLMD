@@ -28,6 +28,7 @@ import lightgbm as lgb
 from sklearn.model_selection import train_test_split as TTS
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score as CVS
+from sklearn.model_selection import LeaveOneOut
 from sklearn import tree
 from sklearn.metrics import mean_squared_error as MSE
 
@@ -41,8 +42,8 @@ from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.ensemble import ExtraTreesRegressor as ETR
 from sklearn.linear_model import LinearRegression as LinearR
 from sklearn.linear_model import LogisticRegression as LR
-from sklearn.linear_model import LassoCV
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import Ridge
 
 from sklearn.feature_selection import RFE
 from sklearn.feature_selection import RFECV
@@ -58,7 +59,13 @@ from sklearn.feature_selection import mutual_info_regression as MIR
 from sklearn.metrics import accuracy_score
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from sklearn.metrics import silhouette_samples
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import f1_score
+from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 
@@ -833,10 +840,23 @@ class customPlot:
         ax.set_ylim(lims)
         plt.xlabel("Actual")
         plt.ylabel("Predicted")
-        plt.legend()
         # img_path = os.path.join(target_dir, 'prediction vs label.png')
         # fig.savefig(img_path)
         st.pyplot(fig)
+
+    def confusion_matrix(self,confusion_matrix):
+        
+        cmap = sns.diverging_palette(220, 10, as_cmap=True)
+        fig, ax = plt.subplots()  
+        ax = sns.heatmap(confusion_matrix, cmap=cmap, linewidths=0.5,square =True, annot=True)
+        plt.ylabel("Actual")
+        plt.xlabel("Predict")
+        # plt.legend()
+        # img_path = os.path.join(target_dir, 'prediction vs label.png')
+        # fig.savefig(img_path)
+        st.pyplot(fig)
+       
+
 
 class FeatureSelector:
     def __init__(self, features, targets) -> None:
@@ -1281,37 +1301,62 @@ class CLASSIFIER:
         self.model = None
 
         self.score = None
+
+        self.Ypred = None
         
     def DecisionTreeClassifier(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
-        
+        self.Ypred = self.model.predict(self.Xtest)
         st.info('train process is over')
-        st.write('test score: {}'.format(self.score))
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))
     
     def RandomForestClassifier(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
+        self.Ypred = self.model.predict(self.Xtest)
+        st.info('train process is over')
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))
+        
+
+
+    def LogisticRegreesion(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+     
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
 
         st.info('train process is over')
-        st.write('test score: {}'.format(self.score))
-    def LogisticRegreesion(self):
-        
-        self.model.fit(self.Xtrain, self.Ytrain)
-        # self.coef = self.model.coef_
-        self.score = accuracy_score(self.model.predict(self.Xtest),self.Ytest)
-        st.info('train process is over')
-        st.write('test score: {}'.format(self.score))
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))
 
     def SupportVector(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
-
+        self.Ypred = self.model.predict(self.Xtest)
         st.info('train process is over')
-        st.write('test score: {}'.format(self.score))
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))
 
 class REGRESSOR:
     def __init__(self, features, targets) -> None:
@@ -1333,8 +1378,8 @@ class REGRESSOR:
         self.model.fit(self.Xtrain, self.Ytrain)
         st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
-        self.score = self.model.score(self.Xtest, self.Ytest)
-        st.write('test score R2: {}'.format(self.score))
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
 
     def RandomForestRegressor(self):
         self.Ytest = self.Ytest.reset_index(drop=True)
@@ -1345,8 +1390,8 @@ class REGRESSOR:
         self.model.fit(self.Xtrain, self.Ytrain)
         st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
-        self.score = self.model.score(self.Xtest, self.Ytest)
-        st.write('test score R2: {}'.format(self.score))
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
 
     def SupportVector(self):
 
@@ -1358,8 +1403,8 @@ class REGRESSOR:
         self.model.fit(self.Xtrain, self.Ytrain)
         st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
-        self.score = self.model.score(self.Xtest, self.Ytest)
-        st.write('test score R2: {}'.format(self.score))
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
 
     def KNeighborsRegressor(self):
 
@@ -1371,8 +1416,8 @@ class REGRESSOR:
         self.model.fit(self.Xtrain, self.Ytrain)
         st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
-        self.score = self.model.score(self.Xtest, self.Ytest)
-        st.write('test score R2: {}'.format(self.score))
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
    
     def LinearRegressor(self):
         self.Ytest = self.Ytest.reset_index(drop=True)
@@ -1383,8 +1428,33 @@ class REGRESSOR:
         self.model.fit(self.Xtrain, self.Ytrain)
         st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
-        self.score = self.model.score(self.Xtest, self.Ytest)
-        st.write('test score R2: {}'.format(self.score))
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
+
+    def LassoRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
+
+    def RidgeRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
+
 
 class CLUSTER():
 
