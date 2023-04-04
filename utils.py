@@ -1,7 +1,7 @@
 import importlib.util
 
 import streamlit as st
-from streamlit_shap import st_shap
+# from streamlit_shap import st_shap
 import streamlit_analytics
 import streamlit_authenticator as stauth
 from streamlit_extras.badges import badge
