@@ -27,7 +27,7 @@ if st.session_state["authentication_status"]:
     P1 = card(
     title="DATA VISUALIZATION!",
     text=" ",
-    image=  "https://tse1-mm.cn.bing.net/th/id/R-C.75ddb34c910f531307d15a3c8cfabd99?rik=UjB2rVbX41xGiQ&riu=http%3a%2f%2fpic.zsucai.com%2ffiles%2f2013%2f0830%2fxiaguang1.jpg&ehk=qLHz0WQu%2bbLSDyX04QscddrbMoX%2bm5wAR8hHIyiGvvA%3d&risl=&pid=ImgRaw&r=0")
+    image=  "https://ts1.cn.mm.bing.net/th/id/R-C.3e42ad7c7744a7a612bfbaa480405611?rik=eX46Dun%2fFF1aDg&riu=http%3a%2f%2fpic.bizhi360.com%2fbbpic%2f25%2f6125.jpg&ehk=ukEQFHgNgClnZxjkosi%2bP3OoaZicxvcitCFcgJISxww%3d&risl=&pid=ImgRaw&r=0")
     if P1:
         switch_page("CONTINUOUS TARGETs")
         
