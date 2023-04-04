@@ -93,42 +93,37 @@ if st.session_state["authentication_status"]:
 
         #     st.write('you found me')
 
-        # elif inputs['model'] == 'LinearRegressor':
+        elif inputs['model'] == 'LinearRegressor':
             
 
-        #     fs.model = SelectFromModel(estimator=LinearR())
+            fs.model = LinearR()
 
-        #     with col2:
-        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
-        #     with st.container():
-        #         button_train = st.button('train', use_container_width=True)
-        #     if button_train:
+            with col2:
+                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+            with st.container():
+                button_train = st.button('train', use_container_width=True)
+            if button_train:
 
-        #         # fs.model.fit(fs.features, fs.targets)
+                fs.LinearRegressor()     
+                fs.identify_zero_low_importance(option_cumulative_importance)
+                fs.feature_importance_select_show()
 
-        #         fs.LinearRegressor()
-        #         # st.write(fs.feature_importances)
-        #         fs.identify_zero_low_importance(option_cumulative_importance)
-        #         fs.feature_importance_select_show()
-
-        # elif inputs['model'] == 'LassoCV':
+        elif inputs['model'] == 'LassoCV':
             
             
-        #     fs.model = LassoCV()
+            fs.model = LassoCV()
 
-        #     with col2:
-        #         option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+            with col2:
+                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
             
-        #     with st.container():
-        #         button_train = st.button('train', use_container_width=True)
-        #     if button_train:
+            with st.container():
+                button_train = st.button('train', use_container_width=True)
+            if button_train:
 
-        #         # fs.model.fit(fs.features, fs.targets)
+                fs.LassoCV()
 
-        #         fs.LassoCV()
-
-        #         fs.identify_zero_low_importance(option_cumulative_importance)
-        #         fs.feature_importance_select_show()
+                fs.identify_zero_low_importance(option_cumulative_importance)
+                fs.feature_importance_select_show()
         
         # elif inputs['model'] == 'ExtraTressClassifier':
             

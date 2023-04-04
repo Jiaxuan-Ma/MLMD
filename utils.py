@@ -1127,7 +1127,7 @@ class FeatureSelector:
         self.model.fit(self.features, self.targets)
 
         st.info('train process is over')
-        feature_importance_values = abs(self.model.estimator_.coef_)
+        feature_importance_values = abs(self.model.coef_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
 
     def LassoCV(self):
@@ -1360,9 +1360,21 @@ class REGRESSOR:
         self.Ypred = self.model.predict(self.Xtest)
         self.score = self.model.score(self.Xtest, self.Ytest)
         st.write('test score R2: {}'.format(self.score))
-        
+
     def KNeighborsRegressor(self):
 
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        st.write('test score R2: {}'.format(self.score))
+   
+    def LinearRegressor(self):
         self.Ytest = self.Ytest.reset_index(drop=True)
         self.Xtest = self.Xtest.reset_index(drop=True)
         self.Ytrain = self.Ytrain.astype('float')

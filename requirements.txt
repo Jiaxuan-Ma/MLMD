@@ -1,10 +1,12 @@
 altair==4.2.2
+graphviz==0.20.1
+imbalanced_learn==0.10.1
+imblearn==0.0
 lightgbm==3.3.5
-markdownlit==0.0.5
 matplotlib==3.6.3
 numpy==1.23.5
 pandas==1.5.3
-Pillow==9.4.0
+Pillow==9.5.0
 PyYAML==6.0
 requests==2.28.2
 scikit_learn==1.2.2
@@ -14,7 +16,7 @@ streamlit==1.20.0
 streamlit_analytics==0.4.1
 streamlit_authenticator==0.2.1
 streamlit_card==0.0.4
-streamlit_extras==0.2.6
+streamlit_extras==0.2.7
 streamlit_lottie==0.0.3
 streamlit_option_menu==0.3.2
 streamlit_shap==1.0.2

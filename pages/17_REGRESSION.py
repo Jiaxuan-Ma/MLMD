@@ -288,6 +288,60 @@ if st.session_state["authentication_status"]:
                     cvs = CVS(reg.model, reg.features, reg.targets, cv = cv, scoring=scoring)
 
                     st.write('mean cross val score:', cvs.mean())
+
+        if inputs['model'] == 'LinearRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('data operator', ('train test split','cross val score'))
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
+                        scoring = st.selectbox('scoring',('r2','neg_mean_absolute_error','neg_mean_squared_error'))
+
+            with st.container():
+                button_train = st.button('train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = LinearR()
+                    
+                    reg.LinearRegressor()
+                    plot = customPlot()
+                    plot.pred_vs_actual(reg.Ytest, reg.Ypred)
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    
+                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                elif operator == 'cross val score':
+
+                    reg.model = LinearR()
+
+                    cvs = CVS(reg.model, reg.features, reg.targets, cv = cv, scoring=scoring)
+
+                    st.write('mean cross val score:', cvs.mean())
         st.write('---')
 
 elif st.session_state["authentication_status"] is False:
