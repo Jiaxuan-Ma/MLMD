@@ -44,7 +44,7 @@ from sklearn.linear_model import LinearRegression as LinearR
 from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import Ridge
-
+from sklearn.neural_network import MLPRegressor
 from sklearn.feature_selection import RFE
 from sklearn.feature_selection import RFECV
 from sklearn.svm import SVR
@@ -1455,6 +1455,17 @@ class REGRESSOR:
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
 
+    def MLPRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))     
 
 class CLUSTER():
 

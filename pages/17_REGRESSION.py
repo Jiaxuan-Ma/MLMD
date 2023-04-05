@@ -649,7 +649,94 @@ if st.session_state["authentication_status"]:
                     plot = customPlot()
                     plot.pred_vs_actual(Y_test, Y_pred)                  
                     st.write('mean cross val R2:', score)
-        
+
+
+        if inputs['model'] == 'MLPRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('data operator', ('train test split','cross val score', 'leave one out'))
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
+                    
+                    elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()              
+
+            with st.container():
+                button_train = st.button('train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
+                                             batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
+                                             random_state=inputs['random state'])
+                    reg.MLPRegressor()
+                    plot = customPlot()
+                    plot.pred_vs_actual(reg.Ytest, reg.Ypred)
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    
+                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                elif operator == 'cross val score':
+
+                    reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
+                                             batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
+                                             random_state=inputs['random state'])
+                    
+                    cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
+
+                    st.write('mean cross val score:', cvs.mean())
+
+                elif operator == 'leave one out':
+
+                    reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
+                                             batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
+                                             random_state=inputs['random state'])
+                   
+                    Y_pred  =[]
+                    Y_test = []
+                    features = pd.DataFrame(reg.features).values
+                    targets = reg.targets.values
+                    for train,test in loo.split(features):
+                        Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
+                        
+                        reg.model.fit(Xtrain, Ytrain)
+                        Ypred = reg.model.predict(Xtest)
+                        Y_pred.append(Ypred)
+                        Y_test.append(Ytest)
+
+                    score = r2_score(y_true=Y_test,y_pred=Y_pred)
+          
+                    plot = customPlot()
+                    plot.pred_vs_actual(Y_test, Y_pred)                  
+                    st.write('mean cross val R2:', score)     
         st.write('---')
 
 elif st.session_state["authentication_status"] is False:
