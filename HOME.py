@@ -143,11 +143,11 @@ if authentication_status:
     
     with col1:
         P6 = card(
-        title="PINNs!",
+        title="SHAP VALUE!",
         text="",
         image="")
         if P6:
-            switch_page("PINNs")
+            switch_page("Shap value")
 
     with col2:
         P7 = card(

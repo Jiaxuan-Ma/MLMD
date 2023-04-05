@@ -10,7 +10,7 @@ from streamlit_option_menu import option_menu
 from streamlit_extras.buy_me_a_coffee import button
 from streamlit_extras.switch_page_button import switch_page
 from streamlit_card import card
-
+from streamlit_shap import st_shap
 
 from PIL import Image
 
@@ -1149,8 +1149,28 @@ class FeatureSelector:
         st.info('train process is over')
         feature_importance_values = abs(self.model.coef_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
+    
+    def RidgeRegressor(self):
+        # One hot encoding
+        features = pd.get_dummies(self.features)
+        # Extract feature names
+        feature_names = list(features.columns)
+        # Conbert to np array
+        features = np.array(self.features)
+        targets = np.array(self.targets).reshape((-1,))
 
-    def LassoCV(self):
+        # Empty array for feature importances
+        feature_importance_values = np.zeros(len(feature_names))
+
+        progress_text = "Operation in progress. Please wait."
+        # my_bar = st.progress(0, text=progress_text)
+        self.model.fit(self.features, self.targets)
+
+        st.info('train process is over')
+        feature_importance_values = abs(self.model.coef_)
+        self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
+
+    def LassoRegressor(self):
         # One hot encoding
         features = pd.get_dummies(self.features)
         # Extract feature names
@@ -1170,45 +1190,6 @@ class FeatureSelector:
         feature_importance_values = abs(self.model.coef_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
     
-    def EXtraTreesClassifier(self):
-        # One hot encoding
-        features = pd.get_dummies(self.features)
-        # Extract feature names
-        feature_names = list(features.columns)
-        # Conbert to np array
-        features = np.array(self.features)
-        targets = np.array(self.targets).reshape((-1,))
-
-        # Empty array for feature importances
-        feature_importance_values = np.zeros(len(feature_names))
-
-        progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
-        self.model.fit(self.features, self.targets)
-
-        st.info('train process is over')
-        feature_importance_values = abs(self.model.feature_importances_)
-        self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
-
-    def RFECVsvr(self):
-        # One hot encoding
-        features = pd.get_dummies(self.features)
-        # Extract feature names
-        feature_names = list(features.columns)
-        # Conbert to np array
-        features = np.array(self.features)
-        targets = np.array(self.targets).reshape((-1,))
-
-        # Empty array for feature importances
-        feature_importance_values = np.zeros(len(feature_names))
-
-        progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
-        self.model.fit(self.features, self.targets)
-
-        st.info('train process is over')
-        feature_importance_values = abs(self.model.ranking_)
-        self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
     def XGBR(self):
         # One hot encoding
         features = pd.get_dummies(self.features)
@@ -1268,28 +1249,6 @@ class FeatureSelector:
         st.info('train process is over')
         feature_importance_values = abs(self.model.feature_importances_)
 
-        self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
-    
-    def LogisticRegression(self):
-        # One hot encoding
-        features = pd.get_dummies(self.features)
-        # Extract feature names
-        feature_names = list(features.columns)
-        # Conbert to np array
-        features = np.array(self.features)
-        # targets = np.array(self.targets).reshape((-1,))
-        
-        # Empty array for feature importances
-        feature_importance_values = np.zeros(len(feature_names))
-
-        progress_text = "Operation in progress. Please wait."
-
-        self.model.fit(self.features, self.targets.astype('int'))
-
-        st.info('train process is over')
-        # st.write(self.model.coef_)
-        feature_importance_values = np.squeeze(abs(self.model.coef_))
-        # st.write(feature_importance_values.shape)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
 
 class CLASSIFIER:
