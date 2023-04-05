@@ -9,9 +9,6 @@ if 'authentication_status' not in st.session_state:
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # ======================================================
-image = Image.open('logo.png')
-
-st.sidebar.image(image)
 
 with st.sidebar:
     badge(type="buymeacoffee", name="jiaxuanmasw")

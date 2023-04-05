@@ -145,9 +145,9 @@ if authentication_status:
         P6 = card(
         title="SHAP VALUE!",
         text="",
-        image="")
+        image="https://img.zcool.cn/community/01193959eeec64a801202b0c23804b.jpg@1280w_1l_2o_100sh.jpg")
         if P6:
-            switch_page("Shap value")
+            switch_page("Shapley value")
 
     with col2:
         P7 = card(
