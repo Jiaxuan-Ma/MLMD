@@ -131,6 +131,13 @@ if authentication_status:
 
     colored_header(label="JIGSAW PUZZLE", description=" ",color_name="violet-70")
 
+    
+    P6 = card(
+    title="SHAPley VALUE!",
+    text="",
+    image="https://img.zcool.cn/community/01193959eeec64a801202b0c23804b.jpg@1280w_1l_2o_100sh.jpg")
+    if P6:
+        switch_page("SHAPley value")
 
     col1, col2 = st.columns([2,2])  
     with col1:
@@ -148,12 +155,10 @@ if authentication_status:
         if P7:
             switch_page("SYMBOLIC REGRESSION")
 
-    P6 = card(
-    title="SHAPley VALUE!",
-    text="",
-    image="https://img.zcool.cn/community/01193959eeec64a801202b0c23804b.jpg@1280w_1l_2o_100sh.jpg")
-    if P6:
-        switch_page("SHAPley value")
+
+
+
+
     with open('./config.yaml', 'w') as file:
         yaml.dump(config, file, default_flow_style=False)
 
