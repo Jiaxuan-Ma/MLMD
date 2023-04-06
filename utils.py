@@ -1031,7 +1031,7 @@ class FeatureSelector:
         self.feature_importances = feature_importances
         self.record_zero_importance = record_zero_importance
         self.ops['zero_importance'] = to_drop
-        st.write('\n%d features with zero importance after one-hot encoding.\n' % len(self.ops['zero_importance']))
+        st.write('\n%d features with zero importance.\n' % len(self.ops['zero_importance']))
 
         self.cumulative_importance = cumulative_importance
 
@@ -1044,7 +1044,7 @@ class FeatureSelector:
         to_drop = list(record_low_importance['feature'])
         self.record_low_importance = record_low_importance
         self.ops['low_importance'] = to_drop
-        st.write('%d features required for cumulative importance of %0.2f after one hot encoding.' % (len(self.feature_importances) -
+        st.write('%d features required for cumulative importance of %0.2f .' % (len(self.feature_importances) -
                                                                         len(self.record_low_importance), self.cumulative_importance))
         st.write('%d features do not contribute to cumulative importance of %0.2f.\n' % (len(self.ops['low_importance']),
                                                                                             self.cumulative_importance))
