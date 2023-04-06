@@ -11,6 +11,7 @@ from streamlit_extras.buy_me_a_coffee import button
 from streamlit_extras.switch_page_button import switch_page
 from streamlit_card import card
 from streamlit_shap import st_shap
+from streamlit_pandas_profiling import st_profile_report
 
 from PIL import Image
 
@@ -23,7 +24,7 @@ import pandas as pd
 from imblearn.over_sampling import SMOTE
 
 import lightgbm as lgb
-
+import pandas_profiling
 
 from sklearn.model_selection import train_test_split as TTS
 from sklearn.model_selection import KFold
@@ -192,6 +193,13 @@ def model_platform(model_path):
     "template_alg", os.path.join(template_dir, "alg.py")
     )
     return template_alg
+
+
+@st.cache(allow_output_mutation=True)
+def gen_profile_report(df, *report_args, **report_kwargs):
+    return pandas_profiling(*report_args, **report_kwargs)
+
+
 
 # =============== some tools =======================
 def create_data_with_group_and_counts(feature_type):
