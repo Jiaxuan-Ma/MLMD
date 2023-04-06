@@ -69,6 +69,7 @@ from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 
+import Bgolearn.BGOsampling as BGOS
 
 
 import graphviz
@@ -1062,12 +1063,12 @@ class FeatureSelector:
             with col1:
                 st.write('dropped zero importance')
                 st.write(self.features_dropped_zero_importance)
-                tmp_download_link = download_button(self.feature_importances, f'feature importance.csv', button_text='download')
+                tmp_download_link = download_button(self.features_dropped_zero_importance, f'feature importance.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             with col2:
                 st.write('dropped low importance')
                 st.write(self.features_dropped_low_importance)
-                tmp_download_link = download_button(self.feature_importances, f'feature importance.csv', button_text='download')
+                tmp_download_link = download_button(self.features_dropped_low_importance, f'feature importance.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     def lightGBM(self, eval_metric='l1', n_iterations=10, early_stopping = True, test_size=0.2, round_number=100):

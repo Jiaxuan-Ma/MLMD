@@ -33,7 +33,7 @@ if st.session_state["authentication_status"]:
         
         with st.expander('DATA INFORMATION'):
             df = pd.read_csv(file)
-
+            check_string_NaN(df)
             colored_header(label="DATA", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
@@ -83,7 +83,8 @@ if st.session_state["authentication_status"]:
         colored_header(label="SHAP Feature Cluster", description=" ",color_name="violet-30")
         clustering = shap.utils.hclust(fs.features, fs.targets)
         clustering_cutoff = st.slider('clustering cutoff', 0.0,1.0,0.5)
-        st_shap(shap.plots.bar(shap_values, clustering=clustering, clustering_cutoff=clustering_cutoff))
+        nfeatures = st.slider("features", 2, fs.features.shape[1],fs.features.shape[1], key=2)
+        st_shap(shap.plots.bar(shap_values, clustering=clustering, clustering_cutoff=clustering_cutoff, max_display=nfeatures))
 
         colored_header(label="SHAP Beeswarm", description=" ",color_name="violet-30")
         rank_option = st.selectbox('rank option',['max','mean'])

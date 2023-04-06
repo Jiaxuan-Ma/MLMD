@@ -115,40 +115,31 @@ if authentication_status:
 
     with col2:
         P2 = card(
-        title="FEATURE ENGERING!",
+        title="FEATURE ENGINEERING!",
         text="STEP 2",
         image="https://wallpapercave.com/wp/8lohWp0.jpg")
         if P2:
-            switch_page("FEATURE ENGERING")
+            switch_page("FEATURE ENGINEERING")
     
-    col1, col2 = st.columns([2,2])
-    with col1:
-        P3 = card(
-        title="PREDICTION!",
-        text="STEP 3",
-        image="https://cdn.wallpapersafari.com/32/81/HrzQfA.jpg")
-        if P3:
-            switch_page("PREDICTION")
-    with col2:
-        P4 = card(
-        title="INVERSE DESIGN!",
-        text="STEP 4",
-        image="")
-        if P4:
-            switch_page("INVERSE DESIGN")
+
+    P3 = card(
+    title="PREDICTION!",
+    text="STEP 3",
+    image="https://cdn.wallpapersafari.com/32/81/HrzQfA.jpg")
+    if P3:
+        switch_page("PREDICTION")
 
     colored_header(label="JIGSAW PUZZLE", description=" ",color_name="violet-70")
 
-    col1, col2 = st.columns([2,2])
-    
-    with col1:
-        P6 = card(
-        title="SHAPley VALUE!",
-        text="",
-        image="https://img.zcool.cn/community/01193959eeec64a801202b0c23804b.jpg@1280w_1l_2o_100sh.jpg")
-        if P6:
-            switch_page("SHAPley value")
 
+    col1, col2 = st.columns([2,2])  
+    with col1:
+        P4 = card(
+        title="ACTIVE LEARNING!",
+        text="",
+        image="")
+        if P4:
+            switch_page("ACTIVATE LEARNING")
     with col2:
         P7 = card(
         title="SYMBOLIC REGRESSION!",
@@ -156,8 +147,13 @@ if authentication_status:
         image="")
         if P7:
             switch_page("SYMBOLIC REGRESSION")
-    
 
+    P6 = card(
+    title="SHAPley VALUE!",
+    text="",
+    image="https://img.zcool.cn/community/01193959eeec64a801202b0c23804b.jpg@1280w_1l_2o_100sh.jpg")
+    if P6:
+        switch_page("SHAPley value")
     with open('./config.yaml', 'w') as file:
         yaml.dump(config, file, default_flow_style=False)
 

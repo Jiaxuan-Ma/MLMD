@@ -23,25 +23,12 @@ if st.session_state["authentication_status"]:
 
     colored_header(label="LETs GO",description=" ",color_name="violet-70")
 
-    col1, col2 = st.columns([2,2])
-
-    with col1:
-        P1 = card(
-        title="BAYESIAN OPTIMIZATION!",
-        text="",
-        image= "https://ts1.cn.mm.bing.net/th/id/R-C.12f82aa380444b1fddae6c4076edc71b?rik=MU0uAw3%2fegKZaw&riu=http%3a%2f%2fpic.zsucai.com%2ffiles%2f2013%2f0717%2fbingo7.jpg&ehk=w43Ou14tQlO6vvwZRS%2bDVUUxJu8xCA6SoyEfdoszXxA%3d&risl=&pid=ImgRaw&r=0")
-        if P1:
-            switch_page("BAYESIAN OPTIMIZATION")
-
-    with col2:
-
-        P2 = card(
-        title="POPULATION METHODs!",
-        text="",
-        image="https://ts1.cn.mm.bing.net/th/id/R-C.f55aa038bb67c75d84d5445050f76239?rik=EUpLueK%2bQk6yRA&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fFCDgjHU.jpg&ehk=CKI50JeZ6WVUnmhfZKi70pjBJ%2f3fg1VS34l5vg2nppY%3d&risl=&pid=ImgRaw&r=0")
-        if P2:
-            switch_page("POPULATION METHODs")
-
+    P1 = card(
+    title="BGOLEARN!",
+    text="",
+    image="")
+    if P1:
+        switch_page("BGOLEARN")
     
 
 elif st.session_state["authentication_status"] is False:
