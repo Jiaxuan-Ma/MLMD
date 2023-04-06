@@ -54,11 +54,14 @@ if st.session_state["authentication_status"]:
                 st.write(features.head())
             with col_target:   
                 st.write(targets.head())
-        
+
 
         colored_header(label="Shapley value",description=" ",color_name="violet-70")
 
         fs = FeatureSelector(features, targets)
+
+        target_selected_option = st.selectbox('choose target', list(fs.targets))
+        fs.targets = fs.targets[target_selected_option]
         # regressor = st.selectbox('tree',['linear','kernel','sampling'])
         reg = XGBR()
         X_train, X_test, y_train, y_test = TTS(fs.features, fs.targets, random_state=0) 

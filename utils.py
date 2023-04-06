@@ -69,6 +69,9 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
+
+
 
 import Bgolearn.BGOsampling as BGOS
 
@@ -1456,4 +1459,16 @@ class CLUSTER():
         st.write('silhouette score: {}'.format(self.score))
         # st.write('cluster centers: {}'.format(self.model.cluster_centers_))
 
-    
+class SAMPLING:
+    def __init__(self, features, targets) -> None:
+    # origin features and targets
+        self.features = features
+        self.targets = targets   
+
+        self.model = None
+
+        self.score = None
+
+        self.Ypred = None
+def BaysSampling(self):
+    pass
