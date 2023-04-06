@@ -1046,8 +1046,8 @@ class FeatureSelector:
         self.ops['low_importance'] = to_drop
         st.write('%d features required for cumulative importance of %0.2f .' % (len(self.feature_importances) -
                                                                         len(self.record_low_importance), self.cumulative_importance))
-        st.write('%d features do not contribute to cumulative importance of %0.2f.\n' % (len(self.ops['low_importance']),
-                                                                                            self.cumulative_importance))
+        # st.write('%d features do not contribute to cumulative importance of %0.2f.\n' % (len(self.ops['low_importance']),
+        #                                                                                     self.cumulative_importance))
         
     def feature_importance_select_show(self):
         st.write('---')
