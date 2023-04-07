@@ -29,15 +29,17 @@ if st.session_state["authentication_status"]:
                 "nav-link-selected": {"background-color": "gray"}})  
 
     if file is not None:
-        with st.expander('DATA INFORMATION'):
+        colored_header(label="Data Information", description=" ", color_name="violet-70")
+        with st.expander('Data Information'):
             df = pd.read_csv(file)
             check_string_NaN(df)
-            colored_header(label="DATA", description=" ",color_name="blue-70")
+            
+            colored_header(label="Data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="FEATUREs SELECT",description=" ",color_name="blue-30")
+            colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
 
             target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
             st.write('target number', target_num)
@@ -55,18 +57,19 @@ if st.session_state["authentication_status"]:
     
         clf = CLASSIFIER(features,targets)
 
+        colored_header(label="Choose Target", description=" ", color_name="violet-30")
         target_selected_option = st.selectbox('target', list(clf.targets)[::-1])
 
         clf.targets = targets[target_selected_option]
 
         # st.write(fs.targets.head())
-        colored_header(label="CLASSIFIER", description=" ",color_name="violet-30")
+        colored_header(label="Classifier", description=" ",color_name="violet-30")
 
         model_path = './models/classifiers'
         
         template_alg = model_platform(model_path)
 
-        colored_header(label="TRAINING", description=" ",color_name="violet-30")
+        colored_header(label="Training", description=" ",color_name="violet-30")
 
         inputs, col2 = template_alg.show()
        
@@ -83,7 +86,7 @@ if st.session_state["authentication_status"]:
                         scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
 
             with st.container():
-                button_train = st.button('train', use_container_width=True)
+                button_train = st.button('Train', use_container_width=True)
             if button_train:
                 if data_process == 'train test split':
                             
@@ -97,7 +100,7 @@ if st.session_state["authentication_status"]:
                     plot.confusion_matrix(cm)
                     result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
-                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                    with st.expander('Actual vs Predict'):
                         st.write(result_data)
                         tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
@@ -129,7 +132,7 @@ if st.session_state["authentication_status"]:
                         inputs['oob score']  = st.checkbox('oob score',True)
                         inputs['warm start'] = True
             with st.container():
-                button_train = st.button('train', use_container_width=True)
+                button_train = st.button('Train', use_container_width=True)
             if button_train:
 
                 if data_process == 'train test split':
@@ -145,7 +148,7 @@ if st.session_state["authentication_status"]:
 
                     result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
-                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                    with st.expander('Actual vs Predict'):
                         st.write(result_data)
                         tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)        
@@ -195,7 +198,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                         scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
             with st.container():
-                button_train = st.button('train', use_container_width=True)
+                button_train = st.button('Train', use_container_width=True)
             
             if button_train:
                 if data_process == 'train test split':
@@ -209,7 +212,7 @@ if st.session_state["authentication_status"]:
                     plot.confusion_matrix(cm)
                     result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
-                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                    with st.expander('Actual vs Predict'):
                         st.write(result_data)
                         tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
@@ -243,7 +246,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                         scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
             with st.container():
-                button_train = st.button('train', use_container_width=True)   
+                button_train = st.button('Train', use_container_width=True)   
             if button_train:
                 if data_process == 'train test split':
                             
@@ -256,7 +259,7 @@ if st.session_state["authentication_status"]:
                     plot.confusion_matrix(cm)
                     result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
-                    with st.expander('ACTUAL AND PREDICTION DATA'):
+                    with st.expander('Actual vs Predict'):
                         st.write(result_data)
                         tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)

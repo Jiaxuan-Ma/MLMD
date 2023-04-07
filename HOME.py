@@ -25,7 +25,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 """
 st.markdown("<br>", unsafe_allow_html=True)
 """
-THE PLATFORM PROVIDES VISULA MACHINE LEARNING SCRIPTS.
+This is a machine learning visual platform.
 """
 
 # streamlit_analytics.start_tracking()
@@ -34,9 +34,7 @@ name, authentication_status, username = authenticator.login('Login', 'main')
 
 
 # ======================================================
-# image = Image.open('logo.png')
 
-# st.sidebar.image(image)
 
 with st.sidebar:
 
@@ -46,6 +44,7 @@ with st.sidebar:
 
 if username == "mjx@shu.edu.cn":
     # register
+    colored_header(label="Register user",description=" ",color_name="violet-70")
     with st.expander('REGISTER USER'):
         try:
             if authenticator.register_user('Register user', preauthorization=False):
@@ -94,7 +93,9 @@ if username == "mjx@shu.edu.cn":
             st.error(e)
 
 if authentication_status:
-    with st.expander('RESET PASSWORD'):
+
+    colored_header(label="Reset password",description=" ",color_name="violet-70")
+    with st.expander('Reset password'):
         try:
             if authenticator.reset_password(username, 'Reset password'):
                 st.success('Password modified successfully')
@@ -102,7 +103,7 @@ if authentication_status:
             st.error(e)
 
 
-    colored_header(label="TRY IT NOW",description=" ",color_name="violet-70")
+    colored_header(label="Try it now",description=" ",color_name="violet-70")
 
     col1, col2 = st.columns([2,2])
     with col1:
@@ -129,7 +130,7 @@ if authentication_status:
     if P3:
         switch_page("PREDICTION")
 
-    colored_header(label="JIGSAW PUZZLE", description=" ",color_name="violet-70")
+    colored_header(label="Jigsaw puzzle", description=" ",color_name="violet-70")
 
     
     P6 = card(
@@ -144,7 +145,7 @@ if authentication_status:
         P4 = card(
         title="ACTIVE LEARNING!",
         text="",
-        image="")
+        image="https://pic1.zhimg.com/v2-e10529e9d16bcb26957866887cfe4dca_r.jpg?source=1940ef5c")
         if P4:
             switch_page("ACTIVATE LEARNING")
     with col2:

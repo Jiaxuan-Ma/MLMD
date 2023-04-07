@@ -21,7 +21,7 @@ st.write('---')
 
 if st.session_state["authentication_status"]:
 
-    colored_header(label="LETs GO",description=" ",color_name="violet-70")
+    colored_header(label="Lets Go",description=" ",color_name="violet-70")
 
     col1, col2 = st.columns([2,2])
 

@@ -30,15 +30,16 @@ if st.session_state["authentication_status"]:
                 "nav-link-selected": {"background-color": "gray"}})  
 
     if file is not None:
-        with st.expander('DATA INFORMATION'):
+        colored_header(label="Data Information",description=" ",color_name="violet-70")
+        with st.expander('Data Informtion'):
             df = pd.read_csv(file)
 
-            colored_header(label="TABLE", description=" ",color_name="blue-70")
+            colored_header(label="Data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="FEATUREs vs TARGET",description=" ",color_name="blue-30")
+            colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
 
             target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
             st.write('target number', target_num)
@@ -56,7 +57,7 @@ if st.session_state["authentication_status"]:
         
         #=============== drop major missing features ================
     
-        colored_header(label="ONE HOT ENCODING FEATUREs",description=" ",color_name="violet-70")
+        colored_header(label="One-hot Encoding Features",description=" ",color_name="violet-70")
         fs = FeatureSelector(features, targets)
         plot = customPlot() 
         str_col_list = fs.features.select_dtypes(include=['object']).columns.tolist()

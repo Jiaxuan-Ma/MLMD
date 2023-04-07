@@ -32,13 +32,13 @@ if st.session_state["authentication_status"]:
         df = pd.read_csv(file)
         # =============== check string / NaN ====================== 
         
-        colored_header(label="DATA TABLE",description=" ",color_name="violet-70")
+        colored_header(label="Data Table",description=" ",color_name="violet-70")
 
         nrow = st.slider("rows", 1, len(df)-1, 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
-        colored_header(label="REPORT",description=" ",color_name="violet-30")
+        colored_header(label="Report",description=" ",color_name="violet-70")
 
         pr = df.profile_report()
 

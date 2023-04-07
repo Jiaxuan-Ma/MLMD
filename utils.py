@@ -1067,7 +1067,7 @@ class FeatureSelector:
         plot.feature_importance(self.record_zero_importance, self.feature_importances, plot_n = 15)
         self.features_dropped_zero_importance = self.features.drop(columns=self.ops['zero_importance'])
         self.features_dropped_low_importance = self.features.drop(columns=self.ops['low_importance'])
-        with st.expander('PROCESSED DATA'):
+        with st.expander('Processed Data'):
             col1, col2 = st.columns([1,1])
             with col1:
                 st.write('dropped zero importance')

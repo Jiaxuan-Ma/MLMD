@@ -30,20 +30,22 @@ if st.session_state["authentication_status"]:
                 "nav-link-selected": {"background-color": "gray"}})  
 
     if file is not None:
-        with st.expander('DATA INFORMATION'):
+
+        colored_header(label="Data Information",description=" ",color_name="violet-70")
+        with st.expander('Data Information'):
             df = pd.read_csv(file)
             # ============ check NaN ===========
             null_columns = df.columns[df.isnull().any()]
             if len(null_columns) == 0:
-                st.error('NO MISSING FEATUREs!')
+                st.error('No Missing Features!')
                 st.stop()
                 
-            colored_header(label="DATA", description=" ",color_name="blue-70")
+            colored_header(label="Data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="FEATUREs SELECT",description=" ",color_name="blue-30")
+            colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
 
             target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
             st.write('target number', target_num)
@@ -61,7 +63,7 @@ if st.session_state["authentication_status"]:
         
         #=============== drop major missing features ================
 
-        colored_header(label="DROP MISSING FEATUREs",description=" ",color_name="violet-70")
+        colored_header(label="Drop Missing Features",description=" ",color_name="violet-70")
     
         fs = FeatureSelector(features, targets)
 
@@ -76,7 +78,7 @@ if st.session_state["authentication_status"]:
         st.write('%d features with $\gt$ %0.2f missing values.\n' % (len(fs.ops['missing']), fs.missing_threshold))
         plot = customPlot()
 
-        with st.expander('PLOT'):
+        with st.expander('Plot'):
             col1, col2 = st.columns([1,3])
             with col1:
                 options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),

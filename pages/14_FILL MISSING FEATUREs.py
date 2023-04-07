@@ -30,15 +30,19 @@ if st.session_state["authentication_status"]:
                 "nav-link-selected": {"background-color": "gray"}})  
 
     if file is not None:
-        with st.expander('DATA INFORMATION'):
+        with st.expander('Data Information'):
             df = pd.read_csv(file)
 
-            colored_header(label="TABLE", description=" ",color_name="blue-70")
+            null_columns = df.columns[df.isnull().any()]
+            if len(null_columns) == 0:
+                st.error('No Missing Features!')
+                st.stop()
+            colored_header(label="data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="FEATUREs vs TARGET",description=" ",color_name="blue-30")
+            colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
 
             target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
             st.write('target number', target_num)
@@ -56,7 +60,7 @@ if st.session_state["authentication_status"]:
         
         #=============== drop major missing features ================
     
-        colored_header(label="FILL MISSING FEATUREs",description=" ",color_name="violet-70")
+        colored_header(label="Fill Missing Features",description=" ",color_name="violet-70")
         fs = FeatureSelector(features, targets)
         missing_feature_list = fs.features.columns[fs.features.isnull().any()].tolist()
         # assert len(fs.features.columns[fs.features.isnull().any()].tolist()) == 0,'Zero missing feature!'
@@ -65,9 +69,7 @@ if st.session_state["authentication_status"]:
             fill_method = st.selectbox('fill method',('fill in Normal method', 'fill in RandomFrostRegression'))
         
         if fill_method == 'fill in Normal method':
-            if len(missing_feature_list) == 0:
-                st.error('Zero missing feature!')
-                st.stop()
+
             missing_feature = st.multiselect('missing feature',missing_feature_list,missing_feature_list[-1])
             
             option_filled = st.selectbox('mean',('mean','constant','median','most frequent'))

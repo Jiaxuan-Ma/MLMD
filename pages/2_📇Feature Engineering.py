@@ -14,14 +14,14 @@ with st.sidebar:
     badge(type="buymeacoffee", name="jiaxuanmasw")
 # ======================================================
 
-st.write('## FEATURE ENGINEER')
+st.write('## FEATURE ENGINEERING')
 st.write('---')
 
 # =====================================================
 
 if st.session_state["authentication_status"]:
 
-    colored_header(label="MISSING FEATUREs",description=" ",color_name="violet-70")
+    colored_header(label="Missing Features",description=" ",color_name="violet-70")
 
     col1, col2 = st.columns([2,2])
 
@@ -42,7 +42,7 @@ if st.session_state["authentication_status"]:
         if P2:
             switch_page("FILL MISSING FEATUREs")
 
-    colored_header(label="NUNIQUE FEATUREs",description=" ",color_name="violet-70")
+    colored_header(label="Drop Nunique Features",description=" ",color_name="violet-70")
     P3= card(
     title="DROP NUNIQUE FEATUREs!",
     text="",
@@ -50,7 +50,7 @@ if st.session_state["authentication_status"]:
     if P3:
         switch_page("DROP NUNIQUE FEATUREs")
     
-    colored_header(label="CORRELATION FEATUREs vs TARGET",description=" ",color_name="violet-70")
+    colored_header(label="Correlation of Features vs Targets",description=" ",color_name="violet-70")
 
     col1, col2 = st.columns([2,2])
 
@@ -73,7 +73,7 @@ if st.session_state["authentication_status"]:
             switch_page("DROP COLLINEAR FEATUREs")
 
 
-    colored_header(label="ENCODING FEATUREs",description=" ",color_name="violet-70")
+    colored_header(label="One-hot Encoding Features",description=" ",color_name="violet-70")
     
     col1, col2 = st.columns([2,2])
     
@@ -84,7 +84,7 @@ if st.session_state["authentication_status"]:
     if P6:
         switch_page("ONE-HOT ENCODING FEATUREs")
         
-    colored_header(label="FEATUREs IMPORTANCE",description=" ",color_name="violet-70")
+    colored_header(label="Features Importance",description=" ",color_name="violet-70")
 
     col1, col2 = st.columns([2,2])
    

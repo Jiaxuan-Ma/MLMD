@@ -32,16 +32,16 @@ if st.session_state["authentication_status"]:
                 "nav-link-selected": {"background-color": "gray"}})  
 
     if file is not None:
-        
-        with st.expander('DATA INFORMATION'):
+        colored_header(label="Data Information",description=" ",color_name="violet-70")
+        with st.expander('Data Information'):
             df = pd.read_csv(file)
             check_string_NaN(df)
-            colored_header(label="DATA", description=" ",color_name="blue-70")
+            colored_header(label="Data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="FEATUREs SELECT",description=" ",color_name="blue-30")
+            colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
 
             target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
             st.write('target number', target_num)
@@ -59,17 +59,19 @@ if st.session_state["authentication_status"]:
     
         fs = FeatureSelector(features,targets)
 
+        colored_header(label="Choose Target", description=" ", color_name="violet-30")
+
         target_selected_option = st.selectbox('target', list(fs.targets)[::-1])
 
         fs.targets = targets[target_selected_option]
         # st.write(fs.targets.head())
-        colored_header(label="SELECTOR", description=" ",color_name="violet-30")
+        colored_header(label="Selector", description=" ",color_name="violet-30")
 
         model_path = './models/feature importance'
         
         template_alg = model_platform(model_path=model_path)
 
-        colored_header(label="TRAINING", description=" ",color_name="violet-30")
+        colored_header(label="Training", description=" ",color_name="violet-30")
 
         inputs, col2 = template_alg.show()
         # st.write(inputs)

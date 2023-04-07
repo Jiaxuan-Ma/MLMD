@@ -30,16 +30,16 @@ if st.session_state["authentication_status"]:
                 "nav-link-selected": {"background-color": "gray"}})  
 
     if file is not None:
-        
-        with st.expander('DATA INFORMATION'):
+        colored_header(label="Data Information",description=" ",color_name="violet-70")
+        with st.expander('Data Information'):
             df = pd.read_csv(file)
             check_string_NaN(df)
-            colored_header(label="TABLE", description=" ",color_name="blue-70")
+            colored_header(label="data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="FEATUREs vs TARGETs",description=" ",color_name="blue-30")
+            colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
 
             target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
             st.write('target number', target_num)
@@ -57,7 +57,7 @@ if st.session_state["authentication_status"]:
         
        #=============== drop nunqiue features ================
 
-        colored_header(label="DROP LOW CORRELATION FEATUREs vs TARGET",description=" ",color_name="violet-70")
+        colored_header(label="Drop Low Correlation features vs Targets",description=" ",color_name="violet-70")
         fs = FeatureSelector(features, targets)
         plot = customPlot() 
 
@@ -69,7 +69,7 @@ if st.session_state["authentication_status"]:
                 option_dropped_threshold = st.slider('corr threshold f_t',0.0, 1.0,0.0)
             if corr_method == 'MIR':
                 options_seed = st.checkbox('random state 1024',True)
-            with st.expander('PLOT PARAMETERS'):
+            with st.expander('Plot parameters'):
                 options_selected = [plot.set_title_fontsize(11),plot.set_label_fontsize(12),
                     plot.set_tick_fontsize(13),plot.set_legend_fontsize(14),plot.set_color('bin color',19,16)]
             
@@ -87,7 +87,7 @@ if st.session_state["authentication_status"]:
                 corr_f_t = pd.concat([fs.features_dropped_f_t, target_selected], axis=1).corr(corr_method)[target_selected_option][:-1]
 
                 plot.corr_feature_target(options_selected, corr_f_t)
-                with st.expander('PROCESSED DATA'):
+                with st.expander('Processed Data'):
                     data = pd.concat([fs.features_dropped_f_t, targets], axis=1)
                     st.write(data)
                     tmp_download_link = download_button(data, f'features dropped low corr feature.csv', button_text='download')
