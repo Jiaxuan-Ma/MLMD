@@ -159,7 +159,7 @@ if st.session_state["authentication_status"]:
                     Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
                             opt_num=inputs['opt num'])
                     res = Mymodel.Entropy()
-
+            st.info('Recommmended Sample')
             sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
             st.write(sp.sample_point)
             tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
