@@ -58,19 +58,22 @@ if st.session_state["authentication_status"]:
             with col_target:   
                 st.write(targets.head())
 
-        colored_header(label="Active learning", description=" ", color_name="violet-70")
+        # colored_header(label="Active learning", description=" ", color_name="violet-70")
 
         sp = SAMPLING(features, targets)
 
-        target_selected_option = st.selectbox('choose target', list(sp.targets))
+        colored_header(label="Choose target", description=" ", color_name="violet-30")
+
+        target_selected_option = st.selectbox('target', list(sp.targets))
+        
         sp.targets = sp.targets[target_selected_option]
         
 
-        colored_header(label="SAMPLING", description=" ",color_name="violet-30")
+        colored_header(label="Sampling", description=" ",color_name="violet-30")
 
         model_path = './models/active learning'
 
-        colored_header(label="TRAINING", description=" ",color_name="violet-30")
+        colored_header(label="Training", description=" ",color_name="violet-30")
 
         template_alg = model_platform(model_path)
 
@@ -78,8 +81,89 @@ if st.session_state["authentication_status"]:
 
         if inputs['model'] == 'BayeSampling':
             with col2:
-                st.write(len(sp.features))
+                # st.write(len(sp.features.columns.tolist()))
+                feature_name = sp.features.columns.tolist()
+                mm = MinMaxScaler()
+                mm.fit(sp.features)
+                data_min = mm.data_min_
+                data_max = mm.data_max_
+                sp.trans_features = mm.transform(sp.features)
+                min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
+       
+                sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
+                feature_num = sp.trans_features.shape[1]
+
+                vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+
+                sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
+
+                Bgolearn = BGOS.Bgolearn()
+
                 
+                Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                       opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
+                # Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures)
+                if inputs['sample criterion'] == 'Expected Improvement algorith':
+                    res = Mymodel.EI()
+                    
+                if inputs['sample criterion'] == 'Expected improvement with "plugin"':
+                    st.write(Mymodel.EI_plugin())
+
+                if inputs['sample criterion'] == 'Augmented Expected Improvement':
+                    with st.expander('EI HyperParamters'):
+                        alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                        tao = st.slider('tao',0.0, 1.0, 0.0)
+                    res = Mymodel.Augmented_EI(alpha = alpha, tao = tao)
+
+                if inputs['sample criterion'] == 'Expected Quantile Improvement':
+                    with st.expander('EQI HyperParamters'):
+                        beta= st.slider('beta',0.2, 0.8, 0.5)
+                        tao = st.slider('tao_new',0.0, 1.0, 0.0)            
+                    res = Mymodel.EQI(beta = beta,tao_new = tao)
+
+                if inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
+                    st.write(Mymodel.Reinterpolation_EI()) 
+
+                if inputs['sample criterion'] == 'Upper confidence bound':
+                    with st.expander('UCB HyperParamters'):
+                        alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                    res = Mymodel.UCB(alpha=alpha)
+
+                if inputs['sample criterion'] == 'Probability of Improvement':
+                    with st.expander('PoI HyperParamters'):
+                        tao = st.slider('tao',0.0, 0.3, 0.0)
+                    res = Mymodel.PoI(tao = tao)
+
+                if inputs['sample criterion'] == 'Predictive Entropy Search':
+                    with st.expander('PES HyperParamters'):
+                        sam_num = st.number_input('sample number',100, 1000, 500)
+                    res = Mymodel.PES(sam_num = sam_num)  
+                    
+                if inputs['sample criterion'] == 'Knowledge Gradient':
+                    with st.expander('Knowldge_G Hyperparameters'):
+                        MC_num = st.number_input('MC number', 50,300,50)
+                    res = Mymodel.Knowledge_G(MC_num = MC_num) 
+
+                if inputs['sample criterion'] == 'Least Confidence':
+                    
+                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                       opt_num=inputs['opt num'])
+                    res = Mymodel.Least_cfd() 
+       
+                if inputs['sample criterion'] == 'Margin Sampling':
+                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                            opt_num=inputs['opt num'])
+                    res = Mymodel.Margin_S()
+
+                if inputs['sample criterion'] == 'Entropy-based approach':
+                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                            opt_num=inputs['opt num'])
+                    res = Mymodel.Entropy()
+
+            sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
+            st.write(sp.sample_point)
+            tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 
 elif st.session_state["authentication_status"] is False:

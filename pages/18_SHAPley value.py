@@ -63,7 +63,7 @@ if st.session_state["authentication_status"]:
         target_selected_option = st.selectbox('choose target', list(fs.targets))
         fs.targets = fs.targets[target_selected_option]
         # regressor = st.selectbox('tree',['linear','kernel','sampling'])
-        reg = XGBR()
+        reg = RFR()
         X_train, X_test, y_train, y_test = TTS(fs.features, fs.targets, random_state=0) 
         test_size = st.slider('test size',0.1, 0.5, 0.2) 
         random_state = st.checkbox('random state 1024',True)

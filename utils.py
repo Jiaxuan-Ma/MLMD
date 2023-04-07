@@ -37,7 +37,6 @@ from sklearn.decomposition import PCA
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.feature_selection import SelectFromModel
-from xgboost import XGBRegressor as XGBR
 from sklearn.ensemble import RandomForestRegressor as RFR
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.ensemble import ExtraTreesRegressor as ETR
@@ -80,7 +79,6 @@ import graphviz
 
 
 import shap
-import xgboost
 import altair as alt
 import seaborn as sns
 import matplotlib.pyplot as plt
