@@ -30,16 +30,16 @@ if st.session_state["authentication_status"]:
                 "nav-link-selected": {"background-color": "gray"}})  
 
     if file is not None:
-        
-        with st.expander('DATA INFORMATION'):
+        colored_header(label="Data Information", description=" ", color_name="violet-70")
+        with st.expander('Data Information'):
             df = pd.read_csv(file)
 
-            colored_header(label="DATA", description=" ",color_name="blue-70")
+            colored_header(label="Data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="FEATUREs SELECT",description=" ",color_name="blue-30")
+            colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
 
             target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
             st.write('target number', target_num)
@@ -57,18 +57,17 @@ if st.session_state["authentication_status"]:
         
        #=============== cluster ================
 
-        colored_header(label="CLUSTERs",description=" ",color_name="violet-70")
+        colored_header(label="Cluster",description=" ",color_name="violet-70")
         cluster = CLUSTER(features, targets)
 
-        target_selected_option = st.selectbox('target', list(cluster.targets)[::-1])
+        # colored_header(label="Choose Target", description=" ", color_name="violet-30")
+        # target_selected_option = st.selectbox('target', list(cluster.targets)[::-1])
 
-        cluster.targets = targets[target_selected_option]
-
-        colored_header(label="CLUSTER", description=" ",color_name="violet-30")
+        # cluster.targets = targets[target_selected_option]
 
         model_path = './models/cluster'
 
-        colored_header(label="TRAINING", description=" ",color_name="violet-30")
+        colored_header(label="Training", description=" ",color_name="violet-30")
 
         template_alg = model_platform(model_path)
 
@@ -80,14 +79,14 @@ if st.session_state["authentication_status"]:
                 pass
 
             with st.container():
-                button_train = st.button('train', use_container_width=True)
+                button_train = st.button('Train', use_container_width=True)
             if button_train:
                 
                     cluster.model = KMeans(n_clusters=inputs['n clusters'], random_state = inputs['random state'])
                     
                     cluster.K_means()
 
-                    clustered_df = pd.concat([cluster.features,pd.DataFrame(cluster.pred)], axis=1)
+                    clustered_df = pd.concat([cluster.features,pd.DataFrame(cluster.model.labels_)], axis=1)
                     
                     r_name='cluster label'
                     c_name=clustered_df.columns[-1]
