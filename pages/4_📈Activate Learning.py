@@ -22,20 +22,26 @@ st.write('---')
 
 if st.session_state["authentication_status"]:
 
-    file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+    file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
     upload_file = option_menu(None, ["Upload"], icons=['cloud-upload'], menu_icon="cast", 
                               default_index=0, orientation="horizontal",styles={
                 "container": {"padding": "0!important", "background-color": "#fafafa"},
                 "icon": {"color": "black", "font-size": "25px"}, 
                 "nav-link": {"font-size": "25px", "text-align": "left", "margin":"0px", "--hover-color": "#eee"},
                 "nav-link-selected": {"background-color": "gray"}})  
-
-    if file is not None:
+    if len(file) > 2:
+        st.error('Only upload two files, the first is the data set, the second is the the vritual space sample point.')
+        st.stop()
+    if len(file) == 2:
+        st.warning('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
+    if len(file) > 0:
 
         colored_header(label="Data Information",description=" ",color_name="violet-70")
 
         with st.expander('Data Information'):
-            df = pd.read_csv(file)
+            df = pd.read_csv(file[0])
+            if len(file) == 2:
+                df_vs = pd.read_csv(file[1])
             check_string_NaN(df)
             colored_header(label="Data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
@@ -80,22 +86,27 @@ if st.session_state["authentication_status"]:
         inputs, col2 = template_alg.show()
 
         if inputs['model'] == 'BayeSampling':
+
             with col2:
-                # st.write(len(sp.features.columns.tolist()))
-                feature_name = sp.features.columns.tolist()
-                mm = MinMaxScaler()
-                mm.fit(sp.features)
-                data_min = mm.data_min_
-                data_max = mm.data_max_
-                sp.trans_features = mm.transform(sp.features)
-                min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
-       
-                sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
-                feature_num = sp.trans_features.shape[1]
+                if len(file) == 2:
+                    sp.vsfeatures = df_vs
+                    st.info('You have upoaded the visula sample point file.')
+                    feature_name = sp.features.columns.tolist()
+                else:
+                    feature_name = sp.features.columns.tolist()
+                    mm = MinMaxScaler()
+                    mm.fit(sp.features)
+                    data_min = mm.data_min_
+                    data_max = mm.data_max_
+                    sp.trans_features = mm.transform(sp.features)
+                    min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
+        
+                    sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
+                    feature_num = sp.trans_features.shape[1]
 
-                vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+                    vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
 
-                sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
+                    sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
 
                 Bgolearn = BGOS.Bgolearn()
 

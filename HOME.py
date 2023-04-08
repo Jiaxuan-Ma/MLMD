@@ -150,18 +150,11 @@ if authentication_status:
             switch_page("ACTIVATE LEARNING")
     with col2:
         P7 = card(
-        title="SYMBOLIC REGRESSION!",
+        title="ENSEMBLE LEARNING!",
         text="",
         image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
         if P7:
-            switch_page("SYMBOLIC REGRESSION")
-
-    P8 = card(
-    title="ENSEMBLE LEARNING!",
-    text="",
-    image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
-    if P8:
-        switch_page("ENSEMBLE LEARNING")
+            switch_page("ENSEMBLE LEARNING")
 
     with open('./config.yaml', 'w') as file:
         yaml.dump(config, file, default_flow_style=False)
