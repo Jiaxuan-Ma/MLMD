@@ -28,16 +28,16 @@ if st.session_state["authentication_status"]:
         P1 = card(
         title="DATA PROFILING!",
         text=" ",
-        image=  "https://ts1.cn.mm.bing.net/th/id/R-C.58d20f1fd4c2c103c8bd327e71c519fa?rik=w5vhuBIv8msleg&riu=http%3a%2f%2fimg.pconline.com.cn%2fimages%2fupload%2fupc%2ftx%2fwallpaper%2f1209%2f14%2fc2%2f13855364_1347613545563.jpg&ehk=54bnqi6V6arP3ZdfR1nbNPOqhKOtDzpI08WFudOrhQw%3d&risl=&pid=ImgRaw&r=0")
+        image=  "https://th.bing.com/th/id/OIP.ddv1QrOKa2RNCyZDdqPUsgHaE8?pid=ImgDet&w=976&h=651&rs=1")
         if P1:
             switch_page("Profiling")
     with col2:
         P2 = card(
         title="DATA VISUALIZATION!",
         text=" ",
-        image=  "https://ts1.cn.mm.bing.net/th/id/R-C.3e42ad7c7744a7a612bfbaa480405611?rik=eX46Dun%2fFF1aDg&riu=http%3a%2f%2fpic.bizhi360.com%2fbbpic%2f25%2f6125.jpg&ehk=ukEQFHgNgClnZxjkosi%2bP3OoaZicxvcitCFcgJISxww%3d&risl=&pid=ImgRaw&r=0")
+        image=  "https://th.bing.com/th/id/OIP.mGEWhKSTMV7hY_150FFT3wHaE7?pid=ImgDet&w=720&h=479&rs=1")
         if P2:
-            switch_page("CONTINUOUS TARGETs")
+            switch_page("Visualization")
 
 
 elif st.session_state["authentication_status"] is False:

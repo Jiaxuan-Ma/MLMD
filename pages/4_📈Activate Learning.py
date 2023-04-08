@@ -99,7 +99,6 @@ if st.session_state["authentication_status"]:
 
                 Bgolearn = BGOS.Bgolearn()
 
-                
                 Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
                                        opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
                 # Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures)
@@ -107,7 +106,7 @@ if st.session_state["authentication_status"]:
                     res = Mymodel.EI()
                     
                 if inputs['sample criterion'] == 'Expected improvement with "plugin"':
-                    st.write(Mymodel.EI_plugin())
+                    res = Mymodel.EI_plugin()
 
                 if inputs['sample criterion'] == 'Augmented Expected Improvement':
                     with st.expander('EI HyperParamters'):
@@ -122,7 +121,7 @@ if st.session_state["authentication_status"]:
                     res = Mymodel.EQI(beta = beta,tao_new = tao)
 
                 if inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
-                    st.write(Mymodel.Reinterpolation_EI()) 
+                    res = Mymodel.Reinterpolation_EI() 
 
                 if inputs['sample criterion'] == 'Upper confidence bound':
                     with st.expander('UCB HyperParamters'):

@@ -25,7 +25,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 """
 st.markdown("<br>", unsafe_allow_html=True)
 """
-This is a machine learning visual platform.
+This is a data miner visual platform.
 """
 
 # streamlit_analytics.start_tracking()
@@ -94,13 +94,13 @@ if username == "mjx@shu.edu.cn":
 
 if authentication_status:
 
-    colored_header(label="Reset password",description=" ",color_name="violet-70")
-    with st.expander('Reset password'):
-        try:
-            if authenticator.reset_password(username, 'Reset password'):
-                st.success('Password modified successfully')
-        except Exception as e:
-            st.error(e)
+    # colored_header(label="Reset password",description=" ",color_name="violet-70")
+    # with st.expander('Reset password'):
+    #     try:
+    #         if authenticator.reset_password(username, 'Reset password'):
+    #             st.success('Password modified successfully')
+    #     except Exception as e:
+    #         st.error(e)
 
 
     colored_header(label="Try it now",description=" ",color_name="violet-70")
@@ -110,7 +110,7 @@ if authentication_status:
         P1 = card(
         title="DATA VISUALIZATION!",
         text="STEP 1",
-        image= "https://images.alphacoders.com/546/546607.jpg")
+        image= "https://th.bing.com/th/id/OIP.W-l_JOepX3wkql8lgeMsqgHaFQ?pid=ImgDet&rs=1")
         if P1:
             switch_page("DATA VISUALIZATION")
 
@@ -118,7 +118,7 @@ if authentication_status:
         P2 = card(
         title="FEATURE ENGINEERING!",
         text="STEP 2",
-        image="https://wallpapercave.com/wp/8lohWp0.jpg")
+        image="https://th.bing.com/th/id/R.f859afb522ab770a6b1d670a75f54aec?rik=ENjw3pPepmHxFg&riu=http%3a%2f%2fimg.sccnn.com%2fbimg%2f338%2f13641.jpg&ehk=fcPxJs5SqNiKxLa1RcofksKgk86OHkghGx6%2fxoITceY%3d&risl=&pid=ImgRaw&r=0")
         if P2:
             switch_page("FEATURE ENGINEERING")
     
@@ -126,7 +126,7 @@ if authentication_status:
     P3 = card(
     title="PREDICTION!",
     text="STEP 3",
-    image="https://cdn.wallpapersafari.com/32/81/HrzQfA.jpg")
+    image="https://th.bing.com/th/id/OIP.L0wnj6PnPxdmIdkaID23GwHaFY?pid=ImgDet&w=660&h=480&rs=1")
     if P3:
         switch_page("PREDICTION")
 
@@ -136,7 +136,7 @@ if authentication_status:
     P6 = card(
     title="SHAPley VALUE!",
     text="",
-    image="https://img.zcool.cn/community/01193959eeec64a801202b0c23804b.jpg@1280w_1l_2o_100sh.jpg")
+    image="https://th.bing.com/th/id/OIP.xwF5xKvzIRNrwmsvvNzntwHaEK?pid=ImgDet&w=1068&h=601&rs=1")
     if P6:
         switch_page("SHAPley value")
 
@@ -145,7 +145,7 @@ if authentication_status:
         P4 = card(
         title="ACTIVE LEARNING!",
         text="",
-        image="https://pic1.zhimg.com/v2-e10529e9d16bcb26957866887cfe4dca_r.jpg?source=1940ef5c")
+        image="https://th.bing.com/th/id/OIP.B8_PwZbAvdAsGKZBFR6tMgHaEM?pid=ImgDet&w=530&h=300&rs=1")
         if P4:
             switch_page("ACTIVATE LEARNING")
     with col2:

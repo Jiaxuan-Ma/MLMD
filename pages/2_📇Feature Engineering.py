@@ -29,7 +29,7 @@ if st.session_state["authentication_status"]:
         P1 = card(
         title="DROP MISSING FEATUREs!",
         text="",
-        image= "https://ts1.cn.mm.bing.net/th/id/R-C.12f82aa380444b1fddae6c4076edc71b?rik=MU0uAw3%2fegKZaw&riu=http%3a%2f%2fpic.zsucai.com%2ffiles%2f2013%2f0717%2fbingo7.jpg&ehk=w43Ou14tQlO6vvwZRS%2bDVUUxJu8xCA6SoyEfdoszXxA%3d&risl=&pid=ImgRaw&r=0")
+        image= "https://th.bing.com/th/id/OIP.pQ-ojbIYIahpk4O4qZ8B6AHaFK?pid=ImgDet&w=600&h=418&rs=1")
         if P1:
             switch_page("DROP MISSING FEATUREs")
 
@@ -38,7 +38,7 @@ if st.session_state["authentication_status"]:
         P2 = card(
         title="FILL MISSING FEATUREs!",
         text="",
-        image="https://ts1.cn.mm.bing.net/th/id/R-C.f55aa038bb67c75d84d5445050f76239?rik=EUpLueK%2bQk6yRA&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fFCDgjHU.jpg&ehk=CKI50JeZ6WVUnmhfZKi70pjBJ%2f3fg1VS34l5vg2nppY%3d&risl=&pid=ImgRaw&r=0")
+        image="https://www.stratx-exl.com/hubfs/Invest%20in%20Innovation%20Training%20.jpg#keepProtocol")
         if P2:
             switch_page("FILL MISSING FEATUREs")
 
@@ -46,7 +46,7 @@ if st.session_state["authentication_status"]:
     P3= card(
     title="DROP NUNIQUE FEATUREs!",
     text="",
-    image="https://desk-fd.zol-img.com.cn/t_s960x600c5/g5/M00/02/05/ChMkJ1bKyLyICgL5AAjMbLExdzkAALIGQDsAlMACMyE427.jpg")
+    image="https://th.bing.com/th/id/R.ad3496b85647db847daeeb5c791e405a?rik=eR3JmekNKe1%2beg&riu=http%3a%2f%2ftangibleinteriors.com%2fblog%2fwp-content%2fuploads%2f2015%2f08%2fidea-1.jpg&ehk=5LyLsfnVPNEd3OyECYea75KvYWXevfifC5w5KpY5Tgk%3d&risl=&pid=ImgRaw&r=0")
     if P3:
         switch_page("DROP NUNIQUE FEATUREs")
     
@@ -59,7 +59,7 @@ if st.session_state["authentication_status"]:
         P4 = card(
         title="DROP LOW CORRELATION FEATUREs vs TARGET!",
         text="",
-        image="https://ts1.cn.mm.bing.net/th/id/R-C.40234919a68b35bd5b8043294e7944fd?rik=%2fRxWjy0nBdtkAQ&riu=http%3a%2f%2fpic.qqbizhi.com%2fallimg%2fbbpic%2f29%2f1229_5.jpg&ehk=B%2b3JbGRA3Xq9iIyjNBr0YCvzTMGFxwLTh4ksQvagBRY%3d&risl=&pid=ImgRaw&r=0")
+        image="https://images.squarespace-cdn.com/content/v1/602574da8aa63d3ab3e7f9ca/1613132653122-AXQK07WIEXIMIMWQ02BF/Lightbulb.jpg?format=500w")
         if P4:
             switch_page("DROP LOW CORRELATION FEATUREs vs TARGET")
         
@@ -68,7 +68,7 @@ if st.session_state["authentication_status"]:
         P5 = card(
         title="DROP COLLINEAR FEATUREs!",
         text="",
-        image="https://ts1.cn.mm.bing.net/th/id/R-C.8efd83545acb3ba7137b2b5450b4ea04?rik=7teH3W0KXFmD1g&riu=http%3a%2f%2fpic.zsucai.com%2ffiles%2f2013%2f0717%2fbingo5.jpg&ehk=FG6ysy4IlDTZcJBECXlDb7yrT5cApwp0Gdo5akzrSQs%3d&risl=&pid=ImgRaw&r=0")
+        image="https://marketingweek.imgix.net/content/uploads/2017/08/08172435/Succession-planning-2.jpg?auto=compress,format&q=60&w=736&h=455")
         if P5:
             switch_page("DROP COLLINEAR FEATUREs")
 
@@ -80,7 +80,7 @@ if st.session_state["authentication_status"]:
     P6 = card(
     title="ONE-HOT ENCODING FEATUREs!",
     text="",
-    image="https://ts1.cn.mm.bing.net/th/id/R-C.5ca538274811bd9853f53b46af249365?rik=%2fGw9z2%2frD9R%2bJA&riu=http%3a%2f%2fup.deskcity.org%2fpic_source%2f5c%2fa5%2f38%2f5ca538274811bd9853f53b46af249365.jpg&ehk=vUjvURB8tE4gEGeveS8aQ6Ve6MydUras1UVUElYVqPo%3d&risl=&pid=ImgRaw&r=0")
+    image="https://www.nasdaq.com/sites/acquia.prod/files/styles/1370x700/public/etf_trends/Keep-Your-Qualitys-Momentum-Introducing-the-Virtus-JOET-ETF-440x250.jpg?1680874597890561479")
     if P6:
         switch_page("ONE-HOT ENCODING FEATUREs")
         
@@ -91,7 +91,7 @@ if st.session_state["authentication_status"]:
     P7 = card(
     title="FEATUREs IMPORTANCE!",
     text="",
-    image="https://ts1.cn.mm.bing.net/th/id/R-C.93e546731d5bc64544905c1e58d6e546?rik=DJf0wHkmD9sG8A&pid=ImgRaw&r=0")
+    image="https://th.bing.com/th/id/R.3f4bfc341cebfab604f44045f2e3032f?rik=XmJ9nimYgKT2Kg&riu=http%3a%2f%2fwww.qsan-usa.com%2fuploads%2f7%2f8%2f0%2f3%2f78037614%2fistock-491490296_orig.jpg&ehk=5x%2bwRIgnZsAbSpB%2fKrIIn9qPCsf6QwSMaL1g3GX0taE%3d&risl=&pid=ImgRaw&r=0")
     if P7:
         switch_page("FEATUREs IMPORTANCE")
     

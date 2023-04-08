@@ -4,26 +4,14 @@ cookie:
   name: some_cookie_name
 credentials:
   usernames:
-    '123':
+    e2m:
       email: mjx@shu.edu.cn
-      name: '123'
-      password: $2b$12$Ghuho5lvDmcjPonVSbbSTO8aMOKtFCGqptOjxkmLTTxcSx5V99u4O
-    2282882173@qq.com:
-      email: 2282882173@qq.com
-      name: 2282882173@qq.com
-      password: $2b$12$xAiPvytn0B88891qOeb19u5/dw79BNzF8CMngcdcLneJI7TfcBNH6
-    huang_dongyang@shu.edu.cn:
-      email: huang_dongyang@shu.edu.cn
-      name: huang_dongyang@shu.edu.cn
-      password: $2b$12$kOY/90./vYno4AtdIRgBbe5Cdk/pQAw87dvsebHN5p2Sy6Wqxgx96
+      name: e2m
+      password: $2b$12$KlJQly07paFsxpGkmA0E1.epXJT3VDS/1SDm5ipOBf/MSugXmC/9G
     mjx@shu.edu.cn:
       email: mjx@shu.edu.cn
       name: mjx@shu.edu.cn
       password: $2b$12$5D2By5uFUmXfJO4XgYD9vOXUQRfKYPuXJ71BXEFswkXId1rnhjC.2
-    "\u9A6C\u5BB6\u8F69@admin":
-      email: mjx@shu.edu.cn
-      name: "\u9A6C\u5BB6\u8F69"
-      password: $2b$12$KunUbiM63tMdpDP05QyJQ.Yo4cCsLL3rRWS4IiGWFTUCzOikZU9lu
 preauthorized:
   emails:
   - mjx@shu.edu.com
