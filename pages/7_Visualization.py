@@ -33,13 +33,13 @@ if st.session_state["authentication_status"]:
         # =============== check string / NaN ====================== 
         check_string_NaN(df)
         
-        colored_header(label="Data Table",description=" ",color_name="violet-70")
+        colored_header(label="Data Information",description=" ",color_name="violet-70")
 
         nrow = st.slider("rows", 1, len(df)-1, 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
-        colored_header(label="Data Stastistics",description=" ",color_name="violet-30")
+        colored_header(label="Data Statistics",description=" ",color_name="violet-30")
 
         st.write(df.describe())
 
@@ -47,7 +47,7 @@ if st.session_state["authentication_status"]:
         
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-        colored_header(label="Data Analysis", description=" ",color_name="violet-70")
+        colored_header(label="Features vs Targets", description=" ",color_name="violet-70")
 
         target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
         st.write('target number', target_num)

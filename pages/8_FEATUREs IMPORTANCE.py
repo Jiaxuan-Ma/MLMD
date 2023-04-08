@@ -113,7 +113,7 @@ if st.session_state["authentication_status"]:
                     scores = np.array(scores) 
                     fig, ax = plt.subplots()
                     ax = plt.plot(cumu_importance, scores,'o-')
-                    plt.xlabel("feature importance")
+                    plt.xlabel("cumulative feature importance")
                     plt.ylabel("r2")
                     st.pyplot(fig)
         elif inputs['model'] == 'LassoRegressor':
@@ -154,7 +154,7 @@ if st.session_state["authentication_status"]:
                     scores = np.array(scores) 
                     fig, ax = plt.subplots()
                     ax = plt.plot(cumu_importance, scores,'o-')
-                    plt.xlabel("feature importance")
+                    plt.xlabel("cumulative feature importance")
                     plt.ylabel("r2")
                     st.pyplot(fig)
 
@@ -194,7 +194,7 @@ if st.session_state["authentication_status"]:
                     scores = np.array(scores) 
                     fig, ax = plt.subplots()
                     ax = plt.plot(cumu_importance, scores,'o-')
-                    plt.xlabel("feature importance")
+                    plt.xlabel("cumulative feature importance")
                     plt.ylabel("r2")
                     st.pyplot(fig)
         elif inputs['model'] == 'LassoRegressor':
@@ -234,7 +234,7 @@ if st.session_state["authentication_status"]:
                     scores = np.array(scores) 
                     fig, ax = plt.subplots()
                     ax = plt.plot(cumu_importance, scores,'o-')
-                    plt.xlabel("feature importance")
+                    plt.xlabel("cumulative feature importance")
                     plt.ylabel("r2")
                     st.pyplot(fig)
 
@@ -281,7 +281,7 @@ if st.session_state["authentication_status"]:
                     scores = np.array(scores) 
                     fig, ax = plt.subplots()
                     ax = plt.plot(cumu_importance, scores,'o-')
-                    plt.xlabel("feature importance")
+                    plt.xlabel("cumulative feature importance")
                     plt.ylabel("r2")
                     st.pyplot(fig)
 
@@ -330,7 +330,7 @@ if st.session_state["authentication_status"]:
                             scores = np.array(scores) 
                             fig, ax = plt.subplots()
                             ax = plt.plot(cumu_importance, scores,'o-')
-                            plt.xlabel("feature importance")
+                            plt.xlabel("cumulative feature importance")
                             plt.ylabel("r2")
                             st.pyplot(fig)
 
