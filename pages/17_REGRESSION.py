@@ -272,8 +272,6 @@ if st.session_state["authentication_status"]:
                             reg.features = MinMaxScaler().fit_transform(reg.features)
                         loo = LeaveOneOut()
 
-  
-
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -739,7 +737,8 @@ if st.session_state["authentication_status"]:
           
                     plot = customPlot()
                     plot.pred_vs_actual(Y_test, Y_pred)                  
-                    st.write('mean cross val R2:', score)     
+                    st.write('mean cross val R2:', score)   
+
         st.write('---')
 
 elif st.session_state["authentication_status"] is False:

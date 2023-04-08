@@ -21,7 +21,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 """
-# EASY TO MATTER DESIGN
+# MACHINE LEARNING FOR MATERIALs
 """
 st.markdown("<br>", unsafe_allow_html=True)
 """
@@ -108,17 +108,17 @@ if authentication_status:
     col1, col2 = st.columns([2,2])
     with col1:
         P1 = card(
-        title="DATA VISUALIZATION!",
+        title="DATA PRELIMINARY!",
         text="STEP 1",
-        image= "https://th.bing.com/th/id/OIP.W-l_JOepX3wkql8lgeMsqgHaFQ?pid=ImgDet&rs=1")
+        image= "https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
         if P1:
-            switch_page("DATA VISUALIZATION")
+            switch_page("DATA PRELIMINARY")
 
     with col2:
         P2 = card(
         title="FEATURE ENGINEERING!",
         text="STEP 2",
-        image="https://th.bing.com/th/id/R.f859afb522ab770a6b1d670a75f54aec?rik=ENjw3pPepmHxFg&riu=http%3a%2f%2fimg.sccnn.com%2fbimg%2f338%2f13641.jpg&ehk=fcPxJs5SqNiKxLa1RcofksKgk86OHkghGx6%2fxoITceY%3d&risl=&pid=ImgRaw&r=0")
+        image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
         if P2:
             switch_page("FEATURE ENGINEERING")
     
@@ -126,7 +126,7 @@ if authentication_status:
     P3 = card(
     title="PREDICTION!",
     text="STEP 3",
-    image="https://th.bing.com/th/id/OIP.L0wnj6PnPxdmIdkaID23GwHaFY?pid=ImgDet&w=660&h=480&rs=1")
+    image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
     if P3:
         switch_page("PREDICTION")
 
@@ -136,7 +136,7 @@ if authentication_status:
     P6 = card(
     title="SHAPley VALUE!",
     text="",
-    image="https://th.bing.com/th/id/OIP.xwF5xKvzIRNrwmsvvNzntwHaEK?pid=ImgDet&w=1068&h=601&rs=1")
+    image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
     if P6:
         switch_page("SHAPley value")
 
@@ -145,20 +145,23 @@ if authentication_status:
         P4 = card(
         title="ACTIVE LEARNING!",
         text="",
-        image="https://th.bing.com/th/id/OIP.B8_PwZbAvdAsGKZBFR6tMgHaEM?pid=ImgDet&w=530&h=300&rs=1")
+        image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
         if P4:
             switch_page("ACTIVATE LEARNING")
     with col2:
         P7 = card(
         title="SYMBOLIC REGRESSION!",
         text="",
-        image="")
+        image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
         if P7:
             switch_page("SYMBOLIC REGRESSION")
 
-
-
-
+    P8 = card(
+    title="ENSEMBLE LEARNING!",
+    text="",
+    image="https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
+    if P8:
+        switch_page("ENSEMBLE LEARNING")
 
     with open('./config.yaml', 'w') as file:
         yaml.dump(config, file, default_flow_style=False)

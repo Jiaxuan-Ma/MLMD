@@ -55,14 +55,13 @@ if st.session_state["authentication_status"]:
             with col_target:   
                 st.write(targets.head())
         
-       #=============== drop nunqiue features ================
 
-        colored_header(label="Drop Low Correlation features vs Targets",description=" ",color_name="violet-70")
+        colored_header(label="Drop Low Correlation Features vs Target",description=" ",color_name="violet-70")
         fs = FeatureSelector(features, targets)
         plot = customPlot() 
-
+        target_selected_option = st.selectbox('choose target', list(fs.targets))
         col1, col2 = st.columns([1,3])
-        # according the feature and target correlation to drop feature
+        
         with col1:  
             corr_method = st.selectbox("correlation method",["pearson","spearman","kendall","MIR"], key=15)  
             if corr_method != "MIR":
@@ -75,7 +74,7 @@ if st.session_state["authentication_status"]:
             
         with col2:
             
-            target_selected_option = st.selectbox('choose target', list(fs.targets))
+           
 
             target_selected = fs.targets[target_selected_option]
             if corr_method != "MIR":

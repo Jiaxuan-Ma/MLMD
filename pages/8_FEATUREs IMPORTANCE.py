@@ -75,33 +75,17 @@ if st.session_state["authentication_status"]:
 
         inputs, col2 = template_alg.show()
         # st.write(inputs)
-        
-        if inputs['model'] == 'LGBRegressor':
-            
-            fs.model = lgb.LGBMRegressor(n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'], verbose=-1)
 
-            with col2:
-                option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
-            with st.container():
-                button_train = st.button('train', use_container_width=True)
-            if button_train:
-                
-                fs.lightGBM(eval_metric=inputs['metric'], n_iterations=inputs['niterations'], early_stopping= inputs['early stopping'], 
-                                            test_size=inputs['test size'], round_number = inputs['early stopping rounds'])
-                fs.identify_zero_low_importance(option_cumulative_importance)
-                fs.feature_importance_select_show()
-
-        # elif inputs['model'] == 'Permutation':
-
-        #     st.write('you found me')
-
-        elif inputs['model'] == 'LinearRegressor':
+        if inputs['model'] == 'LinearRegressor':
             
 
             fs.model = LinearR()
 
             with col2:
                 option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+                Embedded_method = st.checkbox('Embedded method',False)
+                if Embedded_method:
+                    cv = st.number_input('cv',1,10,5)
             with st.container():
                 button_train = st.button('train', use_container_width=True)
             if button_train:
@@ -109,14 +93,39 @@ if st.session_state["authentication_status"]:
                 fs.LinearRegressor()     
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
+                if Embedded_method:
+                    
+                    threshold  = fs.cumulative_importance
 
+                    feature_importances = fs.feature_importances.set_index('feature',drop = False)
+
+                    features = []
+                    scores = []
+                    cumuImportance = []
+                    for i in range(1, len(fs.features.columns) + 1):
+                        features.append(feature_importances.iloc[:i, 0].values.tolist())
+                        X_selected = fs.features[features[-1]]
+                        score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+
+                        cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                        scores.append(score)
+                    cumu_importance = np.array(cumuImportance)
+                    scores = np.array(scores) 
+                    fig, ax = plt.subplots()
+                    ax = plt.plot(cumu_importance, scores,'o-')
+                    plt.xlabel("feature importance")
+                    plt.ylabel("r2")
+                    st.pyplot(fig)
         elif inputs['model'] == 'LassoRegressor':
             
             fs.model = Lasso(random_state=inputs['random state'])
 
             with col2:
                 option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
-            
+                Embedded_method = st.checkbox('Embedded method',False)
+                if Embedded_method:
+                    cv = st.number_input('cv',1,10,5)
+
             with st.container():
                 button_train = st.button('train', use_container_width=True)
             if button_train:
@@ -125,6 +134,29 @@ if st.session_state["authentication_status"]:
 
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
+                if Embedded_method:
+                    
+                    threshold  = fs.cumulative_importance
+
+                    feature_importances = fs.feature_importances.set_index('feature',drop = False)
+
+                    features = []
+                    scores = []
+                    cumuImportance = []
+                    for i in range(1, len(fs.features.columns) + 1):
+                        features.append(feature_importances.iloc[:i, 0].values.tolist())
+                        X_selected = fs.features[features[-1]]
+                        score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+
+                        cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                        scores.append(score)
+                    cumu_importance = np.array(cumuImportance)
+                    scores = np.array(scores) 
+                    fig, ax = plt.subplots()
+                    ax = plt.plot(cumu_importance, scores,'o-')
+                    plt.xlabel("feature importance")
+                    plt.ylabel("r2")
+                    st.pyplot(fig)
 
         elif inputs['model'] == 'RidgeRegressor':
             
@@ -133,20 +165,47 @@ if st.session_state["authentication_status"]:
 
             with col2:
                 option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
+                Embedded_method = st.checkbox('Embedded method',False)
+                if Embedded_method:
+                    cv = st.number_input('cv',1,10,5)
             with st.container():
                 button_train = st.button('train', use_container_width=True)
             if button_train:
                 fs.RidgeRegressor()     
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
+                if Embedded_method:
+                    
+                    threshold  = fs.cumulative_importance
 
+                    feature_importances = fs.feature_importances.set_index('feature',drop = False)
+
+                    features = []
+                    scores = []
+                    cumuImportance = []
+                    for i in range(1, len(fs.features.columns) + 1):
+                        features.append(feature_importances.iloc[:i, 0].values.tolist())
+                        X_selected = fs.features[features[-1]]
+                        score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+
+                        cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                        scores.append(score)
+                    cumu_importance = np.array(cumuImportance)
+                    scores = np.array(scores) 
+                    fig, ax = plt.subplots()
+                    ax = plt.plot(cumu_importance, scores,'o-')
+                    plt.xlabel("feature importance")
+                    plt.ylabel("r2")
+                    st.pyplot(fig)
         elif inputs['model'] == 'LassoRegressor':
             
             fs.model = Lasso(random_state=inputs['random state'])
 
             with col2:
                 option_cumulative_importance = st.slider('cumulative importance',0.0, 1.0, 0.95)
-            
+                Embedded_method = st.checkbox('Embedded method',False)
+                if Embedded_method:
+                    cv = st.number_input('cv',1,10,5)
             with st.container():
                 button_train = st.button('train', use_container_width=True)
             if button_train:
@@ -155,6 +214,29 @@ if st.session_state["authentication_status"]:
 
                 fs.identify_zero_low_importance(option_cumulative_importance)
                 fs.feature_importance_select_show()
+                if Embedded_method:
+                    
+                    threshold  = fs.cumulative_importance
+
+                    feature_importances = fs.feature_importances.set_index('feature',drop = False)
+
+                    features = []
+                    scores = []
+                    cumuImportance = []
+                    for i in range(1, len(fs.features.columns) + 1):
+                        features.append(feature_importances.iloc[:i, 0].values.tolist())
+                        X_selected = fs.features[features[-1]]
+                        score = CVS(fs.model, X_selected, fs.targets, cv=cv).mean()
+
+                        cumuImportance.append(feature_importances.loc[features[-1][-1], 'cumulative_importance'])
+                        scores.append(score)
+                    cumu_importance = np.array(cumuImportance)
+                    scores = np.array(scores) 
+                    fig, ax = plt.subplots()
+                    ax = plt.plot(cumu_importance, scores,'o-')
+                    plt.xlabel("feature importance")
+                    plt.ylabel("r2")
+                    st.pyplot(fig)
 
         elif inputs['model'] == 'RandomForestClassifier':
             

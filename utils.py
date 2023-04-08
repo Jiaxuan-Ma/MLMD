@@ -69,8 +69,18 @@ from sklearn.metrics import r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
+from sklearn.ensemble import VotingRegressor
+from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import BaggingRegressor
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 
 
+import xgboost as xgb
+from catboost import CatBoostClassifier
+from catboost import CatBoostRegressor
 
 import Bgolearn.BGOsampling as BGOS
 
@@ -1080,66 +1090,6 @@ class FeatureSelector:
                 tmp_download_link = download_button(self.features_dropped_low_importance, f'feature importance.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-    def lightGBM(self, eval_metric='l1', n_iterations=10, early_stopping = True, test_size=0.2, round_number=100):
-        # Identify the features with zero importance according to a gradient boosting machine.
-        # The gbm can be trained with early stopping using a validation set to prevent overfitting.
-        # The features importances are averaged over `n_iteration` to reduce variance
-
-        # Parameters 
-        # ------
-        # Extract feature names
-        if early_stopping and eval_metric is None:
-            raise ValueError("""eval metric must be provided with early stopping. Examples include "auc" for classification or
-                            "l2" for regression.""")
-            
-        if self.targets is None:
-            raise ValueError("No training targets provided.")
-
-        # One hot encoding
-        features = pd.get_dummies(self.features)
-        # Extract feature names
-        feature_names = list(features.columns)
-        # Conbert to np array
-        features = np.array(self.features)
-        targets = np.array(self.targets).reshape((-1,))
-
-        # Empty array for feature importances
-        feature_importance_values = np.zeros(len(feature_names))
-                
-        st.markdown(
-                """
-                <style>
-                    .stProgress> div > div > div > div {
-                        background-image: linear-gradient(to right, #67F9D4 , #FF9554);
-                    }
-                </style>""",
-                unsafe_allow_html=True)
-
-        progress_text = "Operation in progress. Please wait."
-        my_bar = st.progress(0, text=progress_text)
-    
-        for iter in range(n_iterations):
-            if early_stopping:
-                train_features, valid_features, train_targets, valid_targets = TTS(self.features, self.targets, test_size = test_size)
-
-                # 'Train the model with early stopping'
-                self.model.fit(train_features, train_targets, eval_metric = eval_metric,
-                        eval_set = [(valid_features, valid_targets)],
-                        early_stopping_rounds = round_number, verbose = -1)
-                # Clean up memory
-                gc.enable()
-                del train_features, train_targets, valid_features, valid_targets
-                gc.collect()
-            else:
-                self.model.fit(self.features, self.targets)
-            
-            # Record the feature importance
-            feature_importance_values += self.model.feature_importances_ / n_iterations
-
-            my_bar.progress((iter + 1)/n_iterations, text=progress_text)
-        st.info('train process is over')
-        self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
-
     def LinearRegressor(self):
         # One hot encoding
         features = pd.get_dummies(self.features)
@@ -1327,6 +1277,87 @@ class CLASSIFIER:
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
 
+    def BaggingClassifier(self):
+        
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        self.Ypred = self.model.predict(self.Xtest)
+        st.info('train process is over')
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))    
+    
+    def AdaBoostClassifier(self):
+        
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        self.Ypred = self.model.predict(self.Xtest)
+        st.info('train process is over')
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))  
+
+    def GradientBoostingClassifier(self):
+        
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        self.Ypred = self.model.predict(self.Xtest)
+        st.info('train process is over')
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))   
+    
+    def XGBClassifier(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        self.Ypred = self.model.predict(self.Xtest)
+        st.info('train process is over')
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))  
+
+    def LGBMClassifier(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        self.Ypred = self.model.predict(self.Xtest)
+        st.info('train process is over')
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))  
+
+    def CatBoostClassifier(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+    
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        self.score = self.model.score(self.Xtest, self.Ytest)
+        self.Ypred = self.model.predict(self.Xtest)
+        st.info('train process is over')
+        self.score = accuracy_score(self.Ypred ,self.Ytest)
+        st.write('accuracy score: {}'.format(self.score))  
+
 class REGRESSOR:
     def __init__(self, features, targets) -> None:
         # origin features and targets
@@ -1436,6 +1467,66 @@ class REGRESSOR:
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))     
 
+    def BaggingRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))     
+
+    def AdaBoostRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score)) 
+
+    def GradientBoostingRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
+
+    def XGBRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))   
+    
+    def LGBMRegressor(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.Xtrain, self.Ytrain)
+        st.info('train process is over')
+        self.Ypred = self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))
+           
 class CLUSTER():
 
     def __init__(self, features, targets) -> None:
@@ -1468,5 +1559,3 @@ class SAMPLING:
         self.score = None
 
         self.Ypred = None
-def BaysSampling(self):
-    pass

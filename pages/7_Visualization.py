@@ -96,7 +96,7 @@ if st.session_state["authentication_status"]:
 
         #=========== Features analysis ==================
 
-        colored_header(label="Feature recipe distribution", description=" ",color_name="violet-30")
+        colored_header(label="Feature Recipe Distribution", description=" ",color_name="violet-30")
 
         feature_range_selected_name = st.slider('Selected different type of feature',1,len(features.columns), (1,2))
         min_feature_selected = feature_range_selected_name[0]-1

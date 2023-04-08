@@ -14,7 +14,7 @@ with st.sidebar:
     badge(type="buymeacoffee", name="jiaxuanmasw")
 # ======================================================
 
-st.write('## DROP UNIQUE FEATUREs')
+st.write('## DROP NUNIQUE FEATUREs')
 st.write('---')
 
 # =====================================================
@@ -33,7 +33,7 @@ if st.session_state["authentication_status"]:
         colored_header(label="Data Information",description=" ",color_name="violet-70")
         with st.expander('Data Information'):
             df = pd.read_csv(file)
-
+            check_string_NaN(df)
             colored_header(label="Data", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)

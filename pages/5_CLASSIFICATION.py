@@ -83,7 +83,7 @@ if st.session_state["authentication_status"]:
                         clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                     elif data_process == 'cross val score':
                         cv = st.number_input('cv',1,10,5)
-                        scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
+                 
 
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
@@ -113,9 +113,9 @@ if st.session_state["authentication_status"]:
                     clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
                                                             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
                                                             
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
+                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
 
-                    st.write('cross val score:', cvs)
+                    st.write('cv mean accuracy score: {}'.format(cvs.mean())) 
 
         if inputs['model'] == 'RandomForestClassifier':
       
@@ -127,7 +127,7 @@ if st.session_state["authentication_status"]:
                         clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                     elif data_process == 'cross val score':
                         cv = st.number_input('cv',1,10,5)
-                        scoring= st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
+             
                     elif data_process == 'oob score':
                         inputs['oob score']  = st.checkbox('oob score',True)
                         inputs['warm start'] = True
@@ -159,9 +159,9 @@ if st.session_state["authentication_status"]:
                                                 min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                 
      
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv,scoring=scoring)
+                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
      
-                    st.write(f'mean cross val score: {cvs.mean()}')
+                    st.write('cv mean accuracy score: {}'.format(cvs.mean())) 
 
                 elif data_process == 'oob score':
  
@@ -196,7 +196,6 @@ if st.session_state["authentication_status"]:
                         if preprocess == 'MinMaxScaler':
                             clf.features = MinMaxScaler().fit_transform(clf.features)
                         cv = st.number_input('cv',1,10,5)
-                        scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             
@@ -220,9 +219,9 @@ if st.session_state["authentication_status"]:
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
                      
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
+                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
 
-                    st.write('cross val score:', cvs)
+                    st.write('cv mean accuracy score: {}'.format(cvs.mean())) 
 
         if inputs['model'] == 'SupportVector':
             with col2:
@@ -244,7 +243,7 @@ if st.session_state["authentication_status"]:
                         if preprocess == 'MinMaxScaler':
                             clf.features = MinMaxScaler().fit_transform(clf.features)
                         cv = st.number_input('cv',1,10,5)
-                        scoring = st.selectbox('scoring',('accuracy','average_precision','f1','f1_micro','f1_macro','f1_weighted','f1_samples'))
+   
             with st.container():
                 button_train = st.button('Train', use_container_width=True)   
             if button_train:
@@ -268,8 +267,8 @@ if st.session_state["authentication_status"]:
                 elif data_process == 'cross val score':
                     clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
                                                                                              
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv, scoring=scoring)
-                    st.write('cross val score:', cvs)     
+                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                    st.write('cv mean accuracy score: {}'.format(cvs.mean()))     
 
         st.write('---')
 

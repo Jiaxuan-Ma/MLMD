@@ -15,7 +15,7 @@ with st.sidebar:
 # ======================================================
 
 
-st.write('## DATA VISUALIZATION')
+st.write('## DATA PRELIMINARY')
 st.write('---')
 
 # =====================================================
@@ -28,14 +28,14 @@ if st.session_state["authentication_status"]:
         P1 = card(
         title="DATA PROFILING!",
         text=" ",
-        image=  "https://th.bing.com/th/id/OIP.ddv1QrOKa2RNCyZDdqPUsgHaE8?pid=ImgDet&w=976&h=651&rs=1")
+        image=  "https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
         if P1:
             switch_page("Profiling")
     with col2:
         P2 = card(
         title="DATA VISUALIZATION!",
         text=" ",
-        image=  "https://th.bing.com/th/id/OIP.mGEWhKSTMV7hY_150FFT3wHaE7?pid=ImgDet&w=720&h=479&rs=1")
+        image=  "https://img1.imgtp.com/2023/04/08/L3wPy8Ra.png")
         if P2:
             switch_page("Visualization")
 
