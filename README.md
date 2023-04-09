@@ -32,7 +32,7 @@ Here we present the data layout `.csv` file that need to upload in the platform.
 
 # Featured Applications
 
-| [Feature Engineering](https://kailaix.github.io/ADCME.jl/dev/apps_constitutive_law/) | [Regression](https://kailaix.github.io/ADCME.jl/dev/apps_adseismic) | [Classification](https://kailaix.github.io/ADCME.jl/dev/apps_ad/) | [Active Learning](https://kailaix.github.io/ADCME.jl/dev/apps_levy/) |
+| [Feature Engineering](https://mlmd.netlify.app/user-guide/feature%20engineering/) | [Regression](https://mlmd.netlify.app/user-guide/regression/) | [Classification](https://mlmd.netlify.app/user-guide/classification/) | [Active Learning](https://mlmd.netlify.app/user-guide/active%20learning/) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/feature%20engineering.png?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/regression.jpg?raw=true)                       | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/classification.jpg?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/active%20learning.jpg?raw=true)    
 
