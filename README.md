@@ -36,3 +36,6 @@ Here we present the data layout in `.csv` file that need to upload.
 | [Data Visulaization](https://kailaix.github.io/ADCME.jl/dev/apps_constitutive_law/) | [Feature Selection](https://kailaix.github.io/ADCME.jl/dev/apps_adseismic) | [Prediction](https://kailaix.github.io/ADCME.jl/dev/apps_ad/) | [Active Learning](https://kailaix.github.io/ADCME.jl/dev/apps_levy/) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/law.png?raw=true)                              | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/earthquake.png?raw=true)                       | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/geo.png?raw=true)                              | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/algo.png?raw=true)    
+
+# LICENSE
+MLMD platform is released under MIT License. See [License]() for details
