@@ -28,3 +28,5 @@ Here we present the data layout in `.csv` file that need to upload.
 </p>
 
 !(300)[https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg]
+
+![](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg)
