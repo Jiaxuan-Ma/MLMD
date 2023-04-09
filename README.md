@@ -3,6 +3,10 @@
 </div>
 </p>
 
+The MLMD platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Enginerring aims at general and frontier machine learning algrithm with visual technology. It is built on the tradition machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
+The design principies and methodologies are summarized in the 
+
+
 # Local Deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
