@@ -4,6 +4,7 @@
 </p>
 
 The MLMD platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Enginerring aims at general and frontier machine learning algrithm with visual technology. It is built on the tradition machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
+
 The design principies and methodologies are summarized in the 
 
 
@@ -33,9 +34,9 @@ Here we present the data layout in `.csv` file that need to upload.
 
 # Featured Applications
 
-| [Data Visulaization](https://kailaix.github.io/ADCME.jl/dev/apps_constitutive_law/) | [Feature Selection](https://kailaix.github.io/ADCME.jl/dev/apps_adseismic) | [Prediction](https://kailaix.github.io/ADCME.jl/dev/apps_ad/) | [Active Learning](https://kailaix.github.io/ADCME.jl/dev/apps_levy/) |
+| [Feature Engineering](https://kailaix.github.io/ADCME.jl/dev/apps_constitutive_law/) | [Regression](https://kailaix.github.io/ADCME.jl/dev/apps_adseismic) | [Classification](https://kailaix.github.io/ADCME.jl/dev/apps_ad/) | [Active Learning](https://kailaix.github.io/ADCME.jl/dev/apps_levy/) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/law.png?raw=true)                              | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/earthquake.png?raw=true)                       | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/geo.png?raw=true)                              | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/algo.png?raw=true)    
+| ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/feature%20engineering.png?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/regression.jpg?raw=true)                       | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/classification.jpg?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/active%20learning.jpg?raw=true)    
 
 # LICENSE
 MLMD platform is released under MIT License. See [License](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design/blob/main/LICENSE) for details
