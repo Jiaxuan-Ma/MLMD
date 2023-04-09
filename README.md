@@ -38,4 +38,4 @@ Here we present the data layout in `.csv` file that need to upload.
 | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/law.png?raw=true)                              | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/earthquake.png?raw=true)                       | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/geo.png?raw=true)                              | ![law](https://github.com/ADCMEMarket/ADCMEImages/blob/master/ADCME/algo.png?raw=true)    
 
 # LICENSE
-MLMD platform is released under MIT License. See [License]() for details
+MLMD platform is released under MIT License. See [License](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design/blob/main/LICENSE) for details
