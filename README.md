@@ -5,8 +5,6 @@
 
 The MLMD platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Enginerring aims at general and frontier machine learning algrithm with visual technology. It is built on the tradition machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
 
-The design principies and methodologies are summarized in the 
-
 
 # Local Deploy
 
@@ -26,7 +24,7 @@ streamlit run HOME.py
 
 # Tutorial
 
-Here we present the data layout in `.csv` file that need to upload.
+Here we present the data layout `.csv` file that need to upload in the platform.
 
 <p align="center">
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" , width="400px" />
