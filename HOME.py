@@ -42,7 +42,7 @@ with st.sidebar:
 
 # ======================================================
 
-if username == "mjx@shu.edu.cn":
+if username == "jiaxuanma.shu@gmail.com":
     # register
     colored_header(label="Register user",description=" ",color_name="violet-70")
     with st.expander('REGISTER USER'):

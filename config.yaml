@@ -4,14 +4,14 @@ cookie:
   name: some_cookie_name
 credentials:
   usernames:
-    e2m:
-      email: mjx@shu.edu.cn
-      name: e2m
-      password: $2b$12$KlJQly07paFsxpGkmA0E1.epXJT3VDS/1SDm5ipOBf/MSugXmC/9G
-    mjx@shu.edu.cn:
-      email: mjx@shu.edu.cn
-      name: mjx@shu.edu.cn
-      password: $2b$12$5D2By5uFUmXfJO4XgYD9vOXUQRfKYPuXJ71BXEFswkXId1rnhjC.2
+    jiaxuanma.shu@gmail.com:
+      email: jiaxuanma.shu@gmail.com
+      name: jiaxuanma.shu@gmail.com
+      password: $2b$12$XS.lHwBdAbKU3aPoz1C2p.Au6JHZW.fit9MEEvpp.tAGNMYh5qO0e
+    mlmd:
+      email: mlmd
+      name: mlmd
+      password: $2b$12$ZvWIVrevprn.9odEKWmojev1YT5H7v5MB89Jq00DJaQzPM/5aA6Bq
 preauthorized:
   emails:
   - mjx@shu.edu.com
