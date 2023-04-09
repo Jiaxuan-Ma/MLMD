@@ -26,7 +26,3 @@ Here we present the data layout in `.csv` file that need to upload.
 <p align="center">
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" style="zoom:50%;" />
 </p>
-
-!(300)[https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg]
-
-![200](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg)
