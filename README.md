@@ -1,7 +1,4 @@
-<body>
 <p align="right">
-  <img src="https://github.com/MLMDMarket/MLMDImages/blob/main/MLMD.gif?raw=true" width="150px"  alt="MLMD"/>
+  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MLMDicon.gif?raw=true" width="150px"  alt="MLMD"/>
 </div>
 </p>
-asdfasdfasf 
-</body>
