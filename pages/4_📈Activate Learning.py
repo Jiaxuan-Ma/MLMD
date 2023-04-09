@@ -43,7 +43,7 @@ if st.session_state["authentication_status"]:
             if len(file) == 2:
                 df_vs = pd.read_csv(file[1])
             check_string_NaN(df)
-            colored_header(label="Data", description=" ",color_name="blue-70")
+            colored_header(label="Data Tale", description=" ",color_name="blue-70")
             nrow = st.slider("rows", 1, len(df)-1, 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
@@ -78,8 +78,6 @@ if st.session_state["authentication_status"]:
         colored_header(label="Sampling", description=" ",color_name="violet-30")
 
         model_path = './models/active learning'
-
-        colored_header(label="Training", description=" ",color_name="violet-30")
 
         template_alg = model_platform(model_path)
 
