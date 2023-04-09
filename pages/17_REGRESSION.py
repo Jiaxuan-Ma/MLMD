@@ -67,7 +67,6 @@ if st.session_state["authentication_status"]:
 
         model_path = './models/regressors'
 
-        colored_header(label="Training", description=" ",color_name="violet-30")
 
         template_alg = model_platform(model_path)
 
@@ -89,7 +88,7 @@ if st.session_state["authentication_status"]:
                         loo = LeaveOneOut()
             
 
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -169,7 +168,7 @@ if st.session_state["authentication_status"]:
                     elif operator == 'oob score':
                         inputs['oob score']  = st.selectbox('oob score',[True], disabled=True)
                         inputs['warm start'] = True
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -271,7 +270,7 @@ if st.session_state["authentication_status"]:
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -353,7 +352,7 @@ if st.session_state["authentication_status"]:
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -436,7 +435,7 @@ if st.session_state["authentication_status"]:
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -519,7 +518,7 @@ if st.session_state["authentication_status"]:
                             reg.features = MinMaxScaler().fit_transform(reg.features)
                         loo = LeaveOneOut()
                
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -601,7 +600,7 @@ if st.session_state["authentication_status"]:
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
                         loo = LeaveOneOut()              
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -684,7 +683,7 @@ if st.session_state["authentication_status"]:
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
                         loo = LeaveOneOut()              
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
