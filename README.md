@@ -1,3 +1,3 @@
 <p align="center">
-  <img src="https://assets9.lottiefiles.com/packages/lf20_LmW6VioIWc.json?raw=true" alt="ADCME"/>
+  <img src="https://github.com/MLMDMarket/MLMDImages/blob/main/MLMD.gif?raw=true" alt="MLMD"/>
 </p>
