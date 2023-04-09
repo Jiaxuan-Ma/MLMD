@@ -24,5 +24,5 @@ streamlit run HOME.py
 Here we present the data layout in `.csv` file that need to upload.
 
 <p align="center">
-  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg" style="zoom:20%;" />
+  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" style="zoom:50%;" />
 </p>
