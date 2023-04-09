@@ -18,7 +18,7 @@ conda create -n MLMD python=3.9
 ```
 pip install -r requirements.txt
 ```
-4. run MLMD platform
+4. Run MLMD platform
 ```
 streamlit run HOME.py
 ```
@@ -28,5 +28,5 @@ streamlit run HOME.py
 Here we present the data layout in `.csv` file that need to upload.
 
 <p align="center">
-  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" style="zoom:50%;" />
+  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" ,width="100px" />
 </p>
