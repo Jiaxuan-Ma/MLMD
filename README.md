@@ -3,6 +3,11 @@
 </div>
 </p>
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/86995074/230804638-1ea3eda7-fd92-4140-b2a4-e7945ba5443f.png" width="300px"  alt="MLMD"/>
+</div>
+</p>
+
 The MLMD platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Enginerring aims at general and frontier machine learning algrithm with visual technology. It is built on the tradition machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
 
 
