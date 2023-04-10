@@ -60,7 +60,7 @@ Here we present the data layout `.csv` file that need to upload in the platform.
 **Subscription account**
 
 <p align="center">
-  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MechInfo.jpg?" width="100px"  alt="MLMD"/>
+  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MechInfo.jpg?" width="150px"  alt="MLMD"/>
 </div>
 </p>
 
