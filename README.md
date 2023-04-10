@@ -65,5 +65,5 @@ Here we present the data layout `.csv` file that need to upload in the platform.
 </p>
 
 
-# LICENSE
+# License
 MLMD platform is released under MIT License. See [License](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design/blob/main/LICENSE) for details
