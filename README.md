@@ -56,7 +56,7 @@ Here we present the data layout `.csv` file that need to upload in the platform.
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" , width="400px" />
 </p> -->
 # Contact
-If you ever have any questions.Please **subscription account**
+If you ever have any questions. Please **subscription account**
 
 <p align="center">
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MechInfo.jpg?" width="150px"  alt="MLMD"/>
