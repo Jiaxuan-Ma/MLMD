@@ -64,20 +64,20 @@ if username == "jiaxuanma.shu@gmail.com":
 
             content = ('''Dear member:
 
-                    We are writing to inform you that the password for your Easy to Matter Design account has been sent. Please check your email inbox for the password %s.
+                    We are writing to inform you that the password for your MLMD account has been sent. Please check your email inbox for the password %s.
                     
 
                     If you have any questions or concerns, please do not hesitate to contact our member support team. We are always available to assist you.
 
-                    Thank you for choosing Easy to Matter Design.
+                    Thank you for choosing MLMD platform.
 
                     Sincerely,
-                    The Easy to Matter Design Team''' %(random_password))
+                    The MLMD Team''' %(random_password))
 
             msg.attach(MIMEText(content,'plain','utf-8'))
             
             # email theme
-            theme = 'Easy to Matter Design Register Successfully'
+            theme = 'MLMD Register Successfully'
             msg['Subject'] = theme
             msg['From'] = msg_from
 

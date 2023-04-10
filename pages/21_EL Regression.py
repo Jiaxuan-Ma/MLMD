@@ -67,7 +67,7 @@ if st.session_state["authentication_status"]:
 
         model_path = './models/el regressors'
 
-        colored_header(label="Training", description=" ",color_name="violet-30")
+
 
         template_alg = model_platform(model_path)
 
@@ -85,7 +85,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -247,7 +247,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -401,7 +401,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -466,7 +466,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -534,7 +534,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
@@ -597,7 +597,7 @@ if st.session_state["authentication_status"]:
                         cv = st.number_input('cv',1,10,5)
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
-
+            colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
