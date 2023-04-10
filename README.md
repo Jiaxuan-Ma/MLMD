@@ -20,15 +20,15 @@ Check out [help document](https://mlmd.netlify.app/) for more information
 
 # Remote Login
 
-**The web site:**
+The web site
 ```
 www.mlmd.com
 ```
-**Username**
+Username
 ```
 mlmd
 ```
-**Password**
+Password
 ```
 123456
 ```
@@ -57,7 +57,7 @@ Here we present the data layout `.csv` file that need to upload in the platform.
 </p> -->
 # Contact
 
-**subscription account**
+**Subscription account**
 
 <p align="center">
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MechInfo.jpg?" width="200px"  alt="MLMD"/>
