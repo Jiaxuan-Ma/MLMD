@@ -33,7 +33,7 @@ with col2:
     badge(type="github", name="Jiaxuan-Ma/MLMDMarket")
 
 with col3:
-    badge(type="buymeacoffee", name="jiaxuanmasw")
+    pass
 with col4:
     pass
 
