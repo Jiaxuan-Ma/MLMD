@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/86995074/230804638-1ea3eda7-fd92-4140-b2a4-e7945ba5443f.png" width="300px"  alt="MLMD"/>
+  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/logo.png" width="300px"  alt="MLMD"/>
 </div>
 </p>
 
