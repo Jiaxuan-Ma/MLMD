@@ -22,7 +22,6 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 st.write('''
   ![](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MLMDicon.gif?raw=true)
-
          ''')
 
 col1, col2, col3, col4 = st.columns([1,1,1,4])
