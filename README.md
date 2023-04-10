@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MLMDicon.gif?raw=true" width="300px"  alt="MLMD"/>
+  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/Logo.jpg?raw=true" width="300px"  alt="MLMD"/>
 </div>
 </p>
 
-<p align="center">
+<!-- <p align="center">
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/logo.png" width="300px"  alt="MLMD"/>
 </div>
-</p>
+</p> -->
 
 The MLMD platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Enginerring aims at general and frontier machine learning algrithm with visual technology. It is built on the tradition machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
 
