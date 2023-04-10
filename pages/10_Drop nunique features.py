@@ -8,10 +8,7 @@ if 'authentication_status' not in st.session_state:
 
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# ======================================================
 
-with st.sidebar:
-    badge(type="buymeacoffee", name="jiaxuanmasw")
 # ======================================================
 
 st.write('## DROP NUNIQUE FEATUREs')

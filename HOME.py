@@ -20,15 +20,27 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
 st.markdown("<br>", unsafe_allow_html=True)
-"""
-# MACHINE LEARNING FOR MATERIALs
-"""
+st.write('''
+  ![](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MLMDicon.gif?raw=true)
+
+         ''')
+
+col1, col2, col3, col4 = st.columns([1,1,1,4])
+with col1:
+    st.write('[![](https://img.shields.io/badge/MLMD-docs-green)](https://mlmd.netlify.app/)')
+
+with col2:
+    badge(type="github", name="Jiaxuan-Ma/MLMDMarket")
+
+with col3:
+    badge(type="buymeacoffee", name="jiaxuanmasw")
+with col4:
+    pass
+
 st.markdown("<br>", unsafe_allow_html=True)
 """
 This is a data miner visual platform.
 """
-
-# streamlit_analytics.start_tracking()
 
 name, authentication_status, username = authenticator.login('Login', 'main')
 
@@ -37,8 +49,8 @@ name, authentication_status, username = authenticator.login('Login', 'main')
 
 
 with st.sidebar:
+    add_vertical_space(36)
 
-    badge(type="buymeacoffee", name="jiaxuanmasw")
 
 # ======================================================
 

@@ -12,6 +12,8 @@ from streamlit_extras.switch_page_button import switch_page
 from streamlit_card import card
 from streamlit_shap import st_shap
 from streamlit_pandas_profiling import st_profile_report
+from streamlit_extras.add_vertical_space import add_vertical_space
+from streamlit_extras.mention import mention
 
 from PIL import Image
 
