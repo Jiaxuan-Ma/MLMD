@@ -8,8 +8,22 @@
 </div>
 </p> -->
 
-The MLMD platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Enginerring aims at general and frontier machine learning algrithm with visual technology. It is built on the tradition machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
+The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at general and frontier machine learning algrithm with visualization. It is built on the traditional machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
 
+| [Feature Engineering](https://mlmd.netlify.app/user-guide/feature%20engineering/) | [Regression](https://mlmd.netlify.app/user-guide/regression/) | [Classification](https://mlmd.netlify.app/user-guide/classification/) | [Active Learning](https://mlmd.netlify.app/user-guide/active%20learning/) |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/feature%20engineering.png?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/regression.jpg?raw=true)                       | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/classification.jpg?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/active%20learning.jpg?raw=true)    
+
+
+Check out ![help document](https://mlmd.netlify.app/) for more information
+
+
+# Remote Login
+The web site:
+
+```
+
+```
 
 # Local Deploy
 
@@ -27,19 +41,15 @@ pip install -r requirements.txt
 streamlit run HOME.py
 ```
 
-# Tutorial
+<!-- # Tutorial
 
 Here we present the data layout `.csv` file that need to upload in the platform.
 
 <p align="center">
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" , width="400px" />
-</p>
+</p> -->
+# Contact
 
-# Featured Applications
-
-| [Feature Engineering](https://mlmd.netlify.app/user-guide/feature%20engineering/) | [Regression](https://mlmd.netlify.app/user-guide/regression/) | [Classification](https://mlmd.netlify.app/user-guide/classification/) | [Active Learning](https://mlmd.netlify.app/user-guide/active%20learning/) |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/feature%20engineering.png?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/regression.jpg?raw=true)                       | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/classification.jpg?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/active%20learning.jpg?raw=true)    
 
 # LICENSE
 MLMD platform is released under MIT License. See [License](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design/blob/main/LICENSE) for details
