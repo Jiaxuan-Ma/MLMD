@@ -1,10 +1,14 @@
-# 主动学习模块
+# 主动学习模块 [![](https://img.shields.io/badge/Bgolearn-GitHub-green)](https://github.com/Bin-Cao/Bgolearn)
 
-本模块通过调用开源算法库 **Bgolearn** 实现(📒[Bgolearn 手册](https://bgolearn.netlify.app/))。用于材料成分定向设计以及性能定向优化过程。***通过已有实验数据（样本）及其测试性能，在给定的成分空间中搜索最优的材料成分设计，以将目标性能最大/最小化***。推荐的成分通过实验合成后，变成新的数据加入数据集合，Bgolearn将利用更多的数据信息对下一次设计做出更加可靠的推荐。迭代这个过程可以高效地在给定的成分空间中，寻找到具有优秀性能的新材料。***其中所有的实验过程也可以通过模拟过程代替***。如下图：
+本模块通过调用开源算法库 **Bgolearn**  实现(📒[手册](https://bgolearn.netlify.app/))。用于材料成分定向设计以及性能定向优化过程。***通过已有实验数据（样本）及其测试性能，在给定的成分空间中搜索最优的材料成分设计，以将目标性能最大/最小化***。推荐的成分通过实验合成后，变成新的数据加入数据集合，Bgolearn将利用更多的数据信息对下一次设计做出更加可靠的推荐。迭代这个过程可以高效地在给定的成分空间中，寻找到具有优秀性能的新材料。***其中所有的实验过程也可以通过模拟过程代替***。如下图：
 
 ________________________________________________________________
 
-<img width="356" alt="Screenshot 2023-04-06 at 16 37 26" src="https://user-images.githubusercontent.com/86995074/230322616-08fc629c-1858-42e7-8795-57fc8d076339.png">
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/86995074/230322616-08fc629c-1858-42e7-8795-57fc8d076339.png" , width="400px" />
+</p>
+
+
 
 关于主动学习中虚拟空间采样点的说明：
 
@@ -34,7 +38,7 @@ ________________________________________________________________
 </p>
 
 
-***Regression-Data Information*** 模块:
+***Active Learning*** 模块 [![](https://img.shields.io/badge/Bgolearn-GitHub-green)](https://github.com/Bin-Cao/Bgolearn)  : 
 
 上传数据之后，`Data Table`功能显示加载所上传的`.csv`文件的数据，通过调节`rows`调整显示的数据表的行数。
 
@@ -45,13 +49,14 @@ ________________________________________________________________
 
 + 在`Sampling`功能下选择`model`，在`Hyper Parameters`中可调节算法的超参数
 
+Note : 超参数说明, 见 Bgolearn 📒[手册](https://bgolearn.netlify.app/recommend-r/)
 ________________________________________________________________
 
 + `simple number` 选择推荐的样本个数
 
 + `min search` 选择优化的方向（最小/最大）
 
-+ `sample criterion` 选择bayes推荐算法
++ `sample criterion` 选择bayes推荐算法, 共包括九种效用函数
 
 > 1: `Expected Improvement algorith`-期望提升函数
 > 
@@ -71,7 +76,7 @@ ________________________________________________________________
 > 
 > 9:`Knowledge Gradient`-知识梯度函数
 
-
+________________________________________________________________
 
 + 在`sample space ratio`中选择虚拟空间采样点范围:
 
