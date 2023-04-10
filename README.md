@@ -15,16 +15,23 @@ The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for
 | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/feature%20engineering.png?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/regression.jpg?raw=true)                       | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/classification.jpg?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/active%20learning.jpg?raw=true)    
 
 
-Check out ![help document](https://mlmd.netlify.app/) for more information
+Check out [help document](https://mlmd.netlify.app/) for more information
 
 
 # Remote Login
-The web site:
 
+**The web site:**
 ```
-
+www.mlmd.com
 ```
-
+**Username**
+```
+mlmd
+```
+**Password**
+```
+123456
+```
 # Local Deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
@@ -49,6 +56,8 @@ Here we present the data layout `.csv` file that need to upload in the platform.
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" , width="400px" />
 </p> -->
 # Contact
+
+**subscription account**
 
 <p align="center">
   <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MechInfo.jpg?" width="200px"  alt="MLMD"/>
