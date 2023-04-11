@@ -44,18 +44,11 @@ pip install -r requirements.txt
 streamlit run HOME.py
 ```
 
-<!-- # Tutorial
-
-Here we present the data layout `.csv` file that need to upload in the platform.
-
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/61132191/231176195-c1986427-29f2-4cc4-a6b1-f7d03e34bdf7.jpg?raw=true" , width="400px" />
-</p> -->
 # Contact
 If you ever have any questions. Please **subscription account**
 
 <p align="center">
-  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MechInfo.jpg?" width="150px"  alt="MLMD"/>
+  <img src="https://user-images.githubusercontent.com/61132191/231176892-6fd4b36b-d841-4239-9876-951a04ed92eb.jpg?" width="150px"  alt="MLMD"/>
 </div>
 </p>
 
