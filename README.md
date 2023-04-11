@@ -49,7 +49,7 @@ streamlit run HOME.py
 Here we present the data layout `.csv` file that need to upload in the platform.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/61132191/231175922-fff5be15-48c6-4e5a-86f5-d560b829b7c8.jpg?raw=true" , width="400px" />
+  <img src="https://user-images.githubusercontent.com/61132191/231176195-c1986427-29f2-4cc4-a6b1-f7d03e34bdf7.jpg?raw=true" , width="400px" />
 </p> -->
 # Contact
 If you ever have any questions. Please **subscription account**
