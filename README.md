@@ -49,7 +49,7 @@ streamlit run HOME.py
 Here we present the data layout `.csv` file that need to upload in the platform.
 
 <p align="center">
-  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg?raw=true" , width="400px" />
+  <img src="https://user-images.githubusercontent.com/61132191/231175922-fff5be15-48c6-4e5a-86f5-d560b829b7c8.jpg?raw=true" , width="400px" />
 </p> -->
 # Contact
 If you ever have any questions. Please **subscription account**
