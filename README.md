@@ -13,7 +13,6 @@ The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for
 
 Check out [help document](https://mlmd.netlify.app/) for more information
 
-
 # Remote Access
 
 Web site
