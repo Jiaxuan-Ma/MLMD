@@ -3,16 +3,12 @@
 </div>
 </p>
 
-<!-- <p align="center">
-  <img src="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/logo.png" width="300px"  alt="MLMD"/>
-</div>
-</p> -->
 
 The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at general and frontier machine learning algrithm with visualization. It is built on the traditional machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
 
 | [Feature Engineering](https://mlmd.netlify.app/user-guide/feature%20engineering/) | [Regression](https://mlmd.netlify.app/user-guide/regression/) | [Classification](https://mlmd.netlify.app/user-guide/classification/) | [Active Learning](https://mlmd.netlify.app/user-guide/active%20learning/) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/feature%20engineering.png?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/regression.jpg?raw=true)                       | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/classification.jpg?raw=true)                              | ![law](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/active%20learning.jpg?raw=true)    
+| ![law](https://user-images.githubusercontent.com/61132191/231174763-00e43b00-dac7-476d-ba7a-701241ea2337.png?raw=true)                              | ![law](https://user-images.githubusercontent.com/61132191/231175195-d65a2907-58d5-4488-bf27-4f78e89f1d4f.jpg?raw=true)                       | ![law](https://user-images.githubusercontent.com/61132191/231175281-0416b03d-8d6b-4d2a-abed-b21034a5bea2.jpg?raw=true)                              | ![law](https://user-images.githubusercontent.com/61132191/231175405-def56770-8016-41c6-9ca1-a474f8f2c1cf.jpg?raw=true)    
 
 
 Check out [help document](https://mlmd.netlify.app/) for more information
