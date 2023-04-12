@@ -28,15 +28,6 @@ Password
 123456
 ```
 
-# Install via Docker
-If you have Docker installed on your system, you can try the no-hassle way to install MLMD
-1. Install [docker](https://www.docker.com/products/docker-desktop/)
-2. Run MLMD
-```
-docker run -ti jiaxuanma/mlmd
-```
-The docker images are hosted [here](https://hub.docker.com/repository/docker/jiaxuanma/mlmd/general)
-
 # Local Deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
@@ -52,6 +43,15 @@ pip install -r requirements.txt
 ```
 streamlit run HOME.py
 ```
+
+# Install via Docker
+If you have Docker installed on your system, you can try the no-hassle way to install MLMD
+1. Install [docker](https://www.docker.com/products/docker-desktop/)
+2. Run MLMD
+```
+docker run -ti jiaxuanma/mlmd
+```
+The docker images are hosted [here](https://hub.docker.com/repository/docker/jiaxuanma/mlmd/general)
 
 # Contact
 If you ever have any questions. Please **subscription** official account
