@@ -102,14 +102,14 @@ if st.session_state["authentication_status"]:
         interact_feature = st.selectbox('interact feature', list_features)
         st_shap(shap.dependence_plot(feature, shap_values, fs.features, display_features=fs.features,interaction_index=interact_feature))
         
-        colored_header(label="SHAP Most Important Feature", description=" ",color_name="violet-30")
-        shap_values = explainer(fs.features)
-        ind_mean = shap_values.abs.mean(0).argsort[-1]
+        # colored_header(label="SHAP Most Important Feature", description=" ",color_name="violet-30")
+        # shap_values = explainer(fs.features)
+        # ind_mean = shap_values.abs.mean(0).argsort[-1]
 
-        ind_max = shap_values.abs.max(0).argsort[-1]
+        # ind_max = shap_values.abs.max(0).argsort[-1]
 
-        ind_perc = shap_values.abs.percentile(95, 0).argsort[-1]
-        st_shap(shap.plots.scatter(shap_values[:, ind_mean]))
+        # ind_perc = shap_values.abs.percentile(95, 0).argsort[-1]
+        # st_shap(shap.plots.scatter(shap_values[:, ind_mean]))
 
 
 elif st.session_state["authentication_status"] is False:
