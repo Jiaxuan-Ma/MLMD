@@ -17,7 +17,7 @@ Check out [help document](https://mlmd.netlify.app/) for more information
 
 Web site
 ```
-www.mlmd.com
+http://116.62.169.182/
 ```
 Username
 ```
@@ -27,6 +27,16 @@ Password
 ```
 123456
 ```
+
+# Install via Docker
+If you have Docker installed on your system, you can try the no-hassle way to install MLMD
+1. Install [docker](https://www.docker.com/products/docker-desktop/)
+2. Run MLMD
+```
+docker run -ti jiaxuanma/mlmd
+```
+The docker images are hosted [here](https://hub.docker.com/repository/docker/jiaxuanma/mlmd/general)
+
 # Local Deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
@@ -34,11 +44,11 @@ Password
 ```
 conda create -n MLMD python=3.9
 ```
-3. Install dependent libraries
+1. Install dependent libraries
 ```
 pip install -r requirements.txt
 ```
-4. Run MLMD platform
+1. Run MLMD 
 ```
 streamlit run HOME.py
 ```

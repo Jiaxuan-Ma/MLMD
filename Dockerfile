@@ -1,13 +1,11 @@
 # app/Dockerfile
 
-FROM python:3.9-slim
+FROM python:3.9
 
 WORKDIR /Easy to Material Design
 
 COPY . .
 
-RUN apt-get update -y && apt-get install -y libgomp1
-
 RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ && pip3 install -r requirements.txt
 
-CMD ["streamlit", "run", "HOME.py", "--server.port", "80"]
+CMD ["streamlit", "run", "HOME.py"]
