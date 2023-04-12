@@ -2,7 +2,7 @@
 
 FROM python:3.9
 
-WORKDIR /Easy to Material Design
+WORKDIR /MLMD
 
 COPY . .
 

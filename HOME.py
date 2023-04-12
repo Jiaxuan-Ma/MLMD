@@ -21,7 +21,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 st.write('''
-  ![](https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/MLMDicon.gif?raw=true)
+  ![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)
          ''')
 
 col1, col2, col3, col4 = st.columns([1,1,1,4])
@@ -29,7 +29,7 @@ with col1:
     st.write('[![](https://img.shields.io/badge/MLMD-docs-green)](https://mlmd.netlify.app/)')
 
 with col2:
-    badge(type="github", name="Jiaxuan-Ma/MLMDMarket")
+    badge(type="github", name="Jiaxuan-Ma/MLMD")
 
 with col3:
     pass
@@ -43,13 +43,11 @@ This is a data miner visual platform.
 
 name, authentication_status, username = authenticator.login('Login', 'main')
 
-
 # ======================================================
 
 
 with st.sidebar:
     add_vertical_space(36)
-
 
 # ======================================================
 
