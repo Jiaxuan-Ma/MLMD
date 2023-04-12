@@ -19,17 +19,16 @@ if 'logout' not in st.session_state:
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
-st.markdown("<br>", unsafe_allow_html=True)
 st.write('''
   ![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)
          ''')
-col1, col2, col3, col4 = st.columns([1,0.2,0.2,0.6])
+col1, col2, col3, col4 = st.columns([1,0.2,0.2,0.5])
 with col1:
     st.write('''
         Check out [help document](https://mlmd.netlify.app/) for more information
         ''')
 with col2:
-    st.write('[![](https://img.shields.io/badge/MLMD-docs-green)](https://mlmd.netlify.app/)')
+    st.write('[![](https://img.shields.io/badge/MLMD-Github-yellowgreen)](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design)')
 with col3:
    badge(type="github", name="Jiaxuan-Ma/MLMD")
 with col4:
