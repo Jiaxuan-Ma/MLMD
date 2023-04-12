@@ -44,7 +44,7 @@ streamlit run HOME.py
 ```
 
 # Contact
-If you ever have any questions. Please **subscription account**
+If you ever have any questions. Please **subscription** official account
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/61132191/231176892-6fd4b36b-d841-4239-9876-951a04ed92eb.jpg?" width="150px"  alt="MLMD"/>
