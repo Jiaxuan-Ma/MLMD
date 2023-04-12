@@ -4,7 +4,7 @@
 </p>
 
 
-The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at general and frontier machine learning algrithm with visualization. It is built on the traditional machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
+The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at general and frontier machine learning algorithm with visualization. It is built on the traditional machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
 
 | [Feature Engineering](https://mlmd.netlify.app/user-guide/feature%20engineering/) | [Regression](https://mlmd.netlify.app/user-guide/regression/) | [Classification](https://mlmd.netlify.app/user-guide/classification/) | [Active Learning](https://mlmd.netlify.app/user-guide/active%20learning/) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -44,7 +44,7 @@ streamlit run HOME.py
 ```
 
 # Contact
-If you ever have any questions. Please **subscription account**
+If you ever have any questions. Please **subscription** official account
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/61132191/231176892-6fd4b36b-d841-4239-9876-951a04ed92eb.jpg?" width="150px"  alt="MLMD"/>
