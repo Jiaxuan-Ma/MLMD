@@ -23,18 +23,19 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.write('''
   ![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)
          ''')
-st.write('''
-    Check out [help document](https://mlmd.netlify.app/) for more information
-    ''')
-col1, col2, col3 = st.columns([2,1,1])
+col1, col2, col3, col4 = st.columns([1,0.2,0.2,0.6])
 with col1:
-    pass
+    st.write('''
+        Check out [help document](https://mlmd.netlify.app/) for more information
+        ''')
 with col2:
     st.write('[![](https://img.shields.io/badge/MLMD-docs-green)](https://mlmd.netlify.app/)')
 with col3:
    badge(type="github", name="Jiaxuan-Ma/MLMD")
-
-st.write("### Machine Learning for Material Design")
+with col4:
+    st.write("")
+st.write(
+    "## Machine Learning for Material Design")
 
 name, authentication_status, username = authenticator.login('Login', 'main')
 
