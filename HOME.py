@@ -22,7 +22,9 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.write('''
   ![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)
          ''')
-col1, col2, col3, col4 = st.columns([1,0.2,0.2,0.5])
+
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2, col3, col4 = st.columns([1,0.25,0.2,0.5])
 with col1:
     st.write('''
         Check out [help document](https://mlmd.netlify.app/) for more information
