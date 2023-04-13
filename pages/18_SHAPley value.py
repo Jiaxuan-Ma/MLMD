@@ -1,7 +1,13 @@
 from utils import *
 
-
-    # streamlit_analytics.start_tracking()
+st.set_page_config(
+    page_title="MLMD",
+    page_icon="🧊",
+    layout="centered",
+    initial_sidebar_state="auto",
+    menu_items={
+    }
+)
 
 if 'authentication_status' not in st.session_state:
     st.session_state['authentication_status'] = None
