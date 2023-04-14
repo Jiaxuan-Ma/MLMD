@@ -117,13 +117,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
-# current_dir = os.path.abspath(os.path.dirname(__file__))
-# parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
-# target_dir = os.path.join(parent_dir, 'results')
-# if not os.path.exists(target_dir):
-#     os.mkdir(target_dir)
-
-
 # ====================== Page design ============================
 
 hide_streamlit_style = """

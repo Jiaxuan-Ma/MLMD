@@ -18,18 +18,8 @@ def show():
     
     inputs = {}  # dict to store all user inputs until return
     
-    # with st.sidebar:
-        
-    # Render all template-specific sidebar components here. 
-
-    # Use ## to denote sections. Common sections for training templates: 
-    # Model, Input data, Preprocessing, Training, Visualizations
-    # Store all user inputs in the `inputs` dict. This will be passed to the code
-    # template later.
     inputs["model"] = MODEL["model"]
     
-    # st.write("preprocessing")
-    # inputs["Normalize"] = st.selectbox('normalize method', ['Z-Score Standardization','Min-Max Scale'])
     
     st.info('TO SOLVE **FEATURE IMPOTRANCE RANK**')
     
