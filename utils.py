@@ -31,6 +31,7 @@ import pandas_profiling
 from sklearn.model_selection import train_test_split as TTS
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score as CVS
+
 from sklearn.model_selection import LeaveOneOut
 from sklearn import tree
 from sklearn.metrics import mean_squared_error as MSE
@@ -68,6 +69,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import f1_score
 from sklearn.metrics import r2_score
+from sklearn.metrics import make_scorer
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
