@@ -56,9 +56,9 @@ The docker images are hosted [here](https://hub.docker.com/repository/docker/jia
 If you ever have any questions. Please **subscription** official account
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/61132191/231176892-6fd4b36b-d841-4239-9876-951a04ed92eb.jpg?" width="150px"  alt="MLMD"/>
+  <img src="https://user-images.githubusercontent.com/61132191/233004520-04750817-24c8-45c3-87f5-5788e81f9f29.png?" width="150px"  alt="MLMD"/>
 </div>
-</p>
+
 
 
 # License
