@@ -53,12 +53,11 @@ docker run -ti jiaxuanma/mlmd
 The docker images are hosted [here](https://hub.docker.com/repository/docker/jiaxuanma/mlmd/general)
 
 # Contact
-If you ever have any questions. Please **subscription** official account
+If you ever have any questions. Welcome to our MLMD group!!! 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/61132191/233004520-04750817-24c8-45c3-87f5-5788e81f9f29.png?" width="150px"  alt="MLMD"/>
+  <img src="https://user-images.githubusercontent.com/61132191/233005635-8e2f5e03-c833-405b-ac67-4e77d59b626b.png" width="200px"  alt="MLMD"/>
 </div>
-
 
 
 # License
