@@ -1,5 +1,5 @@
 altair==4.2.2
-Bgolearn==1.5.1
+Bgolearn==2.0.0
 catboost==1.1.1
 graphviz==0.20.1
 imbalanced_learn==0.10.1
