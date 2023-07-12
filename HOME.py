@@ -1,11 +1,11 @@
 '''
 Runs the streamlit app
-
 Call this file in the terminal via `streamlit run app.py`
 '''
+import streamlit as st
 from utils import *
 
-
+# log function
 if 'name' not in st.session_state:
     st.session_state['name'] = None
 if 'authentication_status' not in st.session_state:
@@ -16,11 +16,11 @@ if 'logout' not in st.session_state:
     st.session_state['logout'] = None
 
 
-import streamlit as st
+
 
 st.set_page_config(
     page_title="MLMD",
-    page_icon="🧊",
+    page_icon="https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg",
     layout="centered",
     initial_sidebar_state="auto",
     menu_items={
@@ -32,7 +32,7 @@ st.write('''
   ![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)
          ''')
 
-st.markdown("<br>", unsafe_allow_html=True)
+# st.markdown("<br>", unsafe_allow_html=True)
 col1, col2, col3, col4 = st.columns([1,0.25,0.2,0.5])
 with col1:
     st.write('''
@@ -52,8 +52,8 @@ name, authentication_status, username = authenticator.login('Login', 'main')
 # ======================================================
 
 
-with st.sidebar:
-    add_vertical_space(36)
+# with st.sidebar:
+#     add_vertical_space(36)
 
 # ======================================================
 
