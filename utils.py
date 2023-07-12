@@ -2,7 +2,7 @@ import importlib.util
 
 import streamlit as st
 # from streamlit_shap import st_shap
-import streamlit_analytics
+# import streamlit_analytics
 import streamlit_authenticator as stauth
 from streamlit_extras.badges import badge
 
@@ -32,7 +32,9 @@ import pandas_profiling
 from sklearn.model_selection import train_test_split as TTS
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score as CVS
+from sklearn.model_selection import cross_validate as CV
 
+from sklearn.metrics import make_scorer, r2_score
 from sklearn.model_selection import LeaveOneOut
 from sklearn import tree
 from sklearn.metrics import mean_squared_error as MSE
@@ -51,6 +53,8 @@ from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPRegressor
 from sklearn.feature_selection import RFE
 from sklearn.feature_selection import RFECV
+from sklearn.model_selection import cross_val_predict as CVP
+
 from sklearn.svm import SVR
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
@@ -81,7 +85,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import BaggingRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
-
+import joblib
 
 import xgboost as xgb
 from catboost import CatBoostClassifier
@@ -115,40 +119,10 @@ import pickle
 import uuid
 import re
 
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-
-# ====================== Page design ============================
-
-hide_streamlit_style = """
-<style>
-
-footer {visibility: hidden;}
-page_title = "Easy to Material Design"
-initial_sidebar_state="auto"
-</style>
-"""
-
-# =================  Register and log ========================
-
-import yaml
-# hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
-
-from yaml.loader import SafeLoader
-
-with open('./config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
-
-
-authenticator = stauth.Authenticate(
-    config['credentials'],
-    config['cookie']['name'],
-    config['cookie']['key'],
-    config['cookie']['expiry_days'],
-    config['preauthorized']
-)
 
 # ============ import model from file =======================
 
@@ -203,13 +177,6 @@ def model_platform(model_path):
     )
     return template_alg
 
-
-@st.cache(allow_output_mutation=True)
-def gen_profile_report(df, *report_args, **report_kwargs):
-    return pandas_profiling(*report_args, **report_kwargs)
-
-
-
 # =============== some tools =======================
 def create_data_with_group_and_counts(feature_type):
     comp_ids = []
@@ -225,7 +192,7 @@ def check_string_NaN(df):
     # check NaN
     null_columns = df.columns[df.isnull().any()]
     if len(null_columns) > 0:
-        st.error(f"ERROR: NAN in COLUMNS {list(null_columns)} !")
+        st.error(f"Error: NaN in column {list(null_columns)} !")
         st.stop()
     # check string
     string_columns = df.select_dtypes(include=[object]).columns
@@ -234,7 +201,7 @@ def check_string_NaN(df):
         if df[column].astype(str).str.contains('').any():
             string_contains_columns.append(column)
     if len(string_contains_columns) > 0:
-        st.error(f"ERROR: STRING in COLUMNS {string_contains_columns} !")
+        st.error(f"Error: string in column {string_contains_columns} !")
         st.stop()
 # =============== dwonload button =======================  
 def download_button(object_to_download, download_filename, button_text, pickle_it=False):
@@ -253,7 +220,7 @@ def download_button(object_to_download, download_filename, button_text, pickle_i
 
         # Try JSON encode for everything else
         else:
-            object_to_download = json.dumps(object_to_download)
+            object_to_download = pickle.dumps(object_to_download)
 
     try:
         # some strings <-> bytes conversions necessary here
@@ -857,7 +824,7 @@ class customPlot:
         ax.set_xlim(lims)
         ax.set_ylim(lims)
         plt.xlabel("Actual")
-        plt.ylabel("Predicted")
+        plt.ylabel("Prediction")
         # img_path = os.path.join(target_dir, 'prediction vs label.png')
         # fig.savefig(img_path)
         st.pyplot(fig)
@@ -1069,23 +1036,23 @@ class FeatureSelector:
     def feature_importance_select_show(self):
         st.write('---')
         st.write(self.feature_importances)
-        tmp_download_link = download_button(self.feature_importances, f'feature importance.csv', button_text='download')
+        tmp_download_link = download_button(self.feature_importances, f'特征重要性数据.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
         plot = customPlot()
         plot.feature_importance(self.record_zero_importance, self.feature_importances, plot_n = 15)
         self.features_dropped_zero_importance = self.features.drop(columns=self.ops['zero_importance'])
         self.features_dropped_low_importance = self.features.drop(columns=self.ops['low_importance'])
-        with st.expander('Processed Data'):
+        with st.expander('处理之后的数据'):
             col1, col2 = st.columns([1,1])
             with col1:
                 st.write('dropped zero importance')
                 st.write(self.features_dropped_zero_importance)
-                tmp_download_link = download_button(self.features_dropped_zero_importance, f'feature importance.csv', button_text='download')
+                tmp_download_link = download_button(self.features_dropped_zero_importance, f'特征重要性-丢弃0贡献特征.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             with col2:
                 st.write('dropped low importance')
                 st.write(self.features_dropped_low_importance)
-                tmp_download_link = download_button(self.features_dropped_low_importance, f'feature importance.csv', button_text='download')
+                tmp_download_link = download_button(self.features_dropped_low_importance, f'特征重要性-丢弃低贡献特征.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     def LinearRegressor(self):
@@ -1095,16 +1062,11 @@ class FeatureSelector:
         feature_names = list(features.columns)
         # Conbert to np array
         features = np.array(self.features)
-        targets = np.array(self.targets).reshape((-1,))
-
         # Empty array for feature importances
         feature_importance_values = np.zeros(len(feature_names))
 
-        progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
         self.model.fit(self.features, self.targets)
 
-        st.info('train process is over')
         feature_importance_values = abs(self.model.coef_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
     
@@ -1115,16 +1077,12 @@ class FeatureSelector:
         feature_names = list(features.columns)
         # Conbert to np array
         features = np.array(self.features)
-        targets = np.array(self.targets).reshape((-1,))
 
         # Empty array for feature importances
         feature_importance_values = np.zeros(len(feature_names))
 
-        progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
         self.model.fit(self.features, self.targets)
 
-        st.info('train process is over')
         feature_importance_values = abs(self.model.coef_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
 
@@ -1135,16 +1093,11 @@ class FeatureSelector:
         feature_names = list(features.columns)
         # Conbert to np array
         features = np.array(self.features)
-        targets = np.array(self.targets).reshape((-1,))
-
         # Empty array for feature importances
         feature_importance_values = np.zeros(len(feature_names))
 
-        progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
         self.model.fit(self.features, self.targets)
 
-        st.info('train process is over')
         feature_importance_values = abs(self.model.coef_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
     
@@ -1200,11 +1153,8 @@ class FeatureSelector:
         # Empty array for feature importances
         feature_importance_values = np.zeros(len(feature_names))
 
-        progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
         self.model.fit(self.features, self.targets.astype('int'))
 
-        st.info('train process is over')
         feature_importance_values = abs(self.model.feature_importances_)
 
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
@@ -1376,7 +1326,7 @@ class REGRESSOR:
         self.model.fit(self.Xtrain, self.Ytrain)
         st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
-        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        self.score = r2_score(y_true=self.Ytest, y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
 
     def RandomForestRegressor(self):
