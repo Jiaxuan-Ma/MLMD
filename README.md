@@ -12,21 +12,6 @@ The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for
 
 Check out [help document](https://mlmd.netlify.app/) for more information
 
-# Remote Access
-
-Web site
-```
-http://116.62.169.182/
-```
-Username
-```
-mlmd
-```
-Password
-```
-123456
-```
-
 # Local Deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
