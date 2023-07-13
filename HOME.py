@@ -1877,8 +1877,6 @@ elif select_option == "其他":
             with col_target:   
                 st.write(targets.head())
 
-            # colored_header(label="Active learning", description=" ", color_name="violet-70")
-
             sp = SAMPLING(features, targets)
 
             colored_header(label="选择目标变量", description=" ", color_name="violet-30")
