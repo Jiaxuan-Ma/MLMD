@@ -1746,7 +1746,7 @@ elif select_option == "聚类":
 
 elif select_option == "其他":
     with st.sidebar:
-        sub_option = option_menu(None, ["可解释性机器学习", "主动学习", "集成学习", "模型推理"])
+        sub_option = option_menu(None, ["可解释性机器学习", "主动学习", "集成学习", "模型推理", "代理优化"])
     if sub_option == "可解释性机器学习":
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
 
@@ -2908,11 +2908,17 @@ elif select_option == "其他":
             with col_target:   
                 st.write(targets.head())    
 
+            preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
+            if preprocess == 'StandardScaler':
+                features = StandardScaler().fit_transform(features)
+            elif preprocess == 'MinMaxScaler':
+                features = MinMaxScaler().fit_transform(features)
+
             model_file = st.file_uploader("Upload `.pickle`model",  label_visibility="collapsed")
             if model_file is not None:
                 model = pickle.load(model_file)
                 prediction = model.predict(features)
-                # st.write(prediction)
+
                 plot = customPlot()
                 plot.pred_vs_actual(targets, prediction)
                 r2 = r2_score(targets, prediction)
@@ -2924,3 +2930,6 @@ elif select_option == "其他":
                     tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('---')
+    
+    elif sub_option == "代理优化":
+        st.write("正在构思")
