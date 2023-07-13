@@ -927,887 +927,511 @@ elif select_option == "回归":
 
         reg.targets = targets[target_selected_option]
 
-        sub_sub_option = option_menu(None, ["训练", "推理"],icons=['house',  "list-task"],
-                            menu_icon="cast", default_index=0, orientation="horizontal")
-        if sub_sub_option == "训练":
+        colored_header(label="Regressor", description=" ",color_name="violet-30")
 
-            colored_header(label="Regressor", description=" ",color_name="violet-30")
+        model_path = './models/regressors'
 
-            model_path = './models/regressors'
+        template_alg = model_platform(model_path)
 
-            template_alg = model_platform(model_path)
+        inputs, col2 = template_alg.show()
+    
+        if inputs['model'] == 'DecisionTreeRegressor':
 
-            inputs, col2 = template_alg.show()
-        
-            if inputs['model'] == 'DecisionTreeRegressor':
-
-                with col2:
-                    with st.expander('Operator'):
-                        operator = st.selectbox('', ('train test split','cross val score', 'leave one out'), label_visibility= "collapsed")
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-
-                        elif operator == 'cross val score':
-                            cv = st.number_input('cv',1,10,5)
-                        
-                        elif operator == 'leave one out':
-                            loo = LeaveOneOut()
-                
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
+            with col2:
+                with st.expander('Operator'):
+                    operator = st.selectbox('', ('train test split','cross val score', 'leave one out'), label_visibility= "collapsed")
                     if operator == 'train test split':
-
-                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-                                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                        min_samples_split=inputs['min samples split']) 
-                        
-                        reg.DecisionTreeRegressor()
-                        plot = customPlot()
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'DTR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-                        
-                        if inputs['tree graph']:
-                            class_names = list(set(reg.targets.astype(str).tolist()))
-                            dot_data = tree.export_graphviz(reg.model,out_file=None, feature_names=list(reg.features), class_names=class_names,filled=True, rounded=True)
-                            graph = graphviz.Source(dot_data)
-                            graph.render('Tree graph', view=True)
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
 
                     elif operator == 'cross val score':
-
-                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                            min_samples_split=inputs['min samples split']) 
-
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                        
-                        # prediction = [estimator.predict(reg.features) for estimator in result_cv['estimator']]
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'DTR_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
-                        
+                        cv = st.number_input('cv',1,10,5)
+                    
                     elif operator == 'leave one out':
-
-                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                            min_samples_split=inputs['min samples split']) 
-                        Y_pred  =[]
-                        Y_test = []
-                        features = reg.features.values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
-                        
-                        score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
-
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'DTR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-            if inputs['model'] == 'RandomForestRegressor':
-                with col2:
-                    with st.expander('Operator'):
-                        operator = st.selectbox('data operator', ('train test split','cross val score','leave one out','oob score'))
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                        elif operator == 'cross val score':
-                            cv = st.number_input('cv',1,10,5)
-
-                        elif operator == 'leave one out':
-                            loo = LeaveOneOut()
-
-                        elif operator == 'oob score':
-                            inputs['oob score']  = st.selectbox('oob score',[True], disabled=True)
-                            inputs['warm start'] = True
-
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                
-                if button_train:
-                    if operator == 'train test split':
-
-                        reg.model = RFR( n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                        min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
-                                                        n_jobs=inputs['njobs'])
-                        
-                        reg.RandomForestRegressor()
-        
-                        plot = customPlot()
-
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'RFR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                    elif operator == 'cross val score':
-
-                        reg.model = RFR(n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                    min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
-                                                    n_jobs=inputs['njobs'])
-
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                        loo = LeaveOneOut()
             
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'RFR_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
-        
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                                    max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                    min_samples_split=inputs['min samples split']) 
+                    
+                    reg.DecisionTreeRegressor()
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    plot_and_export_results(reg, "DTR")
+
+                    if inputs['tree graph']:
+                        class_names = list(set(reg.targets.astype(str).tolist()))
+                        dot_data = tree.export_graphviz(reg.model,out_file=None, feature_names=list(reg.features), class_names=class_names,filled=True, rounded=True)
+                        graph = graphviz.Source(dot_data)
+                        graph.render('Tree graph', view=True)
+
+                elif operator == 'cross val score':
+
+                    reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                        min_samples_split=inputs['min samples split']) 
+
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                    plot_cross_val_results(cvs, "DTR_cv")    
+
+                elif operator == 'leave one out':
+
+                    reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                        min_samples_split=inputs['min samples split']) 
+                    
+                    export_loo_results(reg, loo, "DTR_loo")
+
+
+
+        if inputs['model'] == 'RandomForestRegressor':
+            with col2:
+                with st.expander('Operator'):
+                    operator = st.selectbox('data operator', ('train test split','cross val score','leave one out','oob score'))
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                    elif operator == 'cross val score':
+                        cv = st.number_input('cv',1,10,5)
+
+                    elif operator == 'leave one out':
+                        loo = LeaveOneOut()
+
                     elif operator == 'oob score':
+                        inputs['oob score']  = st.selectbox('oob score',[True], disabled=True)
+                        inputs['warm start'] = True
 
-                        reg.model = RFR(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = RFR( n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
                                                     min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
                                                     n_jobs=inputs['njobs'])
                     
-                        reg_res  = reg.model.fit(reg.features, reg.targets)
-                        oob_score = reg_res.oob_score_
-                        st.write(f'oob score : {oob_score}')
+                    reg.RandomForestRegressor()
 
-                    elif operator == 'leave one out':
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    plot_and_export_results(reg, "RFR")
 
-                        reg.model = RFR(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                    min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
-                                                    n_jobs=inputs['njobs'])
-                    
-                        Y_pred  =[]
-                        Y_test = []
-                        features = reg.features.values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
 
-                        score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
+                elif operator == 'cross val score':
 
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'RFR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)                        
+                    reg.model = RFR(n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
+                                                n_jobs=inputs['njobs'])
 
-            if inputs['model'] == 'SupportVector':
-
-                with col2:
-                    with st.expander('Operator'):
-
-                        preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-
-                        operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            
-                            reg.features = pd.DataFrame(reg.features)    
-                            
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-
-                        elif operator == 'cross val score':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            cv = st.number_input('cv',1,10,5)
-
-                        elif operator == 'leave one out':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            loo = LeaveOneOut()
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
-                    if operator == 'train test split':
-
-                        reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
-                        
-                        reg.SupportVector()
-                        plot = customPlot()
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'SVR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                    elif operator == 'cross val score':
-
-                        reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
-
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'SVR_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
-
-                    elif operator == 'leave one out':
-
-                        reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
-                    
-                        Y_pred  =[]
-                        Y_test = []
-                        features = pd.DataFrame(reg.features).values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
-
-                        score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
-
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'DTR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-                        
-            if inputs['model'] == 'KNeighborsRegressor':
-
-                with col2:
-                    with st.expander('Operator'):
-
-                        preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-
-                        operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            
-                            reg.features = pd.DataFrame(reg.features)    
-                            
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            
-                        elif operator == 'cross val score':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            cv = st.number_input('cv',1,10,5)
-
-                        elif operator == 'leave one out':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            loo = LeaveOneOut()
-
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
-                    if operator == 'train test split':
-
-                        reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
-                        
-                        reg.KNeighborsRegressor()
-                        plot = customPlot()
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'KNR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                    elif operator == 'cross val score':
-
-                        reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
-
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'KNR_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
-
-                    elif operator == 'leave one out':
-
-                        reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
-                    
-                        Y_pred  =[]
-                        Y_test = []
-
-                        features = pd.DataFrame(reg.features).values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
-
-                        score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
-
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'KNR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-            if inputs['model'] == 'LinearRegressor':
-
-                with col2:
-                    with st.expander('Operator'):
-
-                        preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-
-                        operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            
-                            reg.features = pd.DataFrame(reg.features)    
-                            
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            
-                        elif operator == 'cross val score':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            cv = st.number_input('cv',1,10,5)
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
         
-                        elif operator == 'leave one out':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            loo = LeaveOneOut()
+                    plot_cross_val_results(cvs, "RFR_cv") 
+    
+                elif operator == 'oob score':
 
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
-                    if operator == 'train test split':
-
-                        reg.model = LinearR()
-                        
-                        reg.LinearRegressor()
-                        plot = customPlot()
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'LinearR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)                       
-
-
-                    elif operator == 'cross val score':
-
-                        reg.model = LinearR()
-
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'LinearR_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
-
-                    elif operator == 'leave one out':
-
-                        reg.model = LinearR()
-                    
-                        Y_pred  =[]
-                        Y_test = []
-                        features = pd.DataFrame(reg.features).values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
-
-                        score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
-
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'DTR_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)              
-                                 
-            if inputs['model'] == 'LassoRegressor':
-
-                with col2:
-                    with st.expander('Operator'):
-
-                        preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-
-                        operator = st.selectbox('', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            
-                            reg.features = pd.DataFrame(reg.features)    
-                            
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            
-                        elif operator == 'cross val score':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            cv = st.number_input('cv',1,10,5)
-
-                        elif operator == 'leave one out':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            loo = LeaveOneOut()
+                    reg.model = RFR(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
+                                                n_jobs=inputs['njobs'])
                 
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
+                    reg_res  = reg.model.fit(reg.features, reg.targets)
+                    oob_score = reg_res.oob_score_
+                    st.write(f'oob score : {oob_score}')
+
+                elif operator == 'leave one out':
+
+                    reg.model = RFR(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
+                                                n_jobs=inputs['njobs'])
+                    export_loo_results(reg, loo, "RFR_loo")
+
+        if inputs['model'] == 'SupportVector':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if operator == 'train test split':
-
-                        reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
                         
-                        reg.LassoRegressor()
-                        plot = customPlot()
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
+                        reg.features = pd.DataFrame(reg.features)    
                         
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'Lasso_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
 
                     elif operator == 'cross val score':
-
-                        reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
-
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'Lasso_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
 
                     elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
 
-                        reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
+                    reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
                     
-                        Y_pred  =[]
-                        Y_test = []
-                        features = pd.DataFrame(reg.features).values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
+                    reg.SupportVector()
 
-                        score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    
+                    plot_and_export_results(reg, "SVR")
 
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'Lasso_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif operator == 'cross val score':
 
-            if inputs['model'] == 'RidgeRegressor':
+                    reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
 
-                with col2:
-                    with st.expander('Operator'):
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                    plot_cross_val_results(cvs, "SVR_cv")  
 
-                        preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
 
-                        operator = st.selectbox('data operator', ('train test split','cross val score', 'leave one out'))
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            
-                            reg.features = pd.DataFrame(reg.features)    
-                            
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            
-                        elif operator == 'cross val score':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            cv = st.number_input('cv',1,10,5)
-                        
-                        elif operator == 'leave one out':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            loo = LeaveOneOut()              
+                elif operator == 'leave one out':
+
+                    reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
                 
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
+                    export_loo_results(reg, loo, "SVR_loo")
+                    
+        if inputs['model'] == 'KNeighborsRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if operator == 'train test split':
-
-                        reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
                         
-                        reg.RidgeRegressor()
-                        plot = customPlot()
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
+                        reg.features = pd.DataFrame(reg.features)    
                         
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'Ridge_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
                     elif operator == 'cross val score':
-
-                        reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
-
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'Ridge_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
 
                     elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()
 
-                        reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
                     
-                        Y_pred  =[]
-                        Y_test = []
-                        features = pd.DataFrame(reg.features).values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
+                    reg.KNeighborsRegressor()
 
-                        score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    
+                    plot_and_export_results(reg, "KNR")
 
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'Ridge_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif operator == 'cross val score':
 
-            if inputs['model'] == 'MLPRegressor':
+                    reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
 
-                with col2:
-                    with st.expander('Operator'):
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
 
-                        preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    plot_cross_val_results(cvs, "KNR_cv") 
 
-                        operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
-                        if operator == 'train test split':
-                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            
-                            reg.features = pd.DataFrame(reg.features)    
-                            
-                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            
-                        elif operator == 'cross val score':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            cv = st.number_input('cv',1,10,5)
-                        
-                        elif operator == 'leave one out':
-                            if preprocess == 'StandardScaler':
-                                reg.features = StandardScaler().fit_transform(reg.features)
-                            if preprocess == 'MinMaxScaler':
-                                reg.features = MinMaxScaler().fit_transform(reg.features)
-                            loo = LeaveOneOut()              
-                colored_header(label="Training", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
+                elif operator == 'leave one out':
+
+                    reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
+                
+                    export_loo_results(reg, loo, "KNR_loo")
+
+        if inputs['model'] == 'LinearRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if operator == 'train test split':
-
-                        reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
-                                                batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
-                                                random_state=inputs['random state'])
-                        reg.MLPRegressor()
-                        plot = customPlot()
-                        plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
                         
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'MLP_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
                     elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
+    
+                    elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()
 
-                        reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
-                                                batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
-                                                random_state=inputs['random state'])
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = LinearR()
+                    
+                    reg.LinearRegressor()
+                    # plot = customPlot()
+                    # plot.pred_vs_actual(reg.Ytest, reg.Ypred)
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    plot_and_export_results(reg, "LinearR")                     
+
+
+                elif operator == 'cross val score':
+
+                    reg.model = LinearR()
+
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+
+                    plot_cross_val_results(cvs, "linearR_cv")    
+
+                elif operator == 'leave one out':
+
+                    reg.model = LinearR()
+                    
+                    export_loo_results(reg, loo, "LinearR_loo")
+        
+                                
+        if inputs['model'] == 'LassoRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
                         
-                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(cvs['test_score'])
-                        with col2:
-                            with st.expander("模型下载"):
-                                i = 0
-                                for estimator in cvs['estimator']:
-                                    tmp_download_link = download_button(estimator, f'MLP_model'+str(i)+'.pkl', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                    i = i+1
-                        st.write('R2: {}'.format(cvs['test_score'].mean()))
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
 
                     elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()
+            
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
 
-                        reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
-                                                batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
-                                                random_state=inputs['random state'])
+                    reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
                     
-                        Y_pred  =[]
-                        Y_test = []
-                        features = pd.DataFrame(reg.features).values
-                        targets = reg.targets.values
-                        for train,test in loo.split(features):
-                            Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                            
-                            reg.model.fit(Xtrain, Ytrain)
-                            Ypred = reg.model.predict(Xtest)
-                            Y_pred.append(Ypred)
-                            Y_test.append(Ytest)
+                    reg.LassoRegressor()
 
-                        score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                        st.write('R2: {}'.format(score))
-                        plot = customPlot()
-                        plot.pred_vs_actual(Y_test, Y_pred) 
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    
+                    plot_and_export_results(reg, "LassoR")
 
-                        with st.expander("模型下载"):
-                            tmp_download_link = download_button(reg.model, f'MLP_model.pickle', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif operator == 'cross val score':
+
+                    reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
+
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+
+                    plot_cross_val_results(cvs, "LassoR_cv")   
+
+                elif operator == 'leave one out':
+
+                    reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
+                
+                    export_loo_results(reg, loo, "LassoR_loo")
+
+        if inputs['model'] == 'RidgeRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('data operator', ('train test split','cross val score', 'leave one out'))
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
+                    
+                    elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()              
+            
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
+                    
+                    reg.RidgeRegressor()
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+
+                    plot_and_export_results(reg, "RidgeR")
+
+                elif operator == 'cross val score':
+
+                    reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
+
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+
+                    plot_cross_val_results(cvs, "LassoR_cv") 
+
+
+                elif operator == 'leave one out':
+
+                    reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
+                
+                    export_loo_results(reg, loo, "LassoR_loo")
+
+        if inputs['model'] == 'MLPRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,10,5)
+                    
+                    elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()              
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+
+                    reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
+                                            batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
+                                            random_state=inputs['random state'])
+                    reg.MLPRegressor()
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    plot_and_export_results(reg, "MLP")
+
+                elif operator == 'cross val score':
+
+                    reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
+                                            batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
+                                            random_state=inputs['random state'])
+                    
+                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                    plot_cross_val_results(cvs, "MLP_cv") 
+
+                elif operator == 'leave one out':
+
+                    reg.model = MLPRegressor(hidden_layer_sizes=inputs['hidden layer size'], activation= inputs['activation'], solver=inputs['solver'], 
+                                            batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
+                                            random_state=inputs['random state'])
+                
+                    export_loo_results(reg, loo, "MLP_loo")
 
             st.write('---')
-        
-        elif sub_sub_option == "推理":
-            model_file = st.file_uploader("Upload `.pickle`model",  label_visibility="collapsed")
-            if model_file is not None:
-                model = pickle.load(model_file)
-                prediction = model.predict(reg.features)
-                # st.write(prediction)
-                plot = customPlot()
-                plot.pred_vs_actual(reg.targets, prediction)
-                r2 = r2_score(reg.targets, prediction)
-                st.write('R2: {}'.format(r2))
-                result_data = pd.concat([reg.targets, pd.DataFrame(prediction)], axis=1)
-                result_data.columns = ['actual','prediction']
-                with st.expander('预测结果'):
-                    st.write(result_data)
-                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    
-                
+                            
 elif select_option == "分类":
     
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
@@ -2122,7 +1746,7 @@ elif select_option == "聚类":
 
 elif select_option == "其他":
     with st.sidebar:
-        sub_option = option_menu(None, ["可解释性机器学习", "主动学习", "集成学习"])
+        sub_option = option_menu(None, ["可解释性机器学习", "主动学习", "集成学习", "模型推理"])
     if sub_option == "可解释性机器学习":
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
 
@@ -2211,7 +1835,12 @@ elif select_option == "其他":
             # st_shap(shap.plots.scatter(shap_values[:, ind_mean]))           
 
     elif sub_option == "主动学习":
-
+        colored_header(label="主动学习",description=" ",color_name="violet-90")
+            # file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+            # if file is not None:
+            #     df = pd.read_csv(file)
+            #     # 检测缺失值
+            #     check_string_NaN(df)
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
 
         if len(file) > 2:
@@ -2220,46 +1849,44 @@ elif select_option == "其他":
         if len(file) == 2:
             st.warning('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
         if len(file) > 0:
+            
+            colored_header(label="数据信息",description=" ",color_name="violet-70")
 
-            colored_header(label="Data Information",description=" ",color_name="violet-70")
+            # with st.expander('Data Information'):
+            df = pd.read_csv(file[0])
+            if len(file) == 2:
+                df_vs = pd.read_csv(file[1])
+            check_string_NaN(df)
 
-            with st.expander('Data Information'):
-                df = pd.read_csv(file[0])
-                if len(file) == 2:
-                    df_vs = pd.read_csv(file[1])
-                check_string_NaN(df)
-                colored_header(label="Data Tale", description=" ",color_name="blue-70")
-                nrow = st.slider("rows", 1, len(df)-1, 5)
-                df_nrow = df.head(nrow)
-                st.write(df_nrow)
+            nrow = st.slider("rows", 1, len(df)-1, 5)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
 
-                colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
+            colored_header(label="特征变量和目标变量",description=" ",color_name="blue-30")
 
-                target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
-                st.write('target number', target_num)
-                
-                col_feature, col_target = st.columns(2)
-                
-                # features
-                features = df.iloc[:,:-target_num]
-                # targets
-                targets = df.iloc[:,-target_num:]
-                with col_feature:    
-                    st.write(features.head())
-                with col_target:   
-                    st.write(targets.head())
+            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            
+            col_feature, col_target = st.columns(2)
+            
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
 
             # colored_header(label="Active learning", description=" ", color_name="violet-70")
 
             sp = SAMPLING(features, targets)
 
-            colored_header(label="Choose Target", description=" ", color_name="violet-30")
+            colored_header(label="选择目标变量", description=" ", color_name="violet-30")
 
             target_selected_option = st.selectbox('target', list(sp.targets))
             
             sp.targets = sp.targets[target_selected_option]
             
-
             colored_header(label="Sampling", description=" ",color_name="violet-30")
 
             model_path = './models/active learning'
@@ -2273,7 +1900,7 @@ elif select_option == "其他":
                 with col2:
                     if len(file) == 2:
                         sp.vsfeatures = df_vs
-                        st.info('You have upoaded the visula sample point file.')
+                        st.info('You have upoaded the visual sample point file.')
                         feature_name = sp.features.columns.tolist()
                     else:
                         feature_name = sp.features.columns.tolist()
@@ -2291,72 +1918,75 @@ elif select_option == "其他":
 
                         sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
 
-                    Bgolearn = BGOS.Bgolearn()
-
+                Bgolearn = BGOS.Bgolearn()
+                colored_header(label="Optimize", description=" ",color_name="violet-30")
+                with st.container():
+                    button_train = st.button('Train', use_container_width=True)
+                if button_train:
                     Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
                                         opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
-                    # Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures)
                     if inputs['sample criterion'] == 'Expected Improvement algorith':
                         res = Mymodel.EI()
                         
-                    if inputs['sample criterion'] == 'Expected improvement with "plugin"':
+                    elif inputs['sample criterion'] == 'Expected improvement with "plugin"':
                         res = Mymodel.EI_plugin()
 
-                    if inputs['sample criterion'] == 'Augmented Expected Improvement':
+                    elif inputs['sample criterion'] == 'Augmented Expected Improvement':
                         with st.expander('EI HyperParamters'):
                             alpha = st.slider('alpha', 0.0, 3.0, 1.0)
                             tao = st.slider('tao',0.0, 1.0, 0.0)
                         res = Mymodel.Augmented_EI(alpha = alpha, tao = tao)
 
-                    if inputs['sample criterion'] == 'Expected Quantile Improvement':
+                    elif inputs['sample criterion'] == 'Expected Quantile Improvement':
                         with st.expander('EQI HyperParamters'):
                             beta= st.slider('beta',0.2, 0.8, 0.5)
                             tao = st.slider('tao_new',0.0, 1.0, 0.0)            
                         res = Mymodel.EQI(beta = beta,tao_new = tao)
 
-                    if inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
+                    elif inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
                         res = Mymodel.Reinterpolation_EI() 
 
-                    if inputs['sample criterion'] == 'Upper confidence bound':
+                    elif inputs['sample criterion'] == 'Upper confidence bound':
                         with st.expander('UCB HyperParamters'):
                             alpha = st.slider('alpha', 0.0, 3.0, 1.0)
                         res = Mymodel.UCB(alpha=alpha)
 
-                    if inputs['sample criterion'] == 'Probability of Improvement':
+                    elif inputs['sample criterion'] == 'Probability of Improvement':
                         with st.expander('PoI HyperParamters'):
                             tao = st.slider('tao',0.0, 0.3, 0.0)
                         res = Mymodel.PoI(tao = tao)
 
-                    if inputs['sample criterion'] == 'Predictive Entropy Search':
+                    elif inputs['sample criterion'] == 'Predictive Entropy Search':
                         with st.expander('PES HyperParamters'):
                             sam_num = st.number_input('sample number',100, 1000, 500)
                         res = Mymodel.PES(sam_num = sam_num)  
                         
-                    if inputs['sample criterion'] == 'Knowledge Gradient':
+                    elif inputs['sample criterion'] == 'Knowledge Gradient':
                         with st.expander('Knowldge_G Hyperparameters'):
                             MC_num = st.number_input('MC number', 50,300,50)
                         res = Mymodel.Knowledge_G(MC_num = MC_num) 
 
-                    if inputs['sample criterion'] == 'Least Confidence':
+                    elif inputs['sample criterion'] == 'Least Confidence':
                         
                         Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
                                         opt_num=inputs['opt num'])
                         res = Mymodel.Least_cfd() 
         
-                    if inputs['sample criterion'] == 'Margin Sampling':
+                    elif inputs['sample criterion'] == 'Margin Sampling':
                         Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
                                 opt_num=inputs['opt num'])
                         res = Mymodel.Margin_S()
 
-                    if inputs['sample criterion'] == 'Entropy-based approach':
+                    elif inputs['sample criterion'] == 'Entropy-based approach':
                         Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
                                 opt_num=inputs['opt num'])
                         res = Mymodel.Entropy()
-                st.info('Recommmended Sample')
-                sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
-                st.write(sp.sample_point)
-                tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                    st.info('Recommmended Sample')
+                    sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
+                    st.write(sp.sample_point)
+                    tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     elif sub_option == "集成学习":
         sub_sub_option = option_menu(None, ["回归", "分类"],
@@ -2452,62 +2082,33 @@ elif select_option == "其他":
                                 
                                 reg.BaggingRegressor()
                 
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
 
-                                with st.expander("模型下载"):
-                                    tmp_download_link = download_button(reg.model, f'BaggingR_model.pickle', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)    
+                                plot_and_export_results(reg, "BaggingR")
 
-                                with st.expander('预测结果'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
                             
                             elif inputs['base estimator'] == "SupportVector": 
                                 reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
                                         max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                                 reg.BaggingRegressor()
-                
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
 
-                                with st.expander("模型下载"):
-                                    tmp_download_link = download_button(reg.model, f'BaggingR_model.pickle', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)    
-
-                                with st.expander('预测结果'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True) 
+                                plot_and_export_results(reg, "BaggingR")
                             
                             elif inputs['base estimator'] == "LinearRegression": 
                                 reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
                                         max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                                 reg.BaggingRegressor()
                 
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander("模型下载"):
-                                    tmp_download_link = download_button(reg.model, f'BaggingR_model.pickle', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)    
 
-                                with st.expander('预测结果'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                                plot_and_export_results(reg, "BaggingR")
 
                         elif operator == 'cross val score':
                             if inputs['base estimator'] == "DecisionTree": 
@@ -2515,18 +2116,8 @@ elif select_option == "其他":
                                                                 max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    
-                                col1, col2 = st.columns([1, 3])
-                                with col1:
-                                    st.write(cvs['test_score'])
-                                with col2:
-                                    with st.expander("模型下载"):
-                                        i = 0
-                                        for estimator in cvs['estimator']:
-                                            tmp_download_link = download_button(estimator, f'BaggingR_model'+str(i)+'.pkl', button_text='download')
-                                            st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                            i = i+1
-                                st.write('R2: {}'.format(cvs['test_score'].mean()))
+
+                                plot_cross_val_results(cvs, "BaggingR_cv")   
 
                             elif inputs['base estimator'] == "SupportVector": 
 
@@ -2535,17 +2126,7 @@ elif select_option == "其他":
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                col1, col2 = st.columns([1, 3])
-                                with col1:
-                                    st.write(cvs['test_score'])
-                                with col2:
-                                    with st.expander("模型下载"):
-                                        i = 0
-                                        for estimator in cvs['estimator']:
-                                            tmp_download_link = download_button(estimator, f'BaggingR_model'+str(i)+'.pkl', button_text='download')
-                                            st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                            i = i+1
-                                st.write('R2: {}'.format(cvs['test_score'].mean()))
+                                plot_cross_val_results(cvs, "BaggingR_cv")   
 
                             elif inputs['base estimator'] == "LinearRegression":
                                 reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
@@ -2553,114 +2134,27 @@ elif select_option == "其他":
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                col1, col2 = st.columns([1, 3])
-                                with col1:
-                                    st.write(cvs['test_score'])
-                                with col2:
-                                    with st.expander("模型下载"):
-                                        i = 0
-                                        for estimator in cvs['estimator']:
-                                            tmp_download_link = download_button(estimator, f'BaggingR_model'+str(i)+'.pkl', button_text='download')
-                                            st.markdown(tmp_download_link, unsafe_allow_html=True)   
-                                            i = i+1
-                                st.write('R2: {}'.format(cvs['test_score'].mean()))
+                                plot_cross_val_results(cvs, "BaggingR_cv")   
 
                         elif operator == 'leave one out':
                             if inputs['base estimator'] == "DecisionTree": 
                                 reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                         max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                             
-                                Y_pred  =[]
-                                Y_test = []
-                                features = pd.DataFrame(reg.features).values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                                st.write('R2: {}'.format(score))
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred) 
-
-                                with st.expander("模型下载"):
-                                    tmp_download_link = download_button(reg.model, f'BaggingR_model.pickle', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                                result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('预测结果'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                                export_loo_results(reg, loo, "BaggingR_loo")
 
                             elif inputs['base estimator'] == "SupportVector": 
 
                                 reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
                                         max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                                 
-                                Y_pred  =[]
-                                Y_test = []
-                                st.write(reg.features.dtype)
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                                st.write('R2: {}'.format(score))
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred) 
-
-                                with st.expander("模型下载"):
-                                    tmp_download_link = download_button(reg.model, f'BaggingR_model.pickle', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                                result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('预测结果'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                                export_loo_results(reg, loo, "BaggingR_loo")
 
                             elif inputs['base estimator'] == "LinearRegression":
                                 reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
                                         max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                 
-                                Y_pred  =[]
-                                Y_test = []
-                                st.write(reg.features.dtype)
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test, y_pred=Y_pred)
-                                st.write('R2: {}'.format(score))
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred) 
-
-                                with st.expander("模型下载"):
-                                    tmp_download_link = download_button(reg.model, f'BaggingR_model.pickle', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)  
-                                result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('预测结果'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                                export_loo_results(reg, loo, "BaggingR_loo")
 
                 if inputs['model'] == 'AdaBoostRegressor':
 
@@ -2687,48 +2181,30 @@ elif select_option == "其他":
                                 
                                 reg.AdaBoostRegressor()
                 
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
-
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                                plot_and_export_results(reg, "AdaBoostR")
                             
                             elif inputs['base estimator'] == "SupportVector": 
 
                                 reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                                 
                                 reg.AdaBoostRegressor()
-                
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
+
+                                plot_and_export_results(reg, "AdaBoostR")
                             
                             elif inputs['base estimator'] == "LinearRegression": 
                                 reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                                 reg.AdaBoostRegressor()
-                
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
+                                
+                                plot_and_export_results(reg, "AdaBoostR")
 
                         elif operator == 'cross val score':
                             if inputs['base estimator'] == "DecisionTree": 
@@ -2740,81 +2216,33 @@ elif select_option == "其他":
 
                                 reg.model =  AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
 
-                                cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
+                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                st.write('mean cross val R2:', cvs.mean())  
+                                plot_cross_val_results(cvs, "AdaBoostR_cv")  
 
                             elif inputs['base estimator'] == "LinearRegression":
                                 reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
 
-                                cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
+                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                st.write('mean cross val R2:', cvs.mean())
+                                plot_cross_val_results(cvs, "AdaBoostR_cv")  
 
                         elif operator == 'leave one out':
                             if inputs['base estimator'] == "DecisionTree": 
                                 reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                             
-                                Y_pred  =[]
-                                Y_test = []
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                    
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred)                  
-                                st.write('mean cross val R2:', score)
+                                export_loo_results(reg, loo, "AdaBoostR_loo")
                             
                             elif inputs['base estimator'] == "SupportVector": 
 
                                 reg.model = reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                                 
-                                Y_pred  =[]
-                                Y_test = []
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                    
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred)                  
-                                st.write('mean cross val R2:', score)
+                                export_loo_results(reg, loo, "AdaBoostR_loo")
 
                             elif inputs['base estimator'] == "LinearRegression":
                                 reg.model = reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                                                     
-                                Y_pred  =[]
-                                Y_test = []
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                    
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred)                  
-                                st.write('mean cross val R2:', score)
+                                export_loo_results(reg, loo, "AdaBoostR_loo")
                             
                 if inputs['model'] == 'GradientBoostingRegressor':
 
@@ -2829,6 +2257,7 @@ elif select_option == "其他":
                                 cv = st.number_input('cv',1,10,5)
                             elif operator == 'leave one out':
                                 loo = LeaveOneOut()
+
                     colored_header(label="Training", description=" ",color_name="violet-30")
                     with st.container():
                         button_train = st.button('Train', use_container_width=True)
@@ -2841,45 +2270,22 @@ elif select_option == "其他":
                                 
                                 reg.AdaBoostRegressor()
                 
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                                plot_and_export_results(reg, "GradientBoostingR")
 
                         elif operator == 'cross val score':
                                 reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
                                                                     random_state=inputs['random state'])  
-                                cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
-                    
-                                st.write('mean cross val R2:', cvs.mean())
+                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                                plot_cross_val_results(cvs, "GradientBoostingR_cv")    
 
                         elif operator == 'leave one out':
                                 reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
                                                                     random_state=inputs['random state']) 
                             
-                                Y_pred  =[]
-                                Y_test = []
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                    
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred)                  
-                                st.write('mean cross val R2:', score)
+                                export_loo_results(reg, loo, "GradientBoostingR_loo")
 
                 if inputs['model'] == 'XGBRegressor':
 
@@ -2905,48 +2311,27 @@ elif select_option == "其他":
                                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                             learning_rate=inputs['learning rate'])
                                 reg.XGBRegressor()
-                
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                                plot_and_export_results(reg, "XGBR")
 
                         elif operator == 'cross val score':
                                 reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                             learning_rate=inputs['learning rate'])
-                                cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
-                    
-                                st.write('mean cross val R2:', cvs.mean())
+                                
+                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                                plot_cross_val_results(cvs, "DTR_cv")    
+
 
                         elif operator == 'leave one out':
                                 reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                             learning_rate=inputs['learning rate'])
                             
-                                Y_pred  =[]
-                                Y_test = []
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                    
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred)                  
-                                st.write('mean cross val R2:', score) 
+                                export_loo_results(reg, loo, "DTR_loo")
 
 
                 if inputs['model'] == 'LGBMRegressor':
@@ -2973,45 +2358,24 @@ elif select_option == "其他":
                                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
 
                                 reg.LGBMRegressor()
-                
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                                plot_and_export_results(reg, "LGBMR")
 
                         elif operator == 'cross val score':
                                 reg.model = lgb.LGBMRegressor(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
                                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
-                                cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
-                    
-                                st.write('mean cross val R2:', cvs.mean())
+                                
+                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                                plot_cross_val_results(cvs, "LGBMR_cv")    
 
                         elif operator == 'leave one out':
                                 reg.model = lgb.LGBMRegressor(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
                                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
-                                Y_pred  =[]
-                                Y_test = []
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                    
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred)                  
-                                st.write('mean cross val R2:', score)    
+                                
+                                export_loo_results(reg, loo, "LGBMR_loo")
 
                 if inputs['model'] == 'CatBoostRegressor':
                     with col2:
@@ -3035,43 +2399,21 @@ elif select_option == "其他":
                                 reg.model =CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
 
                                 reg.LGBMRegressor()
-                
-                                plot = customPlot()
-
-                                plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                                 result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                                plot_and_export_results(reg, "CatBoostR")
 
                         elif operator == 'cross val score':
                                 reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
-                                cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
-                    
-                                st.write('mean cross val R2:', cvs.mean())
+                                
+                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                                plot_cross_val_results(cvs, "CatBoostR_cv")    
 
                         elif operator == 'leave one out':
                                 reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
-                                Y_pred  =[]
-                                Y_test = []
-                                features = reg.features.values
-                                targets = reg.targets.values
-                                for train,test in loo.split(features):
-                                    Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-                                    
-                                    reg.model.fit(Xtrain, Ytrain)
-                                    Ypred = reg.model.predict(Xtest)
-                                    Y_pred.append(Ypred)
-                                    Y_test.append(Ytest)
-
-                                score = r2_score(y_true=Y_test,y_pred=Y_pred)
-                    
-                                plot = customPlot()
-                                plot.pred_vs_actual(Y_test, Y_pred)                  
-                                st.write('mean cross val R2:', score)                     
+                                export_loo_results(reg, loo, "CatBoostR_loo")            
                 st.write('---')                
 
         elif sub_sub_option == "分类":
@@ -3539,5 +2881,48 @@ elif select_option == "其他":
                                 cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean()))                 
+    
+    elif sub_option == "模型推理":
+        
+        colored_header(label="模型推理",description=" ",color_name="violet-90")
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is not None:
+            df = pd.read_csv(file)
+            # 检测缺失值
+            check_string_NaN(df)
 
+            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            nrow = st.slider("rows", 1, len(df)-1, 5)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
+
+            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+
+            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            
+            col_feature, col_target = st.columns(2)
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())    
+
+            model_file = st.file_uploader("Upload `.pickle`model",  label_visibility="collapsed")
+            if model_file is not None:
+                model = pickle.load(model_file)
+                prediction = model.predict(features)
+                # st.write(prediction)
+                plot = customPlot()
+                plot.pred_vs_actual(targets, prediction)
+                r2 = r2_score(targets, prediction)
+                st.write('R2: {}'.format(r2))
+                result_data = pd.concat([targets, pd.DataFrame(prediction)], axis=1)
+                result_data.columns = ['actual','prediction']
+                with st.expander('预测结果'):
+                    st.write(result_data)
+                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('---')

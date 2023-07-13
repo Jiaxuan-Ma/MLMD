@@ -1507,3 +1507,56 @@ class SAMPLING:
         self.score = None
 
         self.Ypred = None
+
+
+def plot_and_export_results(model, model_name):
+        plot = customPlot()
+        plot.pred_vs_actual(model.Ytest, model.Ypred)
+        result_data = pd.concat([model.Ytest, pd.DataFrame(model.Ypred)], axis=1)
+        result_data.columns = ['actual', 'prediction']
+        with st.expander("模型下载"):
+            tmp_download_link = download_button(model.model, model_name+'.pickle', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+        with st.expander('预测结果'):
+            st.write(result_data)
+            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+def plot_cross_val_results(cvs, model_name):
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.write(cvs['test_score'])
+        with col2:
+            with st.expander("模型下载"):
+                i = 0
+                for estimator in cvs['estimator']:
+                    tmp_download_link = download_button(estimator, model_name+f'_model{i}.pkl', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    i = i + 1
+        st.write('R2: {}'.format(cvs['test_score'].mean()))
+
+def export_loo_results(model, loo, model_name):
+    Y_pred  =[]
+    Y_test = []
+    features = pd.DataFrame(model.features).values
+    targets = model.targets.values
+
+    for train,test in loo.split(features):
+        Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
+        
+        model.model.fit(Xtrain, Ytrain)
+        Ypred = model.model.predict(Xtest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
+    st.write('R2: {}'.format(r2_score(y_true=Y_test, y_pred=Y_pred)))
+    plot = customPlot()
+    plot.pred_vs_actual(Y_test, Y_pred)
+    with st.expander("模型下载"):
+        tmp_download_link = download_button(model.model, model_name+'_model.pickle', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+    result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
+    result_data.columns = ['actual', 'prediction']
+    with st.expander('预测结果'):
+        st.write(result_data)
+        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
