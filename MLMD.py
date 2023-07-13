@@ -24,8 +24,8 @@ footer {visibility:hidden;}
 st.markdown(sysmenu,unsafe_allow_html=True)
 # arrow-repeat
 with st.sidebar:
-    select_option = option_menu("MLMD", ["介绍", "数据可视化", "特征工程", "回归", "分类", "聚类", "其他"],
-                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'diamond-half', 'disc', 'microsoft'],
+    select_option = option_menu("MLMD", ["介绍", "数据可视化", "特征工程", "回归", "其他"],
+                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'microsoft'],
                     menu_icon="broadcast", default_index=0)
 if select_option == "介绍":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
@@ -33,9 +33,10 @@ if select_option == "介绍":
 # st.markdown("<br>", unsafe_allow_html=True)
     col1, col2, col3, col4 = st.columns([1,0.25,0.2,0.5])
     with col1:
-        st.write('''
-            Check out [help document](https://mlmd.netlify.app/) for more information
-            ''')
+        pass
+        # st.write('''
+        #     Check out [help document](https://mlmd.netlify.app/) for more information
+        #     ''')
     with col2:
         st.write('[![](https://img.shields.io/badge/MLMD-Github-yellowgreen)](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design)')
     with col3:
@@ -1746,7 +1747,7 @@ elif select_option == "聚类":
 
 elif select_option == "其他":
     with st.sidebar:
-        sub_option = option_menu(None, ["可解释性机器学习", "主动学习", "集成学习", "模型推理", "代理优化"])
+        sub_option = option_menu(None, ["主动学习", "集成学习", "模型推理"])
     if sub_option == "可解释性机器学习":
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
 
@@ -1987,12 +1988,13 @@ elif select_option == "其他":
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     elif sub_option == "集成学习":
-        sub_sub_option = option_menu(None, ["回归", "分类"],
+        colored_header(label="集成学习",description=" ",color_name="violet-90")
+        sub_sub_option = option_menu(None, ["回归"],
                                 icons=['house',  "list-task"],
                                 menu_icon="cast", default_index=0, orientation="horizontal")
-
+        
         if sub_sub_option == "回归":
-            colored_header(label="集成学习-回归",description=" ",color_name="violet-90")
+            
             file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
             if file is not None:
                 df = pd.read_csv(file)
@@ -2897,7 +2899,7 @@ elif select_option == "其他":
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
 
             target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
-            
+
             col_feature, col_target = st.columns(2)
             # features
             features = df.iloc[:,:-target_num]
@@ -2907,7 +2909,11 @@ elif select_option == "其他":
                 st.write(features.head())
             with col_target:   
                 st.write(targets.head())    
+            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
 
+            target_selected_option = st.selectbox('target', list(targets)[::-1])
+
+            targets = targets[target_selected_option]
             preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
             if preprocess == 'StandardScaler':
                 features = StandardScaler().fit_transform(features)
@@ -2933,3 +2939,5 @@ elif select_option == "其他":
     
     elif sub_option == "代理优化":
         st.write("正在构思")
+    elif sub_option == "符号回归":
+        st.write("sisso")

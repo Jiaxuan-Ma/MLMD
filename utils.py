@@ -1,8 +1,7 @@
 import importlib.util
 
 import streamlit as st
-# from streamlit_shap import st_shap
-# import streamlit_analytics
+
 import streamlit_authenticator as stauth
 from streamlit_extras.badges import badge
 
@@ -16,21 +15,12 @@ from streamlit_pandas_profiling import st_profile_report
 from streamlit_extras.add_vertical_space import add_vertical_space
 from streamlit_extras.mention import mention
 
-from PIL import Image
-
-from streamlit_lottie import st_lottie
-from streamlit_lottie import st_lottie_spinner
 
 import numpy as np
 import pandas as pd
 
-from imblearn.over_sampling import SMOTE
-
-import lightgbm as lgb
-import pandas_profiling
 
 from sklearn.model_selection import train_test_split as TTS
-from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score as CVS
 from sklearn.model_selection import cross_validate as CV
 
@@ -51,18 +41,12 @@ from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPRegressor
-from sklearn.feature_selection import RFE
-from sklearn.feature_selection import RFECV
-from sklearn.model_selection import cross_val_predict as CVP
+
 
 from sklearn.svm import SVR
 from sklearn.svm import SVC
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import GridSearchCV
 from sklearn.impute import SimpleImputer
-from sklearn.feature_selection import f_classif
-from sklearn.feature_selection import f_regression
-from sklearn.feature_selection import mutual_info_classif
+
 from sklearn.feature_selection import mutual_info_regression as MIR
 from sklearn.metrics import accuracy_score
 from sklearn.cluster import KMeans
@@ -95,7 +79,6 @@ import Bgolearn.BGOsampling as BGOS
 
 
 import graphviz
-
 
 import shap
 import altair as alt
