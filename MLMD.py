@@ -58,8 +58,8 @@ import graphviz
 
 import shap
 import matplotlib.pyplot as plt
-
 import pickle
+from utils import *
 
 
 st.set_page_config(
