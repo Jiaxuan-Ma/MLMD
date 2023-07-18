@@ -11,8 +11,13 @@ The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for
 
 
 Check out [help document](https://mlmd.netlify.app/) for more information
+# Remote access
 
-# Local Deploy
+```
+https://ml4material.streamlit.app/
+```
+
+# Local deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
 2. Create virtual envrionment
