@@ -4,12 +4,12 @@ import streamlit as st
 
 from streamlit_extras.colored_header import colored_header
 from streamlit_option_menu import option_menu
-from streamlit_extras.buy_me_a_coffee import button
-from streamlit_extras.switch_page_button import switch_page
-from streamlit_shap import st_shap
-from streamlit_pandas_profiling import st_profile_report
-from streamlit_extras.add_vertical_space import add_vertical_space
-from streamlit_extras.mention import mention
+# from streamlit_extras.buy_me_a_coffee import button
+# from streamlit_extras.switch_page_button import switch_page
+# from streamlit_shap import st_shap
+# from streamlit_pandas_profiling import st_profile_report
+# from streamlit_extras.add_vertical_space import add_vertical_space
+# from streamlit_extras.mention import mention
 
 
 import numpy as np
