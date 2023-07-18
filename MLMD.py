@@ -3,8 +3,7 @@ Runs the streamlit app
 Call this file in the terminal via `streamlit run app.py`
 '''
 import streamlit as st, requests, json
-from streamlit_option_menu import option_menu
-
+from streamlit_extras.badges import badge
 from utils import *
 
 
