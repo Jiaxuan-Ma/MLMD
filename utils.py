@@ -2,106 +2,27 @@ import importlib.util
 
 import streamlit as st
 
-from streamlit_extras.colored_header import colored_header
-from streamlit_option_menu import option_menu
-# from streamlit_extras.buy_me_a_coffee import button
-# from streamlit_extras.switch_page_button import switch_page
-# from streamlit_shap import st_shap
-# from streamlit_pandas_profiling import st_profile_report
-# from streamlit_extras.add_vertical_space import add_vertical_space
-# from streamlit_extras.mention import mention
-
-
 import numpy as np
 import pandas as pd
 
-
-from sklearn.model_selection import train_test_split as TTS
-from sklearn.model_selection import cross_val_score as CVS
-from sklearn.model_selection import cross_validate as CV
-
-from sklearn.metrics import make_scorer, r2_score
-from sklearn.model_selection import LeaveOneOut
-from sklearn import tree
-from sklearn.metrics import mean_squared_error as MSE
-
-from sklearn.decomposition import PCA
-from sklearn.svm import SVR
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.feature_selection import SelectFromModel
-from sklearn.ensemble import RandomForestRegressor as RFR
-from sklearn.ensemble import RandomForestClassifier as RFC
-from sklearn.ensemble import ExtraTreesRegressor as ETR
-from sklearn.linear_model import LinearRegression as LinearR
-from sklearn.linear_model import LogisticRegression as LR
-from sklearn.linear_model import Lasso
-from sklearn.linear_model import Ridge
-from sklearn.neural_network import MLPRegressor
-
-
-from sklearn.svm import SVR
-from sklearn.svm import SVC
-from sklearn.impute import SimpleImputer
-
-from sklearn.feature_selection import mutual_info_regression as MIR
-from sklearn.metrics import accuracy_score
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import f1_score
 from sklearn.metrics import r2_score
-from sklearn.metrics import make_scorer
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
-from sklearn.ensemble import VotingRegressor
-from sklearn.ensemble import BaggingClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import BaggingRegressor
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.ensemble import GradientBoostingRegressor
-import joblib
 
-import xgboost as xgb
-from catboost import CatBoostClassifier
-from catboost import CatBoostRegressor
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import silhouette_score
 
-import Bgolearn.BGOsampling as BGOS
+from sklearn.metrics import r2_score
 
-
-import graphviz
-
-import shap
-import altair as alt
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
-import time
-import requests
 import collections
-import utils
 import os
-import sys
-import gc
 # utilities
-from itertools import chain
 
 import base64
-import json
 import pickle
 import uuid
 import re
-
-
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 # ============ import model from file =======================
 

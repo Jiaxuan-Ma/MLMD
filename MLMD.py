@@ -2,9 +2,65 @@
 Runs the streamlit app
 Call this file in the terminal via `streamlit run app.py`
 '''
-import streamlit as st, requests, json
 from streamlit_extras.badges import badge
-from utils import *
+
+import streamlit as st
+
+from streamlit_extras.colored_header import colored_header
+from streamlit_option_menu import option_menu
+
+import numpy as np
+import pandas as pd
+
+from sklearn.model_selection import train_test_split as TTS
+from sklearn.model_selection import cross_val_score as CVS
+from sklearn.model_selection import cross_validate as CV
+
+from sklearn.metrics import make_scorer, r2_score
+from sklearn.model_selection import LeaveOneOut
+from sklearn import tree
+
+from sklearn.svm import SVR
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor as RFR
+from sklearn.ensemble import RandomForestClassifier as RFC
+from sklearn.linear_model import LinearRegression as LinearR
+from sklearn.linear_model import LogisticRegression as LR
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import Ridge
+from sklearn.neural_network import MLPRegressor
+
+from sklearn.svm import SVR
+from sklearn.svm import SVC
+from sklearn.impute import SimpleImputer
+from sklearn.feature_selection import mutual_info_regression as MIR
+from sklearn.cluster import KMeans
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import r2_score
+from sklearn.metrics import make_scorer
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import BaggingRegressor
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+
+import xgboost as xgb
+from catboost import CatBoostClassifier
+from catboost import CatBoostRegressor
+
+import Bgolearn.BGOsampling as BGOS
+
+
+import graphviz
+
+import shap
+import matplotlib.pyplot as plt
+
+import pickle
+
 
 
 st.set_page_config(
