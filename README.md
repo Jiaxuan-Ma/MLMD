@@ -12,21 +12,6 @@ The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for
 
 Check out [help document](https://mlmd.netlify.app/) for more information
 
-# Remote Access
-
-Web site
-```
-http://116.62.169.182/
-```
-Username
-```
-mlmd
-```
-Password
-```
-123456
-```
-
 # Local Deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
@@ -40,25 +25,8 @@ pip install -r requirements.txt
 ```
 1. Run MLMD 
 ```
-streamlit run HOME.py
+streamlit run MLMD.py
 ```
-
-# Install via Docker
-If you have Docker installed on your system, you can try the no-hassle way to install MLMD
-1. Install [docker](https://www.docker.com/products/docker-desktop/)
-2. Run MLMD
-```
-docker run -ti jiaxuanma/mlmd
-```
-The docker images are hosted [here](https://hub.docker.com/repository/docker/jiaxuanma/mlmd/general)
-
-# Contact
-If you ever have any questions. Welcome to our MLMD group!!! 
-
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/61132191/233005635-8e2f5e03-c833-405b-ac67-4e77d59b626b.png" width="200px"  alt="MLMD"/>
-</div>
-
 
 # License
 MLMD platform is released under MIT License. See [License](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design/blob/main/LICENSE) for details
