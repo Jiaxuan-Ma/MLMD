@@ -17,7 +17,7 @@ Check out [help document](https://mlmd.netlify.app/) for more information
 https://ml4material.streamlit.app/
 ```
 
-# Local Deploy
+# Local deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
 2. Create virtual envrionment
