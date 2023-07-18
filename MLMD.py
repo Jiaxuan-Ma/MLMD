@@ -62,7 +62,6 @@ import matplotlib.pyplot as plt
 import pickle
 
 
-
 st.set_page_config(
         page_title="MLMD",
         page_icon="🍁",
