@@ -9,7 +9,7 @@ from sklearn.metrics import r2_score
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import silhouette_score
-
+from streamlit_option_menu import option_menu
 from sklearn.metrics import r2_score
 
 import seaborn as sns
@@ -17,8 +17,8 @@ import matplotlib.pyplot as plt
 
 import collections
 import os
-# utilities
 
+# utilities
 import base64
 import pickle
 import uuid
