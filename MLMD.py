@@ -60,7 +60,11 @@ import shap
 import matplotlib.pyplot as plt
 import pickle
 from utils import *
+from streamlit_extras.badges import badge
 
+import warnings
+ 
+warnings.filterwarnings('ignore')
 
 st.set_page_config(
         page_title="MLMD",
