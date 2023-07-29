@@ -3244,11 +3244,19 @@ elif select_option == "其他":
                 reg.model = GaussianProcessRegressor(kernel=kernel)
                 reg.model.fit(reg.Xtrain, reg.Ytrain)
                 reg.Ypred, reg.Ystd = reg.model.predict(reg.Xtest, return_std=True)
-                st.write(reg.Ypred)
-                st.write(reg.Ystd)
-                # ref00=[traindata['es1'].max()*1.1,traindata['es2'].max()*1.1]
-                target_refpoint = [reg.Xtrain[target_selected_option[0]]*1.1, reg.Xtrain[target_selected_option[1]*1.1]]
+                reg.Ypred = pd.DataFrame(reg.Ypred, columns=reg.Ytrain.columns.tolist())
 
-
+                ref_point = [inputs['obj1 ref'], inputs['obj2 ref']]
+                if inputs['method'] == 'HV':
+                    HV_values = []
+                    for i in range(reg.Ypred.shape[0]):
+                        i_Ypred = reg.Ypred.iloc[i]
+                        Ytrain_i_Ypred = reg.Ytrain.append(i_Ypred)
+                        i_pareto_front = find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
+                        i_HV_value = dominated_hypervolume(i_pareto_front, ref_point)
+                        HV_values.append(i_HV_value)
+                    st.write(HV_values)
+                    HV_values = pd.DataFrame(HV_values, columns=['HV values'])
+                    
     elif sub_option == "符号回归":
         st.write("sisso")

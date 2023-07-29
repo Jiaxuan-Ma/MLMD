@@ -35,7 +35,7 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['objective'] = st.selectbox('objective', ['both max'])
-
+            inputs['method'] = st.selectbox('method', ['HV', 'EHVI','EGO', 'PI'])
             inputs['obj1 ref'] = st.number_input('obj1 ref point', 0.0, 100.0, 2.0)
             inputs['obj2 ref'] = st.number_input('obj2 ref point', 0.0, 100.0, 2.0)
 

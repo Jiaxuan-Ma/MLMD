@@ -1549,12 +1549,12 @@ def find_non_dominated_solutions(fitness_values, feature_name):
     non_dominated_solutions = []
     for front in fronts:
         non_dominated_solutions.extend(front)
-    non_dominated_solutions_Data =fitness_values[non_dominated_solutions]
+    non_dominated_solutions_Data = fitness_values[non_dominated_solutions]
     non_dominated_solutions_Data = pd.DataFrame(non_dominated_solutions_Data, columns=feature_name)
     non_dominated_solutions_Data.sort_values(by=feature_name[0], inplace=True)
     return  non_dominated_solutions_Data
 
-def self_dominated_hypervolume(pareto_data, ref_point):
+def dominated_hypervolume(pareto_data, ref_point):
     pareto_data = np.vstack([pareto_data, ref_point])
     pareto_data = pareto_data[np.argsort(-pareto_data[:,0])]
     S = 0
