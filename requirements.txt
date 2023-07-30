@@ -18,3 +18,5 @@ streamlit_extras==0.2.7
 streamlit_option_menu==0.3.2
 streamlit_shap==1.0.2
 xgboost==1.7.4
+sko==0.5.7
+SciencePlots==2.1.0
