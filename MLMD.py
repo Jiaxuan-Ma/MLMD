@@ -87,11 +87,13 @@ sysmenu = '''
 MainMenu {visibility:hidden;}
 footer {visibility:hidden;}
 '''
+
+# https://icons.bootcss.com/
 st.markdown(sysmenu,unsafe_allow_html=True)
 # arrow-repeat
 with st.sidebar:
-    select_option = option_menu("MLMD", ["介绍", "数据可视化", "特征工程", "回归", "其他"],
-                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'microsoft'],
+    select_option = option_menu("MLMD", ["介绍", "数据可视化", "特征工程", "回归", "主动学习", "代理优化", "其他"],
+                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'arrow-repeat', 'app', 'microsoft'],
                     menu_icon="broadcast", default_index=0)
 if select_option == "介绍":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
@@ -123,6 +125,14 @@ if select_option == "介绍":
     ''')
 
     st.write('''![](https://user-images.githubusercontent.com/61132191/231178382-aa223924-f1cb-4e0e-afa1-08c536111f3a.jpg?raw=true)''')
+
+    st.markdown(
+    '''
+    ## Acknowledgments
+
+    国家科技部重点研发计划(No. 2022YFB3707803)
+    
+    ''')
 
 elif select_option == "数据可视化":
     colored_header(label="数据可视化",description=" ",color_name="violet-90")
@@ -1811,9 +1821,323 @@ elif select_option == "聚类":
             
         st.write('---')   
 
+elif select_option == "主动学习":
+    colored_header(label="主动学习",description=" ",color_name="violet-90")
+        # file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        # if file is not None:
+        #     df = pd.read_csv(file)
+        #     # 检测缺失值
+        #     check_string_NaN(df)
+    file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
+
+    if len(file) > 2:
+        st.error('Only upload two files, the first is the data set, the second is the the vritual space sample point.')
+        st.stop()
+    if len(file) == 2:
+        st.warning('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
+    if len(file) > 0:
+        
+        colored_header(label="数据信息",description=" ",color_name="violet-70")
+
+        # with st.expander('Data Information'):
+        df = pd.read_csv(file[0])
+        if len(file) == 2:
+            df_vs = pd.read_csv(file[1])
+        check_string_NaN(df)
+
+        nrow = st.slider("rows", 1, len(df)-1, 5)
+        df_nrow = df.head(nrow)
+        st.write(df_nrow)
+
+        colored_header(label="特征变量和目标变量",description=" ",color_name="blue-30")
+
+        target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+        
+        col_feature, col_target = st.columns(2)
+        
+        # features
+        features = df.iloc[:,:-target_num]
+        # targets
+        targets = df.iloc[:,-target_num:]
+        with col_feature:    
+            st.write(features.head())
+        with col_target:   
+            st.write(targets.head())
+
+        sp = SAMPLING(features, targets)
+
+        colored_header(label="选择目标变量", description=" ", color_name="violet-30")
+
+        target_selected_option = st.selectbox('target', list(sp.targets))
+        
+        sp.targets = sp.targets[target_selected_option]
+        
+        colored_header(label="Sampling", description=" ",color_name="violet-30")
+
+        model_path = './models/active learning'
+
+        template_alg = model_platform(model_path)
+
+        inputs, col2 = template_alg.show()
+
+        if inputs['model'] == 'BayeSampling':
+
+            with col2:
+                if len(file) == 2:
+                    sp.vsfeatures = df_vs
+                    st.info('You have upoaded the visual sample point file.')
+                    feature_name = sp.features.columns.tolist()
+                else:
+                    feature_name = sp.features.columns.tolist()
+                    mm = MinMaxScaler()
+                    mm.fit(sp.features)
+                    data_min = mm.data_min_
+                    data_max = mm.data_max_
+                    sp.trans_features = mm.transform(sp.features)
+                    min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
+        
+                    sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
+                    feature_num = sp.trans_features.shape[1]
+
+                    vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+
+                    sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
+
+            Bgolearn = BGOS.Bgolearn()
+            colored_header(label="Optimize", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                    opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
+                if inputs['sample criterion'] == 'Expected Improvement algorith':
+                    res = Mymodel.EI()
+                    
+                elif inputs['sample criterion'] == 'Expected improvement with "plugin"':
+                    res = Mymodel.EI_plugin()
+
+                elif inputs['sample criterion'] == 'Augmented Expected Improvement':
+                    with st.expander('EI HyperParamters'):
+                        alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                        tao = st.slider('tao',0.0, 1.0, 0.0)
+                    res = Mymodel.Augmented_EI(alpha = alpha, tao = tao)
+
+                elif inputs['sample criterion'] == 'Expected Quantile Improvement':
+                    with st.expander('EQI HyperParamters'):
+                        beta= st.slider('beta',0.2, 0.8, 0.5)
+                        tao = st.slider('tao_new',0.0, 1.0, 0.0)            
+                    res = Mymodel.EQI(beta = beta,tao_new = tao)
+
+                elif inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
+                    res = Mymodel.Reinterpolation_EI() 
+
+                elif inputs['sample criterion'] == 'Upper confidence bound':
+                    with st.expander('UCB HyperParamters'):
+                        alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                    res = Mymodel.UCB(alpha=alpha)
+
+                elif inputs['sample criterion'] == 'Probability of Improvement':
+                    with st.expander('PoI HyperParamters'):
+                        tao = st.slider('tao',0.0, 0.3, 0.0)
+                    res = Mymodel.PoI(tao = tao)
+
+                elif inputs['sample criterion'] == 'Predictive Entropy Search':
+                    with st.expander('PES HyperParamters'):
+                        sam_num = st.number_input('sample number',100, 1000, 500)
+                    res = Mymodel.PES(sam_num = sam_num)  
+                    
+                elif inputs['sample criterion'] == 'Knowledge Gradient':
+                    with st.expander('Knowldge_G Hyperparameters'):
+                        MC_num = st.number_input('MC number', 50,300,50)
+                    res = Mymodel.Knowledge_G(MC_num = MC_num) 
+
+                elif inputs['sample criterion'] == 'Least Confidence':
+                    
+                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                    opt_num=inputs['opt num'])
+                    res = Mymodel.Least_cfd() 
+    
+                elif inputs['sample criterion'] == 'Margin Sampling':
+                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                            opt_num=inputs['opt num'])
+                    res = Mymodel.Margin_S()
+
+                elif inputs['sample criterion'] == 'Entropy-based approach':
+                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                            opt_num=inputs['opt num'])
+                    res = Mymodel.Entropy()
+
+                st.info('Recommmended Sample')
+                sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
+                st.write(sp.sample_point)
+                tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+elif select_option == "代理优化":
+    colored_header(label="代理优化",description=" ",color_name="violet-90")
+    file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
+
+    if len(file) != 2:
+        st.error('Only upload two files, the first is the trained model, the second is the features range.')
+        st.stop()
+    if len(file) == 2:
+        st.warning('You have unpload two files, the first is the trained model, the second is the features range.')       
+        model = pickle.load(file[0])
+        model_path = './models/surrogate optimize'
+
+        template_alg = model_platform(model_path)
+
+        inputs, col2 = template_alg.show()
+        df_var = pd.read_csv(file[1])
+        features_name = df_var.columns.tolist()
+        range_var = df_var.values
+        vars_min = get_column_min(range_var)
+        vars_max = get_column_max(range_var)
+        inputs['lb'] = vars_min
+        inputs['ub'] = vars_max
+
+        if inputs['model'] == 'PSO':      
+            with col2:
+                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                    st.warning('the variable dim is not match')
+                else:
+                    st.info('the variable dim is  %d' % inputs['n dim'])
+            with st.container():
+                button_train = st.button('Opt', use_container_width=True)
+            if button_train:  
+                def opt_func(x):
+                    x = x.reshape(1,-1)
+                    y_pred = model.predict(x)
+                    return y_pred  
+                
+                alg = PSO(func=opt_func, dim=inputs['n dim'], pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+                        w=inputs['w'], c1=inputs['c1'], c2=inputs['c2'])
+        
+                alg.run()
+
+                st.info('Recommmended Sample')
+                gbest_x = pd.DataFrame({'Feature':features_name, 'value': alg.gbest_x})
+                st.write(gbest_x)         
+                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)
+                st.info('gbest_y: %s' % alg.gbest_y.item())
+        
+        elif inputs['model'] == 'GA':
+            with col2:
+                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                    st.warning('the variable dim is not match')
+                else:
+                    st.info('the variable dim is  %d' % inputs['n dim'])
+            with st.container():
+                button_train = st.button('Opt', use_container_width=True)
+            if button_train:  
+                def opt_func(x):
+                    x = x.reshape(1,-1)
+                    y_pred = model.predict(x)
+                    return y_pred  
+
+                alg = GA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+                        prob_mut = inputs['prob mut'])
+
+                best_x, best_y = alg.run()
+
+                st.info('Recommmended Sample')
+                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                st.write(gbest_x)         
+                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)
+                st.info('gbest_y: %s' %  best_y.item())
+                
+
+                # demo_func = lambda x: (x[0] - 1) ** 2 + (x[1] - 0.05) ** 2 + x[2] ** 2
+                # ga = GA(func=demo_func, n_dim=3, max_iter=500, lb=[-1, -1, -1], ub=[5, 1, 1], precision=[2, 1, 1e-7])
+                # best_x, best_y = ga.run()
+                # st.write('best_x:', best_x, '\n', 'best_y:', best_y)
+
+        elif inputs['model'] == 'DE':
+            with col2:
+                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                    st.warning('the variable dim is not match')
+                else:
+                    st.info('the variable dim is  %d' % inputs['n dim'])
+            with st.container():
+                button_train = st.button('Opt', use_container_width=True)
+            if button_train:  
+                def opt_func(x):
+                    x = x.reshape(1,-1)
+                    y_pred = model.predict(x)
+                    return y_pred  
+                
+                alg = DE(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+                        prob_mut = inputs['prob mut'], F=inputs['F'])
+
+                best_x, best_y = alg.run()
+
+                st.info('Recommmended Sample')
+                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                st.write(gbest_x)         
+                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)
+                st.info('gbest_y: %s' %  best_y.item())   
+        
+        elif inputs['model'] == 'AFSA':
+            with col2:
+                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                    st.warning('the variable dim is not match')
+                else:
+                    st.info('the variable dim is  %d' % inputs['n dim'])
+            with st.container():
+                button_train = st.button('Opt', use_container_width=True)
+            if button_train:  
+                def opt_func(x):
+                    x = x.reshape(1,-1)
+                    y_pred = model.predict(x)
+                    return y_pred  
+                
+                alg = AFSA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'],
+                        max_try_num=inputs['max try num'], step=inputs['step'], visual=inputs['visual'], q=inputs['q'], delta=inputs['delta'])
+
+                best_x, best_y = alg.run()
+
+                st.info('Recommmended Sample')
+                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                st.write(gbest_x)         
+                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)
+                st.info('gbest_y: %s' %  best_y.item())   
+        
+        elif inputs['model'] == 'SA':
+            with col2:
+                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                    st.warning('the variable dim is not match')
+                else:
+                    st.info('the variable dim is  %d' % inputs['n dim'])
+            with st.container():
+                button_train = st.button('Opt', use_container_width=True)
+            if button_train:  
+                def opt_func(x):
+                    x = x.reshape(1,-1)
+                    y_pred = model.predict(x)
+                    return y_pred  
+                x0 = calculate_mean(inputs['lb'], inputs['ub'])
+                st.write(inputs['lb'])
+                st.write(inputs['ub'])
+                st.write(x0)
+                alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
+                            lb=inputs['lb'], ub=inputs['ub'])
+
+                best_x, best_y = alg.run()
+
+                st.info('Recommmended Sample')
+                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                st.write(gbest_x)         
+                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)
+                st.info('gbest_y: %s' %  best_y.item())                   
+
 elif select_option == "其他":
     with st.sidebar:
-        sub_option = option_menu(None, ["主动学习", "集成学习", "模型推理", "代理优化", "多目标主动学习"])
+        sub_option = option_menu(None, [ "集成学习", "模型推理", "多目标主动学习"])
     if sub_option == "可解释性机器学习":
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
 
@@ -1901,158 +2225,7 @@ elif select_option == "其他":
             # ind_perc = shap_values.abs.percentile(95, 0).argsort[-1]
             # st_shap(shap.plots.scatter(shap_values[:, ind_mean]))           
 
-    elif sub_option == "主动学习":
-        colored_header(label="主动学习",description=" ",color_name="violet-90")
-            # file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-            # if file is not None:
-            #     df = pd.read_csv(file)
-            #     # 检测缺失值
-            #     check_string_NaN(df)
-        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
-
-        if len(file) > 2:
-            st.error('Only upload two files, the first is the data set, the second is the the vritual space sample point.')
-            st.stop()
-        if len(file) == 2:
-            st.warning('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
-        if len(file) > 0:
-            
-            colored_header(label="数据信息",description=" ",color_name="violet-70")
-
-            # with st.expander('Data Information'):
-            df = pd.read_csv(file[0])
-            if len(file) == 2:
-                df_vs = pd.read_csv(file[1])
-            check_string_NaN(df)
-
-            nrow = st.slider("rows", 1, len(df)-1, 5)
-            df_nrow = df.head(nrow)
-            st.write(df_nrow)
-
-            colored_header(label="特征变量和目标变量",description=" ",color_name="blue-30")
-
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
-            
-            col_feature, col_target = st.columns(2)
-            
-            # features
-            features = df.iloc[:,:-target_num]
-            # targets
-            targets = df.iloc[:,-target_num:]
-            with col_feature:    
-                st.write(features.head())
-            with col_target:   
-                st.write(targets.head())
-
-            sp = SAMPLING(features, targets)
-
-            colored_header(label="选择目标变量", description=" ", color_name="violet-30")
-
-            target_selected_option = st.selectbox('target', list(sp.targets))
-            
-            sp.targets = sp.targets[target_selected_option]
-            
-            colored_header(label="Sampling", description=" ",color_name="violet-30")
-
-            model_path = './models/active learning'
-
-            template_alg = model_platform(model_path)
-
-            inputs, col2 = template_alg.show()
-
-            if inputs['model'] == 'BayeSampling':
-
-                with col2:
-                    if len(file) == 2:
-                        sp.vsfeatures = df_vs
-                        st.info('You have upoaded the visual sample point file.')
-                        feature_name = sp.features.columns.tolist()
-                    else:
-                        feature_name = sp.features.columns.tolist()
-                        mm = MinMaxScaler()
-                        mm.fit(sp.features)
-                        data_min = mm.data_min_
-                        data_max = mm.data_max_
-                        sp.trans_features = mm.transform(sp.features)
-                        min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
-            
-                        sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
-                        feature_num = sp.trans_features.shape[1]
-
-                        vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
-
-                        sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
-
-                Bgolearn = BGOS.Bgolearn()
-                colored_header(label="Optimize", description=" ",color_name="violet-30")
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-                if button_train:
-                    Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                                        opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
-                    if inputs['sample criterion'] == 'Expected Improvement algorith':
-                        res = Mymodel.EI()
-                        
-                    elif inputs['sample criterion'] == 'Expected improvement with "plugin"':
-                        res = Mymodel.EI_plugin()
-
-                    elif inputs['sample criterion'] == 'Augmented Expected Improvement':
-                        with st.expander('EI HyperParamters'):
-                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)
-                            tao = st.slider('tao',0.0, 1.0, 0.0)
-                        res = Mymodel.Augmented_EI(alpha = alpha, tao = tao)
-
-                    elif inputs['sample criterion'] == 'Expected Quantile Improvement':
-                        with st.expander('EQI HyperParamters'):
-                            beta= st.slider('beta',0.2, 0.8, 0.5)
-                            tao = st.slider('tao_new',0.0, 1.0, 0.0)            
-                        res = Mymodel.EQI(beta = beta,tao_new = tao)
-
-                    elif inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
-                        res = Mymodel.Reinterpolation_EI() 
-
-                    elif inputs['sample criterion'] == 'Upper confidence bound':
-                        with st.expander('UCB HyperParamters'):
-                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)
-                        res = Mymodel.UCB(alpha=alpha)
-
-                    elif inputs['sample criterion'] == 'Probability of Improvement':
-                        with st.expander('PoI HyperParamters'):
-                            tao = st.slider('tao',0.0, 0.3, 0.0)
-                        res = Mymodel.PoI(tao = tao)
-
-                    elif inputs['sample criterion'] == 'Predictive Entropy Search':
-                        with st.expander('PES HyperParamters'):
-                            sam_num = st.number_input('sample number',100, 1000, 500)
-                        res = Mymodel.PES(sam_num = sam_num)  
-                        
-                    elif inputs['sample criterion'] == 'Knowledge Gradient':
-                        with st.expander('Knowldge_G Hyperparameters'):
-                            MC_num = st.number_input('MC number', 50,300,50)
-                        res = Mymodel.Knowledge_G(MC_num = MC_num) 
-
-                    elif inputs['sample criterion'] == 'Least Confidence':
-                        
-                        Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                                        opt_num=inputs['opt num'])
-                        res = Mymodel.Least_cfd() 
-        
-                    elif inputs['sample criterion'] == 'Margin Sampling':
-                        Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                                opt_num=inputs['opt num'])
-                        res = Mymodel.Margin_S()
-
-                    elif inputs['sample criterion'] == 'Entropy-based approach':
-                        Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                                opt_num=inputs['opt num'])
-                        res = Mymodel.Entropy()
-
-                    st.info('Recommmended Sample')
-                    sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
-                    st.write(sp.sample_point)
-                    tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-
+    
     elif sub_option == "集成学习":
         colored_header(label="集成学习",description=" ",color_name="violet-90")
         sub_sub_option = option_menu(None, ["回归"],
@@ -3003,167 +3176,7 @@ elif select_option == "其他":
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('---')
     
-    elif sub_option == "代理优化":
-        colored_header(label="代理优化",description=" ",color_name="violet-90")
-        file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-
-        if len(file) != 2:
-            st.error('Only upload two files, the first is the trained model, the second is the features range.')
-            st.stop()
-        if len(file) == 2:
-            st.warning('You have unpload two files, the first is the trained model, the second is the features range.')       
-            model = pickle.load(file[0])
-            model_path = './models/surrogate optimize'
-
-            template_alg = model_platform(model_path)
-
-            inputs, col2 = template_alg.show()
-            df_var = pd.read_csv(file[1])
-            features_name = df_var.columns.tolist()
-            range_var = df_var.values
-            vars_min = get_column_min(range_var)
-            vars_max = get_column_max(range_var)
-            inputs['lb'] = vars_min
-            inputs['ub'] = vars_max
-
-            if inputs['model'] == 'PSO':      
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
-                    
-                    alg = PSO(func=opt_func, dim=inputs['n dim'], pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                            w=inputs['w'], c1=inputs['c1'], c2=inputs['c2'])
-            
-                    alg.run()
-
-                    st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': alg.gbest_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' % alg.gbest_y.item())
-            
-            elif inputs['model'] == 'GA':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
-
-                    alg = GA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                            prob_mut = inputs['prob mut'])
-    
-                    best_x, best_y = alg.run()
-
-                    st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())
-                    
-
-                    # demo_func = lambda x: (x[0] - 1) ** 2 + (x[1] - 0.05) ** 2 + x[2] ** 2
-                    # ga = GA(func=demo_func, n_dim=3, max_iter=500, lb=[-1, -1, -1], ub=[5, 1, 1], precision=[2, 1, 1e-7])
-                    # best_x, best_y = ga.run()
-                    # st.write('best_x:', best_x, '\n', 'best_y:', best_y)
-
-            elif inputs['model'] == 'DE':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
-                    
-                    alg = DE(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                            prob_mut = inputs['prob mut'], F=inputs['F'])
-    
-                    best_x, best_y = alg.run()
-
-                    st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())   
-            
-            elif inputs['model'] == 'AFSA':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
-                    
-                    alg = AFSA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'],
-                            max_try_num=inputs['max try num'], step=inputs['step'], visual=inputs['visual'], q=inputs['q'], delta=inputs['delta'])
-    
-                    best_x, best_y = alg.run()
-
-                    st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())   
-            
-            elif inputs['model'] == 'SA':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
-                    x0 = calculate_mean(inputs['lb'], inputs['ub'])
-                    st.write(inputs['lb'])
-                    st.write(inputs['ub'])
-                    st.write(x0)
-                    alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
-                                lb=inputs['lb'], ub=inputs['ub'])
-    
-                    best_x, best_y = alg.run()
-
-                    st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())                                                     
+                                     
     
     elif sub_option == "多目标主动学习":
         colored_header(label="多目标主动学习",description=" ",color_name="violet-90")
@@ -3248,15 +3261,32 @@ elif select_option == "其他":
 
                 ref_point = [inputs['obj1 ref'], inputs['obj2 ref']]
                 if inputs['method'] == 'HV':
-                    HV_values = []
-                    for i in range(reg.Ypred.shape[0]):
-                        i_Ypred = reg.Ypred.iloc[i]
-                        Ytrain_i_Ypred = reg.Ytrain.append(i_Ypred)
-                        i_pareto_front = find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
-                        i_HV_value = dominated_hypervolume(i_pareto_front, ref_point)
-                        HV_values.append(i_HV_value)
-                    st.write(HV_values)
-                    HV_values = pd.DataFrame(HV_values, columns=['HV values'])
-                    
+                    with st.container():
+                        button_train = st.button('Opt', use_container_width=True)  
+                    if button_train:             
+                        HV_values = []
+                        for i in range(reg.Ypred.shape[0]):
+                            i_Ypred = reg.Ypred.iloc[i]
+                            Ytrain_i_Ypred = reg.Ytrain.append(i_Ypred)
+                            i_pareto_front = find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
+                            i_HV_value = dominated_hypervolume(i_pareto_front, ref_point)
+                            HV_values.append(i_HV_value)
+                        
+                        HV_values = pd.DataFrame(HV_values, columns=['HV values'])
+                        HV_values.set_index(reg.Xtest.index, inplace=True)
+
+                        max_idx = HV_values.nlargest(inputs['num'], 'HV values').index
+                        recommend_point = reg.Xtest.loc[max_idx]
+                        reg.Xtest = reg.Xtest.drop(max_idx)
+                        st.write('The maximum value of HV:')
+                        st.write(HV_values.loc[max_idx])
+                        st.write('The recommended point is :')
+                        st.write(recommend_point)
+                        tmp_download_link = download_button(recommend_point, f'recommended samples.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif inputs['method'] == 'EHVI':
+                    pass
+
+
     elif sub_option == "符号回归":
         st.write("sisso")
