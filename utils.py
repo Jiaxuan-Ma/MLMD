@@ -10,8 +10,8 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import silhouette_score
 from sklearn.metrics import r2_score
-from sklearn.gaussian_process import GaussianProcessRegressor######for GP
-from sklearn.gaussian_process.kernels import RBF
+######for GP
+
 
 import seaborn as sns
 import matplotlib.pyplot as plt

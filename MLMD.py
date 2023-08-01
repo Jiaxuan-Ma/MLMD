@@ -50,7 +50,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 import xgboost as xgb
 from catboost import CatBoostClassifier
 from catboost import CatBoostRegressor
-
+from sklearn.gaussian_process import GaussianProcessRegressor
 import Bgolearn.BGOsampling as BGOS
 
 
@@ -61,7 +61,7 @@ import matplotlib.pyplot as plt
 import pickle
 from utils import *
 from streamlit_extras.badges import badge
-
+from sklearn.gaussian_process.kernels import RBF
 import warnings
 
 from sko.GA import GA
