@@ -1005,7 +1005,7 @@ elif select_option == "回归预测":
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
     if file is None:
         table = PrettyTable(['上传文件名称', '名称','数据说明'])
-        table.add_row(['file_1','data set','数据集'])
+        table.add_row(['file_1','dataset','数据集'])
         st.write(table)
     if file is not None:
         df = pd.read_csv(file)
@@ -2136,7 +2136,7 @@ elif select_option == "主动学习":
                     ref_point_loc = st.number_input(target_selected_option[i] + ' ref location', 0, 100000, 50)
                     ref_point.append(ref_point_loc)
                 if inputs['objective'] == 'max':
-                    
+                    pass
 
 
                 if inputs['method'] == 'HV':
@@ -2245,7 +2245,6 @@ elif select_option == "迁移学习":
             reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
                         max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
                         min_samples_split=inputs['min samples split']) 
-               
             TrAdaboostR2 = TrAdaboostR2(reg.model, inputs['max iter'])
             with st.container():
                 button_train = st.button('Train', use_container_width=True)

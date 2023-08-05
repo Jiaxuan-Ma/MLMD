@@ -1,6 +1,6 @@
 altair==4.2.2
 Bgolearn==2.0.0
-catboost==1.1.1
+catboost==1.2
 graphviz==0.20.1
 matplotlib==3.6.3
 numpy==1.23.5
@@ -20,3 +20,4 @@ streamlit_shap==1.0.2
 xgboost==1.7.4
 sko==0.5.7
 SciencePlots==2.1.0
+prettytable==3.8.0
