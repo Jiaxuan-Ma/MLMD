@@ -4,7 +4,7 @@ import streamlit as st
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "MOO",
+    "model": "MOBO",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 

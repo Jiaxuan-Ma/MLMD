@@ -70,6 +70,7 @@ from sko.DE import DE
 from sko.AFSA import AFSA
 from sko.SA import SAFast
 
+
 import scienceplots
 
 warnings.filterwarnings('ignore')
@@ -92,10 +93,10 @@ footer {visibility:hidden;}
 st.markdown(sysmenu,unsafe_allow_html=True)
 # arrow-repeat
 with st.sidebar:
-    select_option = option_menu("MLMD", ["介绍", "数据可视化", "特征工程", "回归", "主动学习", "代理优化", "其他"],
-                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'arrow-repeat', 'app', 'microsoft'],
-                    menu_icon="broadcast", default_index=0)
-if select_option == "介绍":
+    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程", "回归预测", "主动学习","迁移学习", "代理优化", "其他"],
+                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'arrow-repeat','subtract', 'app', 'microsoft'],
+                    menu_icon="boxes", default_index=0)
+if select_option == "平台主页":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
 
 # st.markdown("<br>", unsafe_allow_html=True)
@@ -111,30 +112,28 @@ if select_option == "介绍":
         badge(type="github", name="Jiaxuan-Ma/MLMD")
     with col4:
         st.write("")
-    st.write(
-        "## Machine Learning for Material Design")
-
+    colored_header(label="材料设计的机器学习平台",description="Machine Learning for Material Design",color_name="violet-90")
+    # st.write("## Machine Learning for Material Design")
+    # st.write("## 材料的机器学习平台")
     st.markdown(
     '''
-    The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at general and frontier machine learning algrithm with visualization. It is built on the traditional machine learning framework mostly based [scikit-learn](https://scikit-learn.org/stable/index.html), which provides the machine learning in python. 
-
-    ## Data layout
-
-    Here we present the data layout of `.csv` file that need to upload in the MLMD platform.
-
+    The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at utilizing general and frontier machine learning algrithm to accelerate the material design with no-programming. \n
+    材料基因组工程理念的发展将会大幅度提高新材料的研发效率、缩短研发周期、降低研发成本、全面加速材料从设计到工程化应用的进程。
+    因此**MLMD**旨在为材料试验科研人员提供快速上手，无编程的机器学习算法平台，致力于材料试验到材料设计的一体化。
     ''')
+    colored_header(label="数据布局",description="only support `.csv` file",color_name="violet-90")
 
     st.write('''![](https://user-images.githubusercontent.com/61132191/231178382-aa223924-f1cb-4e0e-afa1-08c536111f3a.jpg?raw=true)''')
-
+    
+    colored_header(label="致谢",description="",color_name="violet-90")
     st.markdown(
     '''
-    ## Acknowledgments
-
     国家科技部重点研发计划(No. 2022YFB3707803)
     
     ''')
 
-elif select_option == "数据可视化":
+elif select_option == "基础功能":
+
     colored_header(label="数据可视化",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
 
@@ -968,9 +967,9 @@ elif select_option == "特征工程":
 
             st.write('---')
 
-elif select_option == "回归":
+elif select_option == "回归预测":
 
-    colored_header(label="回归",description=" ",color_name="violet-90")
+    colored_header(label="回归预测",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
     if file is not None:
         df = pd.read_csv(file)
@@ -1823,168 +1822,376 @@ elif select_option == "聚类":
 
 elif select_option == "主动学习":
     colored_header(label="主动学习",description=" ",color_name="violet-90")
-        # file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-        # if file is not None:
-        #     df = pd.read_csv(file)
-        #     # 检测缺失值
-        #     check_string_NaN(df)
-    file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
+    sub_option = option_menu(None, ["单目标主动学习", "多目标主动学习"],
+                            icons=['house',  "list-task"],
+                            menu_icon="cast", default_index=0, orientation="horizontal")
+    if sub_option == "单目标主动学习":
 
-    if len(file) > 2:
-        st.error('Only upload two files, the first is the data set, the second is the the vritual space sample point.')
-        st.stop()
-    if len(file) == 2:
-        st.warning('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
-    if len(file) > 0:
-        
-        colored_header(label="数据信息",description=" ",color_name="violet-70")
+        colored_header(label="单目标主动学习",description=" ",color_name="violet-70")
 
-        # with st.expander('Data Information'):
-        df = pd.read_csv(file[0])
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
+
+        if len(file) > 2:
+            st.error('May uploaded two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
+            st.stop()
         if len(file) == 2:
-            df_vs = pd.read_csv(file[1])
-        check_string_NaN(df)
+            st.warning('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
+        if len(file) > 0:
+            
+            colored_header(label="数据信息",description=" ",color_name="violet-70")
 
-        nrow = st.slider("rows", 1, len(df)-1, 5)
-        df_nrow = df.head(nrow)
-        st.write(df_nrow)
+            # with st.expander('Data Information'):
+            df = pd.read_csv(file[0])
+            if len(file) == 2:
+                df_vs = pd.read_csv(file[1])
+            check_string_NaN(df)
 
-        colored_header(label="特征变量和目标变量",description=" ",color_name="blue-30")
+            nrow = st.slider("rows", 1, len(df)-1, 5)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
 
-        target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+
+            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            
+            col_feature, col_target = st.columns(2)
+            
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
+
+            sp = SAMPLING(features, targets)
+
+            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+
+            target_selected_option = st.selectbox('target', list(sp.targets))
+            
+            sp.targets = sp.targets[target_selected_option]
+            
+            colored_header(label="Sampling", description=" ",color_name="violet-70")
+
+            model_path = './models/active learning'
+
+            template_alg = model_platform(model_path)
+
+            inputs, col2 = template_alg.show()
+
+            if inputs['model'] == 'BayeSampling':
+
+                with col2:
+                    if len(file) == 2:
+                        sp.vsfeatures = df_vs
+                        st.info('You have upoaded the visual sample point file.')
+                        feature_name = sp.features.columns.tolist()
+                    else:
+                        feature_name = sp.features.columns.tolist()
+                        mm = MinMaxScaler()
+                        mm.fit(sp.features)
+                        data_min = mm.data_min_
+                        data_max = mm.data_max_
+                        sp.trans_features = mm.transform(sp.features)
+                        min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
+            
+                        sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
+                        feature_num = sp.trans_features.shape[1]
+
+                        vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+
+                        sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
+
+                Bgolearn = BGOS.Bgolearn()
+                colored_header(label="Optimize", description=" ",color_name="violet-70")
+                with st.container():
+                    button_train = st.button('Train', use_container_width=True)
+                if button_train:
+                    Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                        opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
+                    if inputs['sample criterion'] == 'Expected Improvement algorith':
+                        res = Mymodel.EI()
+                        
+                    elif inputs['sample criterion'] == 'Expected improvement with "plugin"':
+                        res = Mymodel.EI_plugin()
+
+                    elif inputs['sample criterion'] == 'Augmented Expected Improvement':
+                        with st.expander('EI HyperParamters'):
+                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                            tao = st.slider('tao',0.0, 1.0, 0.0)
+                        res = Mymodel.Augmented_EI(alpha = alpha, tao = tao)
+
+                    elif inputs['sample criterion'] == 'Expected Quantile Improvement':
+                        with st.expander('EQI HyperParamters'):
+                            beta= st.slider('beta',0.2, 0.8, 0.5)
+                            tao = st.slider('tao_new',0.0, 1.0, 0.0)            
+                        res = Mymodel.EQI(beta = beta,tao_new = tao)
+
+                    elif inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
+                        res = Mymodel.Reinterpolation_EI() 
+
+                    elif inputs['sample criterion'] == 'Upper confidence bound':
+                        with st.expander('UCB HyperParamters'):
+                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                        res = Mymodel.UCB(alpha=alpha)
+
+                    elif inputs['sample criterion'] == 'Probability of Improvement':
+                        with st.expander('PoI HyperParamters'):
+                            tao = st.slider('tao',0.0, 0.3, 0.0)
+                        res = Mymodel.PoI(tao = tao)
+
+                    elif inputs['sample criterion'] == 'Predictive Entropy Search':
+                        with st.expander('PES HyperParamters'):
+                            sam_num = st.number_input('sample number',100, 1000, 500)
+                        res = Mymodel.PES(sam_num = sam_num)  
+                        
+                    elif inputs['sample criterion'] == 'Knowledge Gradient':
+                        with st.expander('Knowldge_G Hyperparameters'):
+                            MC_num = st.number_input('MC number', 50,300,50)
+                        res = Mymodel.Knowledge_G(MC_num = MC_num) 
+
+                    elif inputs['sample criterion'] == 'Least Confidence':
+                        
+                        Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                        opt_num=inputs['opt num'])
+                        res = Mymodel.Least_cfd() 
         
-        col_feature, col_target = st.columns(2)
-        
-        # features
-        features = df.iloc[:,:-target_num]
-        # targets
-        targets = df.iloc[:,-target_num:]
-        with col_feature:    
-            st.write(features.head())
-        with col_target:   
-            st.write(targets.head())
+                    elif inputs['sample criterion'] == 'Margin Sampling':
+                        Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                opt_num=inputs['opt num'])
+                        res = Mymodel.Margin_S()
 
-        sp = SAMPLING(features, targets)
+                    elif inputs['sample criterion'] == 'Entropy-based approach':
+                        Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                opt_num=inputs['opt num'])
+                        res = Mymodel.Entropy()
 
-        colored_header(label="选择目标变量", description=" ", color_name="violet-30")
+                    st.info('Recommmended Sample')
+                    sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
+                    st.write(sp.sample_point)
+                    tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-        target_selected_option = st.selectbox('target', list(sp.targets))
-        
-        sp.targets = sp.targets[target_selected_option]
-        
-        colored_header(label="Sampling", description=" ",color_name="violet-30")
+    elif sub_option == "多目标主动学习":
 
-        model_path = './models/active learning'
+        colored_header(label="多目标主动学习",description=" ",color_name="blue-70")
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
+        # if len(file) != 2:
+        #     st.error('May upload two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
+        # else:
 
-        template_alg = model_platform(model_path)
+        #     df = pd.read_csv(file[0])
+        #     if len(file) == 2:
+        #         df_vs = pd.read_csv(file[1])
+        #     check_string_NaN(df)
+        #     df = pd.read_csv(file[0])
+            
+            # check_string_NaN(df)
+        if len(file) > 2:
+            st.error('May upload two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
+            st.stop()
+        if len(file) == 2:
+            st.warning('You have unploaded two files, the first is the dataset, the second is the the vritual space sample point.')       
+        if len(file) > 0:
+            
+            colored_header(label="数据信息",description=" ",color_name="violet-70")
 
-        inputs, col2 = template_alg.show()
+            # with st.expander('Data Information'):
+            df = pd.read_csv(file[0])
+            if len(file) == 2:
+                df_vs = pd.read_csv(file[1])
+                check_string_NaN(df_vs)
+            check_string_NaN(df)
 
-        if inputs['model'] == 'BayeSampling':
+            nrow = st.slider("rows", 1, len(df)-1, 5, key=1)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
 
-            with col2:
-                if len(file) == 2:
-                    sp.vsfeatures = df_vs
-                    st.info('You have upoaded the visual sample point file.')
-                    feature_name = sp.features.columns.tolist()
-                else:
-                    feature_name = sp.features.columns.tolist()
-                    mm = MinMaxScaler()
-                    mm.fit(sp.features)
-                    data_min = mm.data_min_
-                    data_max = mm.data_max_
-                    sp.trans_features = mm.transform(sp.features)
-                    min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
-        
-                    sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
-                    feature_num = sp.trans_features.shape[1]
+            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            nrow = st.slider("rows", 1, len(df)-1, 5)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
+            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
 
-                    vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=2)
+            
+            col_feature, col_target = st.columns(2)
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
+            
+            col_feature, col_target = st.columns(2)
 
-                    sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
 
-            Bgolearn = BGOS.Bgolearn()
-            colored_header(label="Optimize", description=" ",color_name="violet-30")
-            with st.container():
-                button_train = st.button('Train', use_container_width=True)
-            if button_train:
-                Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                                    opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
-                if inputs['sample criterion'] == 'Expected Improvement algorith':
-                    res = Mymodel.EI()
-                    
-                elif inputs['sample criterion'] == 'Expected improvement with "plugin"':
-                    res = Mymodel.EI_plugin()
+    # =================== model ====================================
+            reg = REGRESSOR(features,targets)
 
-                elif inputs['sample criterion'] == 'Augmented Expected Improvement':
-                    with st.expander('EI HyperParamters'):
-                        alpha = st.slider('alpha', 0.0, 3.0, 1.0)
-                        tao = st.slider('tao',0.0, 1.0, 0.0)
-                    res = Mymodel.Augmented_EI(alpha = alpha, tao = tao)
+            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            target_selected_option = st.multiselect('target', list(reg.targets)[::-1], default=targets.columns.tolist())
+            
+            reg.targets = targets[target_selected_option]
+            reg.Xtrain = features
+            reg.Ytrain = targets
 
-                elif inputs['sample criterion'] == 'Expected Quantile Improvement':
-                    with st.expander('EQI HyperParamters'):
-                        beta= st.slider('beta',0.2, 0.8, 0.5)
-                        tao = st.slider('tao_new',0.0, 1.0, 0.0)            
-                    res = Mymodel.EQI(beta = beta,tao_new = tao)
+            colored_header(label="Multi-obj-opt", description=" ",color_name="violet-30")
+            model_path = './models/multi-obj'
 
-                elif inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
-                    res = Mymodel.Reinterpolation_EI() 
+            template_alg = model_platform(model_path)
+            inputs, col2 = template_alg.show()  
 
-                elif inputs['sample criterion'] == 'Upper confidence bound':
-                    with st.expander('UCB HyperParamters'):
-                        alpha = st.slider('alpha', 0.0, 3.0, 1.0)
-                    res = Mymodel.UCB(alpha=alpha)
+            if inputs['model'] == 'MOBO':
+                pareto_front = find_non_dominated_solutions(reg.targets.values, target_selected_option)
+                pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+                # st.write('pareto front of train data:', pareto_front)
+                with col2:
+                    if len(file) == 2:
+                        # features
+                        vs_features = df_vs.iloc[:,:-target_num]
+                        # targets
+                        vs_targets = df_vs.iloc[:,-target_num:]
+                        reg.Xtest = vs_features
+                        st.info('You have upoaded the visual sample point file.')
+                    else:
+                        feature_name = features.columns.tolist()
+                        mm = MinMaxScaler()
+                        mm.fit(features)
+                        data_min = mm.data_min_
+                        data_max = mm.data_max_
+                        trans_features = mm.transform(features)
+                        min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
+            
+                        sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
+                        feature_num = trans_features.shape[1]
 
-                elif inputs['sample criterion'] == 'Probability of Improvement':
-                    with st.expander('PoI HyperParamters'):
-                        tao = st.slider('tao',0.0, 0.3, 0.0)
-                    res = Mymodel.PoI(tao = tao)
+                        vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+                        reg.Xtest = pd.DataFrame(vs, columns=feature_name)
 
-                elif inputs['sample criterion'] == 'Predictive Entropy Search':
-                    with st.expander('PES HyperParamters'):
-                        sam_num = st.number_input('sample number',100, 1000, 500)
-                    res = Mymodel.PES(sam_num = sam_num)  
-                    
-                elif inputs['sample criterion'] == 'Knowledge Gradient':
-                    with st.expander('Knowldge_G Hyperparameters'):
-                        MC_num = st.number_input('MC number', 50,300,50)
-                    res = Mymodel.Knowledge_G(MC_num = MC_num) 
+                with st.expander('visual samples'):
+                    st.write(reg.Xtest)
+                    tmp_download_link = download_button(reg.Xtest, f'visual samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-                elif inputs['sample criterion'] == 'Least Confidence':
-                    
-                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                                    opt_num=inputs['opt num'])
-                    res = Mymodel.Least_cfd() 
-    
-                elif inputs['sample criterion'] == 'Margin Sampling':
-                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                            opt_num=inputs['opt num'])
-                    res = Mymodel.Margin_S()
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    with plt.style.context(['nature','no-latex']):
+                        fig, ax = plt.subplots()
+                        ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
+                        ax.scatter(reg.targets[target_selected_option[0]], reg.targets[target_selected_option[1]])
+                        ax.set_xlabel(target_selected_option[0])
+                        ax.set_ylabel(target_selected_option[1])
+                        ax.set_title('Pareto front of visual space')
+                        st.pyplot(fig)
+                with col2:
+                    st.write(pareto_front)
 
-                elif inputs['sample criterion'] == 'Entropy-based approach':
-                    Mymodel = Bgolearn.fit(Mission='Classification', Classifier=inputs['Classifier'], data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                            opt_num=inputs['opt num'])
-                    res = Mymodel.Entropy()
+                kernel = RBF(length_scale=1.0)
+                reg.model = GaussianProcessRegressor(kernel=kernel)
+                reg.model.fit(reg.Xtrain, reg.Ytrain)
+                reg.Ypred, reg.Ystd = reg.model.predict(reg.Xtest, return_std=True)
+                reg.Ypred = pd.DataFrame(reg.Ypred, columns=reg.Ytrain.columns.tolist())
 
-                st.info('Recommmended Sample')
-                sp.sample_point = pd.DataFrame(res[1], columns=feature_name)
-                st.write(sp.sample_point)
-                tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
+                # ref_point = [inputs['obj1 ref'], inputs['obj2 ref']]
+                
+                ref_point = []
+                for i in range(len(target_selected_option)):
+                    ref_point_loc = st.number_input(target_selected_option[i] + ' ref location', 0, 100000, 50)
+                    ref_point.append(ref_point_loc)
+
+                if inputs['method'] == 'HV':
+                    with st.container():
+                        button_train = st.button('Opt', use_container_width=True)  
+                    if button_train:             
+                        HV_values = []
+                        for i in range(reg.Ypred.shape[0]):
+                            i_Ypred = reg.Ypred.iloc[i]
+                            Ytrain_i_Ypred = reg.Ytrain.append(i_Ypred)
+                            i_pareto_front = find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
+                            i_HV_value = dominated_hypervolume(i_pareto_front, ref_point)
+                            HV_values.append(i_HV_value)
+                        
+                        HV_values = pd.DataFrame(HV_values, columns=['HV values'])
+                        HV_values.set_index(reg.Xtest.index, inplace=True)
+
+                        max_idx = HV_values.nlargest(inputs['num'], 'HV values').index
+                        recommend_point = reg.Xtest.loc[max_idx]
+                        reg.Xtest = reg.Xtest.drop(max_idx)
+                        st.write('The maximum value of HV:')
+                        st.write(HV_values.loc[max_idx])
+                        st.write('The recommended point is :')
+                        st.write(recommend_point)
+                        tmp_download_link = download_button(recommend_point, f'recommended samples.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif inputs['method'] == 'EHVI':
+                    pass        
+
+elif select_option == "迁移学习":
+    colored_header(label="迁移学习",description=" ",color_name="violet-90")
+    sub_option = option_menu(None, ["boosting迁移", "NN迁移"],
+                            icons=['house',  "list-task"],
+                            menu_icon="cast", default_index=0, orientation="horizontal")   
+    if sub_option == "boosting迁移":
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is not None:
+            df = pd.read_csv(file)
+            # 检测缺失值
+            check_string_NaN(df)
+
+            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            nrow = st.slider("rows", 1, len(df)-1, 5)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
+
+            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+
+            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            
+            col_feature, col_target = st.columns(2)
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
+    # =================== model ====================================
+            reg = REGRESSOR(features,targets)
+
+            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+
+            target_selected_option = st.selectbox('target', list(reg.targets)[::-1])
+
+            reg.targets = targets[target_selected_option]
+
+            colored_header(label="Transfer", description=" ",color_name="violet-30")
+
+            model_path = './models/transfer learning'
+
+            template_alg = model_platform(model_path)
+
+            inputs, col2 = template_alg.show()
+            
+
 
 elif select_option == "代理优化":
+
     colored_header(label="代理优化",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
 
     if len(file) != 2:
-        st.error('Only upload two files, the first is the trained model, the second is the features range.')
+        st.error('Only upload two files, the first is the trained model, the second is the feature variable range.')
         st.stop()
     if len(file) == 2:
-        st.warning('You have unpload two files, the first is the trained model, the second is the features range.')       
+        st.warning('You have unpload two files, the first is the trained model, the second is the feature variable range.')       
         model = pickle.load(file[0])
         model_path = './models/surrogate optimize'
-
         template_alg = model_platform(model_path)
 
         inputs, col2 = template_alg.show()
@@ -3206,9 +3413,9 @@ elif select_option == "其他":
             with col_target:   
                 st.write(targets.head())
 
-            visual_df = pd.read_csv(file[1])
+            df_vs = pd.read_csv(file[1])
             # 检测缺失值
-            check_string_NaN(visual_df)
+            check_string_NaN(df_vs)
             
             col_feature, col_target = st.columns(2)
             # features
