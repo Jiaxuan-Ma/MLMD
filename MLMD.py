@@ -70,8 +70,15 @@ from sko.DE import DE
 from sko.AFSA import AFSA
 from sko.SA import SAFast
 
+# import sys
+from prettytable import PrettyTable
 
 import scienceplots
+
+from algorithm.TrAdaboostR2 import TrAdaboostR2
+from algorithm.mobo import mobo
+
+
 
 warnings.filterwarnings('ignore')
 
@@ -136,7 +143,10 @@ elif select_option == "基础功能":
 
     colored_header(label="数据可视化",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-
+    if file is None:
+        table = PrettyTable(['上传文件名称', '名称','数据说明'])
+        table.add_row(['file_1','dataset','数据集'])
+        st.write(table)
     if file is not None:
         df = pd.read_csv(file)
         # check NaN
@@ -258,6 +268,10 @@ elif select_option == "特征工程":
     if sub_option == "空值处理":
         colored_header(label="空值处理",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)
         if file is not None:
         # colored_header(label="数据信息",description=" ",color_name="violet-70")
         # with st.expander('数据信息'):
@@ -490,7 +504,10 @@ elif select_option == "特征工程":
     elif sub_option == "特征唯一值处理":
         colored_header(label="特征唯一值处理",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)
         if file is not None:
             colored_header(label="数据信息",description=" ",color_name="violet-70")
 
@@ -551,6 +568,10 @@ elif select_option == "特征工程":
     elif sub_option == "特征和特征相关性":
         colored_header(label="特征和特征相关性",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)
         if file is not None:
             df = pd.read_csv(file)
             # 检测缺失值
@@ -607,9 +628,12 @@ elif select_option == "特征工程":
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     elif sub_option == "特征和目标相关性":
-
         colored_header(label="特征和目标相关性",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)
         if file is not None:
             df = pd.read_csv(file)
             # 检测缺失值
@@ -679,6 +703,10 @@ elif select_option == "特征工程":
     elif sub_option == "One-hot编码":
         colored_header(label="One-hot编码",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)
         if file is not None:
             df = pd.read_csv(file)
             # 检测缺失值
@@ -721,6 +749,10 @@ elif select_option == "特征工程":
     elif sub_option == "特征重要性":
         colored_header(label="特征重要性",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)
         if file is not None:
             df = pd.read_csv(file)
             # 检测缺失值
@@ -971,6 +1003,10 @@ elif select_option == "回归预测":
 
     colored_header(label="回归预测",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+    if file is None:
+        table = PrettyTable(['上传文件名称', '名称','数据说明'])
+        table.add_row(['file_1','data set','数据集'])
+        st.write(table)
     if file is not None:
         df = pd.read_csv(file)
         # 检测缺失值
@@ -1821,21 +1857,25 @@ elif select_option == "聚类":
         st.write('---')   
 
 elif select_option == "主动学习":
-    colored_header(label="主动学习",description=" ",color_name="violet-90")
-    sub_option = option_menu(None, ["单目标主动学习", "多目标主动学习"],
-                            icons=['house',  "list-task"],
-                            menu_icon="cast", default_index=0, orientation="horizontal")
+    with st.sidebar:
+        sub_option = option_menu(None, ["单目标主动学习", "多目标主动学习"])
+    
     if sub_option == "单目标主动学习":
 
         colored_header(label="单目标主动学习",description=" ",color_name="violet-70")
 
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
-
+        if len(file) == 0:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            table.add_row(['file_2','visual data','虚拟采样点'])
+            st.write(table)
+            st.info("If only one dataset is uploaded, the range of virtual sampling points can be adjusted in the program based on a ratio of 0.8~1.2 relative to the size of each feature dimension.")
         if len(file) > 2:
             st.error('May uploaded two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
             st.stop()
-        if len(file) == 2:
-            st.warning('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
+        # if len(file) == 2:
+        #     st.info('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
         if len(file) > 0:
             
             colored_header(label="数据信息",description=" ",color_name="violet-70")
@@ -1976,24 +2016,17 @@ elif select_option == "主动学习":
 
     elif sub_option == "多目标主动学习":
 
-        colored_header(label="多目标主动学习",description=" ",color_name="blue-70")
+        colored_header(label="多目标主动学习",description=" ",color_name="violet-70")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
-        # if len(file) != 2:
-        #     st.error('May upload two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
-        # else:
-
-        #     df = pd.read_csv(file[0])
-        #     if len(file) == 2:
-        #         df_vs = pd.read_csv(file[1])
-        #     check_string_NaN(df)
-        #     df = pd.read_csv(file[0])
-            
-            # check_string_NaN(df)
+        if len(file) == 0:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            table.add_row(['file_2','visual data','虚拟采样点'])
+            st.write(table)
+            st.info("If only one dataset is uploaded, the range of virtual sampling points can be adjusted in the program based on a ratio of 0.8~1.2 relative to the size of each feature dimension.")
         if len(file) > 2:
             st.error('May upload two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
-            st.stop()
-        if len(file) == 2:
-            st.warning('You have unploaded two files, the first is the dataset, the second is the the vritual space sample point.')       
+            st.stop() 
         if len(file) > 0:
             
             colored_header(label="数据信息",description=" ",color_name="violet-70")
@@ -2028,7 +2061,6 @@ elif select_option == "主动学习":
                 st.write(targets.head())
             
             col_feature, col_target = st.columns(2)
-
 
     # =================== model ====================================
             reg = REGRESSOR(features,targets)
@@ -2103,6 +2135,9 @@ elif select_option == "主动学习":
                 for i in range(len(target_selected_option)):
                     ref_point_loc = st.number_input(target_selected_option[i] + ' ref location', 0, 100000, 50)
                     ref_point.append(ref_point_loc)
+                if inputs['objective'] == 'max':
+                    
+
 
                 if inputs['method'] == 'HV':
                     with st.container():
@@ -2132,43 +2167,69 @@ elif select_option == "主动学习":
                     pass        
 
 elif select_option == "迁移学习":
-    colored_header(label="迁移学习",description=" ",color_name="violet-90")
-    sub_option = option_menu(None, ["boosting迁移", "NN迁移"],
-                            icons=['house',  "list-task"],
-                            menu_icon="cast", default_index=0, orientation="horizontal")   
-    if sub_option == "boosting迁移":
-        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-        if file is not None:
-            df = pd.read_csv(file)
-            # 检测缺失值
-            check_string_NaN(df)
+    with st.sidebar:
+        sub_option = option_menu(None, ["Boosting", "Neural Network"])
+
+    if sub_option == "Boosting":
+        colored_header(label="基于boosting迁移学习",description=" ",color_name="violet-90")
+        sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
+                                icons=['list-task',  "list-task","list-task"],
+                                menu_icon="cast", default_index=0, orientation="horizontal")
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
+        if len(file) < 3:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','test_data','无标签目标域数据'])
+            table.add_row(['file_2','target_data','有标签目标域数据'])
+            table.add_row(['file_3','source_data_1','1 源域数据'])
+            table.add_row(['...','...','...'])
+            table.add_row(['file_n','source_data_n','n 源域数据'])
+            st.write(table)
+        else:
+            # if len(file) == 3:
+            df_test = pd.read_csv(file[0])
+            df_target = pd.read_csv(file[1])
+            df_source = pd.read_csv(file[2])
+            if len(file) > 3:
+                df_test = pd.read_csv(file[0])
+                df_target = pd.read_csv(file[1])
+                source_files = file[2:]
+                df = [pd.read_csv(f) for f in source_files]
+                df_source = pd.concat(df, axis=0)
 
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
-            df_nrow = df.head(nrow)
-            st.write(df_nrow)
 
+            # show target data
+
+            nrow = st.slider("rows", 1, len(df_target)-1, 5)
+            df_nrow = df_target.head(nrow)
+            st.write(df_nrow)
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
 
             target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             # features
-            features = df.iloc[:,:-target_num]
+            target_features = df_target.iloc[:,:-target_num]
+            source_features = df_source.iloc[:,:-target_num]
+            
             # targets
-            targets = df.iloc[:,-target_num:]
+            target_targets = df_target.iloc[:,-target_num:]
+            source_targets = df_source.iloc[:,-target_num:]
+
             with col_feature:    
-                st.write(features.head())
+                st.write(target_features.head())
             with col_target:   
-                st.write(targets.head())
+                st.write(target_targets.head())
     # =================== model ====================================
-            reg = REGRESSOR(features,targets)
+            # features = pd.concat([source_features, target_features], axis=0)
+            # targets = pd.concat([source_targets,target_targets], axis=0)
+            reg = REGRESSOR(target_features, target_targets)
 
             colored_header(label="选择目标变量", description=" ", color_name="violet-70")
 
             target_selected_option = st.selectbox('target', list(reg.targets)[::-1])
 
-            reg.targets = targets[target_selected_option]
+            reg.targets = target_targets[target_selected_option]
 
             colored_header(label="Transfer", description=" ",color_name="violet-30")
 
@@ -2177,19 +2238,62 @@ elif select_option == "迁移学习":
             template_alg = model_platform(model_path)
 
             inputs, col2 = template_alg.show()
-            
+            # TrAdaBoostR2 = template_alg.TrAdaBoostR2(reg.)
+            with col2:
+                st.write('')
 
+            reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                        min_samples_split=inputs['min samples split']) 
+               
+            TrAdaboostR2 = TrAdaboostR2(reg.model, inputs['max iter'])
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+
+            if inputs['max iter'] > source_features.shape[0]:
+                st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
+
+            if button_train:
+                TrAdaboostR2.fit(source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option])
+                
+                Xtest = df_test[list(target_features.columns)]
+                predict = TrAdaboostR2.predict(Xtest)
+                prediction = pd.DataFrame(predict, columns=[target_selected_option])
+                try:
+                    Ytest = df_test[target_selected_option]
+                    plot = customPlot()
+                    plot.pred_vs_actual(Ytest, prediction)
+                    r2 = r2_score(Ytest, prediction)
+                    st.write('R2: {}'.format(r2))
+                    result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    with st.expander('预测结果'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+                except KeyError:
+                    st.write("label does not exist in test data.")
+                    st.write(prediction)
+                st.write('---')
+
+    elif sub_option == "Neural Network":
+        colored_header(label="基于Neural Network迁移学习",description=" ",color_name="violet-90")
+        sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
+                                icons=['list-task',  "list-task","list-task"],
+                                menu_icon="cast", default_index=0, orientation="horizontal")      
 
 elif select_option == "代理优化":
 
     colored_header(label="代理优化",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-
-    if len(file) != 2:
-        st.error('Only upload two files, the first is the trained model, the second is the feature variable range.')
-        st.stop()
+    if len(file) < 2:
+        table = PrettyTable(['上传文件名称', '名称','数据说明'])
+        table.add_row(['file_1','dataset','数据集'])
+        table.add_row(['file_2','boundary','设计变量上下界'])
+        st.write(table)
+    
     if len(file) == 2:
-        st.warning('You have unpload two files, the first is the trained model, the second is the feature variable range.')       
+        st.info('You have unpload two files, the first is the trained model, the second is the feature variable boundary.')       
         model = pickle.load(file[0])
         model_path = './models/surrogate optimize'
         template_alg = model_platform(model_path)
@@ -2344,10 +2448,15 @@ elif select_option == "代理优化":
 
 elif select_option == "其他":
     with st.sidebar:
-        sub_option = option_menu(None, [ "集成学习", "模型推理", "多目标主动学习"])
+        sub_option = option_menu(None, [ "集成学习", "模型推理","可解释性机器学习"])
     if sub_option == "可解释性机器学习":
-        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        colored_header(label="可解释性机器学习",description=" ",color_name="violet-90")
 
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)        
         if file is not None:
             df = pd.read_csv(file)
             # 检测缺失值
@@ -2440,8 +2549,11 @@ elif select_option == "其他":
                                 menu_icon="cast", default_index=0, orientation="horizontal")
         
         if sub_sub_option == "回归":
-            
             file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+            if file is None:
+                table = PrettyTable(['上传文件名称', '名称','数据说明'])
+                table.add_row(['file_1','data set','数据集'])
+                st.write(table)
             if file is not None:
                 df = pd.read_csv(file)
                 # 检测缺失值
@@ -3331,9 +3443,15 @@ elif select_option == "其他":
     elif sub_option == "模型推理":
         
         colored_header(label="模型推理",description=" ",color_name="violet-90")
-        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-        if file is not None:
-            df = pd.read_csv(file)
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
+        if len(file) < 2:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','data set','数据集'])
+            table.add_row(['file_2','model','模型'])
+            st.write(table)
+        elif len(file) == 2:
+            df = pd.read_csv(file[0])
+            model_file = file[1]
             # 检测缺失值
             check_string_NaN(df)
 
@@ -3366,134 +3484,22 @@ elif select_option == "其他":
             elif preprocess == 'MinMaxScaler':
                 features = MinMaxScaler().fit_transform(features)
 
-            model_file = st.file_uploader("Upload `.pickle`model",  label_visibility="collapsed")
-            if model_file is not None:
-                model = pickle.load(model_file)
-                prediction = model.predict(features)
+            # model_file = st.file_uploader("Upload `.pickle`model",  label_visibility="collapsed")
+            # if model_file is not None:
+            model = pickle.load(model_file)
+            prediction = model.predict(features)
 
-                plot = customPlot()
-                plot.pred_vs_actual(targets, prediction)
-                r2 = r2_score(targets, prediction)
-                st.write('R2: {}'.format(r2))
-                result_data = pd.concat([targets, pd.DataFrame(prediction)], axis=1)
-                result_data.columns = ['actual','prediction']
-                with st.expander('预测结果'):
-                    st.write(result_data)
-                    tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                st.write('---')
-    
-                                     
-    
-    elif sub_option == "多目标主动学习":
-        colored_header(label="多目标主动学习",description=" ",color_name="violet-90")
-        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) != 2:
-            st.error('Need two files, the first file is the train data and another is the visual data (test data)')
-        else:
-            df = pd.read_csv(file[0])
-            # 检测缺失值
-            check_string_NaN(df)
-
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
-            df_nrow = df.head(nrow)
-            st.write(df_nrow)
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
-
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=2)
-            
-            col_feature, col_target = st.columns(2)
-            # features
-            features = df.iloc[:,:-target_num]
-            # targets
-            targets = df.iloc[:,-target_num:]
-            with col_feature:    
-                st.write(features.head())
-            with col_target:   
-                st.write(targets.head())
-
-            df_vs = pd.read_csv(file[1])
-            # 检测缺失值
-            check_string_NaN(df_vs)
-            
-            col_feature, col_target = st.columns(2)
-            # features
-            vis_features = df.iloc[:,:-target_num]
-            # targets
-            vis_targets = df.iloc[:,-target_num:]
-
-    # =================== model ====================================
-            reg = REGRESSOR(features,targets)
-
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
-            target_selected_option = st.multiselect('target', list(reg.targets)[::-1], default=targets.columns.tolist())
-            
-            reg.targets = targets[target_selected_option]
-            reg.Xtrain = features
-            reg.Ytrain = targets
-            reg.Xtest = vis_features
-            reg.Ytest = vis_targets[target_selected_option]
-            # st.write(reg.targets)
-            if len(reg.targets.columns) != 2:
-                 st.error('Need two targets')
-            colored_header(label="Multi-obj-opt", description=" ",color_name="violet-30")
-            model_path = './models/multi-obj'
-
-            template_alg = model_platform(model_path)
-            inputs, col2 = template_alg.show()  
-
-            if inputs['model'] == 'MOO':
-                pareto_front = find_non_dominated_solutions(reg.targets.values, target_selected_option)
-                pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
-                # st.write('pareto front of train data:', pareto_front)
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    with plt.style.context(['nature','no-latex']):
-                        fig, ax = plt.subplots()
-                        ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
-                        ax.scatter(reg.targets[target_selected_option[0]], reg.targets[target_selected_option[1]])
-                        ax.set_xlabel(target_selected_option[0])
-                        ax.set_ylabel(target_selected_option[1])
-                        ax.set_title('Pareto front of visual space')
-                        st.pyplot(fig)
-                with col2:
-                    st.write(pareto_front)
-
-                kernel = RBF(length_scale=1.0)
-                reg.model = GaussianProcessRegressor(kernel=kernel)
-                reg.model.fit(reg.Xtrain, reg.Ytrain)
-                reg.Ypred, reg.Ystd = reg.model.predict(reg.Xtest, return_std=True)
-                reg.Ypred = pd.DataFrame(reg.Ypred, columns=reg.Ytrain.columns.tolist())
-
-                ref_point = [inputs['obj1 ref'], inputs['obj2 ref']]
-                if inputs['method'] == 'HV':
-                    with st.container():
-                        button_train = st.button('Opt', use_container_width=True)  
-                    if button_train:             
-                        HV_values = []
-                        for i in range(reg.Ypred.shape[0]):
-                            i_Ypred = reg.Ypred.iloc[i]
-                            Ytrain_i_Ypred = reg.Ytrain.append(i_Ypred)
-                            i_pareto_front = find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
-                            i_HV_value = dominated_hypervolume(i_pareto_front, ref_point)
-                            HV_values.append(i_HV_value)
-                        
-                        HV_values = pd.DataFrame(HV_values, columns=['HV values'])
-                        HV_values.set_index(reg.Xtest.index, inplace=True)
-
-                        max_idx = HV_values.nlargest(inputs['num'], 'HV values').index
-                        recommend_point = reg.Xtest.loc[max_idx]
-                        reg.Xtest = reg.Xtest.drop(max_idx)
-                        st.write('The maximum value of HV:')
-                        st.write(HV_values.loc[max_idx])
-                        st.write('The recommended point is :')
-                        st.write(recommend_point)
-                        tmp_download_link = download_button(recommend_point, f'recommended samples.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
-                elif inputs['method'] == 'EHVI':
-                    pass
-
+            plot = customPlot()
+            plot.pred_vs_actual(targets, prediction)
+            r2 = r2_score(targets, prediction)
+            st.write('R2: {}'.format(r2))
+            result_data = pd.concat([targets, pd.DataFrame(prediction)], axis=1)
+            result_data.columns = ['actual','prediction']
+            with st.expander('预测结果'):
+                st.write(result_data)
+                tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)
+            st.write('---')
 
     elif sub_option == "符号回归":
         st.write("sisso")

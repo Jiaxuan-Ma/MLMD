@@ -1,4 +1,5 @@
 import streamlit as st
+import numpy as np
 
 # Define possible modelsd in a dict
 # Format of the dict: model name -> model code
@@ -34,20 +35,23 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['objective'] = st.selectbox('objective', ['both max'])
-            inputs['method'] = st.selectbox('method', ['HV', 'EHVI','EGO', 'PI'])
-            inputs['obj1 ref'] = st.number_input('obj1 ref point', 0.0, 100.0, 2.0)
-            inputs['obj2 ref'] = st.number_input('obj2 ref point', 0.0, 100.0, 2.0)
-            inputs['num'] = st.number_input('number', 1, 10, 1)
-            # inputs['n dim'] = st.number_input('variable dim', 1, 20, 1)
-            # inputs['size pop'] = st.number_input('size pop', 1, 500, 50)
-            # inputs['max iter'] = st.number_input('max iter', 1, 10000, 200)
-            # inputs['prob mut'] = st.slider('prob mut', 0.0, 1.0, 0.001)
-            # inputs['F'] = st.slider('F', 0.0, 1.0, 0.5)
+            inputs['estimator'] = st.selectbox('estimator', ['DecisionTreeRegressor'])
+            inputs['max iter'] = st.number_input('max iter', 1, 10000, 20)
+            if inputs['estimator'] == 'DecisionTreeRegressor':
+                inputs['splitter'] = st.selectbox('splitter',('best','random'))
+                max_depth = st.checkbox('max depth', None)
+                inputs['max depth'] = None
+                if max_depth:
+                    inputs['max depth'] = st.number_input('max depth',1, 10000, 3)
+                inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 1000, 1)
+                inputs['min samples split'] = st.number_input('min samples split', 2, 1000, 2)
 
-            # inputs['lb']  = st.number_input('lb',  )  # 跟据虚拟样本空间的最大值和最小值进行调整
-            # inputs['ub'] = st.number_input('ub', )
-            
+                random_state = st.checkbox('random state 1024',True)
+                if random_state:
+                    inputs['random state'] = 42
+                else:
+                    inputs['random state'] = None
+
     return inputs,col2
 # To test the alg independent of the app or template, just run 
 # `streamlit run alg.py` from within this folder.
@@ -57,3 +61,4 @@ def show():
 
 if __name__ == "__main__":
     show()
+
