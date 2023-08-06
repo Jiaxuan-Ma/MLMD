@@ -1628,7 +1628,7 @@ elif select_option == "分类":
                     clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
                                                             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
                                                             
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                     st.write('cv mean accuracy score: {}'.format(cvs.mean())) 
 
@@ -1674,7 +1674,7 @@ elif select_option == "分类":
                                                 min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                 
      
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
      
                     st.write('cv mean accuracy score: {}'.format(cvs.mean())) 
 
@@ -1734,7 +1734,7 @@ elif select_option == "分类":
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
                      
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                     st.write('cv mean accuracy score: {}'.format(cvs.mean())) 
 
@@ -1782,7 +1782,7 @@ elif select_option == "分类":
                 elif data_process == 'cross val score':
                     clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
                                                                                              
-                    cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
                     st.write('cv mean accuracy score: {}'.format(cvs.mean()))     
 
         st.write('---')
@@ -2282,168 +2282,197 @@ elif select_option == "迁移学习":
                                 menu_icon="cast", default_index=0, orientation="horizontal")      
 
 elif select_option == "代理优化":
+    with st.sidebar:
+        sub_option = option_menu(None, ["单目标代理优化", "多目标代理优化"])
+    if sub_option == "单目标代理优化":
 
-    colored_header(label="代理优化",description=" ",color_name="violet-90")
-    file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-    if len(file) < 2:
-        table = PrettyTable(['上传文件名称', '名称','数据说明'])
-        table.add_row(['file_1','dataset','数据集'])
-        table.add_row(['file_2','boundary','设计变量上下界'])
-        st.write(table)
-    
-    if len(file) == 2:
-        st.info('You have unpload two files, the first is the trained model, the second is the feature variable boundary.')       
-        model = pickle.load(file[0])
-        model_path = './models/surrogate optimize'
-        template_alg = model_platform(model_path)
+        colored_header(label="单目标代理优化",description=" ",color_name="violet-90")
+        file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
+        if len(file) < 2:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','boundary','设计变量上下界'])
+            table.add_row(['file_2','model','模型'])
+            st.write(table)
+            st.info('You need unpload two files, the first is the feature variable boundary, the second is the trained models.')       
+        if len(file) >= 2:    
+            model = pickle.load(file[1])
+            model_path = './models/surrogate optimize'
+            template_alg = model_platform(model_path)
 
-        inputs, col2 = template_alg.show()
-        df_var = pd.read_csv(file[1])
-        features_name = df_var.columns.tolist()
-        range_var = df_var.values
-        vars_min = get_column_min(range_var)
-        vars_max = get_column_max(range_var)
-        inputs['lb'] = vars_min
-        inputs['ub'] = vars_max
+            inputs, col2 = template_alg.show()
+            df_var = pd.read_csv(file[0])
+            features_name = df_var.columns.tolist()
+            range_var = df_var.values
+            vars_min = get_column_min(range_var)
+            vars_max = get_column_max(range_var)
+            inputs['lb'] = vars_min
+            inputs['ub'] = vars_max
 
-        if inputs['model'] == 'PSO':      
-            with col2:
-                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                    st.warning('the variable dim is not match')
-                else:
-                    st.info('the variable dim is  %d' % inputs['n dim'])
-            with st.container():
-                button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
-                def opt_func(x):
-                    x = x.reshape(1,-1)
-                    y_pred = model.predict(x)
-                    return y_pred  
-                
-                alg = PSO(func=opt_func, dim=inputs['n dim'], pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                        w=inputs['w'], c1=inputs['c1'], c2=inputs['c2'])
-        
-                alg.run()
+            if inputs['model'] == 'PSO':      
+                with col2:
+                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                        st.warning('the variable dim is not match')
+                    else:
+                        st.info('the variable dim is  %d' % inputs['n dim'])
+                with st.container():
+                    button_train = st.button('Opt', use_container_width=True)
+                if button_train:  
+                    def opt_func(x):
+                        x = x.reshape(1,-1)
+                        y_pred = model.predict(x)
+                        return y_pred  
+                    
+                    alg = PSO(func=opt_func, dim=inputs['n dim'], pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+                            w=inputs['w'], c1=inputs['c1'], c2=inputs['c2'])
+            
+                    alg.run()
 
-                st.info('Recommmended Sample')
-                gbest_x = pd.DataFrame({'Feature':features_name, 'value': alg.gbest_x})
-                st.write(gbest_x)         
-                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
-                st.info('gbest_y: %s' % alg.gbest_y.item())
-        
-        elif inputs['model'] == 'GA':
-            with col2:
-                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                    st.warning('the variable dim is not match')
-                else:
-                    st.info('the variable dim is  %d' % inputs['n dim'])
-            with st.container():
-                button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
-                def opt_func(x):
-                    x = x.reshape(1,-1)
-                    y_pred = model.predict(x)
-                    return y_pred  
+                    st.info('Recommmended Sample')
+                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': alg.gbest_x})
+                    st.write(gbest_x)         
+                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    st.info('gbest_y: %s' % alg.gbest_y.item())
+            
+            elif inputs['model'] == 'GA':
+                with col2:
+                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                        st.warning('the variable dim is not match')
+                    else:
+                        st.info('the variable dim is  %d' % inputs['n dim'])
+                with st.container():
+                    button_train = st.button('Opt', use_container_width=True)
+                if button_train:  
+                    def opt_func(x):
+                        x = x.reshape(1,-1)
+                        y_pred = model.predict(x)
+                        return y_pred  
 
-                alg = GA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                        prob_mut = inputs['prob mut'])
+                    alg = GA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+                            prob_mut = inputs['prob mut'])
 
-                best_x, best_y = alg.run()
+                    best_x, best_y = alg.run()
 
-                st.info('Recommmended Sample')
-                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                st.write(gbest_x)         
-                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
-                st.info('gbest_y: %s' %  best_y.item())
-                
+                    st.info('Recommmended Sample')
+                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                    st.write(gbest_x)         
+                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    st.info('gbest_y: %s' %  best_y.item())
+                    
 
-                # demo_func = lambda x: (x[0] - 1) ** 2 + (x[1] - 0.05) ** 2 + x[2] ** 2
-                # ga = GA(func=demo_func, n_dim=3, max_iter=500, lb=[-1, -1, -1], ub=[5, 1, 1], precision=[2, 1, 1e-7])
-                # best_x, best_y = ga.run()
-                # st.write('best_x:', best_x, '\n', 'best_y:', best_y)
+                    # demo_func = lambda x: (x[0] - 1) ** 2 + (x[1] - 0.05) ** 2 + x[2] ** 2
+                    # ga = GA(func=demo_func, n_dim=3, max_iter=500, lb=[-1, -1, -1], ub=[5, 1, 1], precision=[2, 1, 1e-7])
+                    # best_x, best_y = ga.run()
+                    # st.write('best_x:', best_x, '\n', 'best_y:', best_y)
 
-        elif inputs['model'] == 'DE':
-            with col2:
-                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                    st.warning('the variable dim is not match')
-                else:
-                    st.info('the variable dim is  %d' % inputs['n dim'])
-            with st.container():
-                button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
-                def opt_func(x):
-                    x = x.reshape(1,-1)
-                    y_pred = model.predict(x)
-                    return y_pred  
-                
-                alg = DE(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                        prob_mut = inputs['prob mut'], F=inputs['F'])
+            elif inputs['model'] == 'DE':
+                with col2:
+                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                        st.warning('the variable dim is not match')
+                    else:
+                        st.info('the variable dim is  %d' % inputs['n dim'])
+                with st.container():
+                    button_train = st.button('Opt', use_container_width=True)
+                if button_train:  
+                    def opt_func(x):
+                        x = x.reshape(1,-1)
+                        y_pred = model.predict(x)
+                        return y_pred  
+                    
+                    alg = DE(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+                            prob_mut = inputs['prob mut'], F=inputs['F'])
 
-                best_x, best_y = alg.run()
+                    best_x, best_y = alg.run()
 
-                st.info('Recommmended Sample')
-                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                st.write(gbest_x)         
-                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
-                st.info('gbest_y: %s' %  best_y.item())   
-        
-        elif inputs['model'] == 'AFSA':
-            with col2:
-                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                    st.warning('the variable dim is not match')
-                else:
-                    st.info('the variable dim is  %d' % inputs['n dim'])
-            with st.container():
-                button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
-                def opt_func(x):
-                    x = x.reshape(1,-1)
-                    y_pred = model.predict(x)
-                    return y_pred  
-                
-                alg = AFSA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'],
-                        max_try_num=inputs['max try num'], step=inputs['step'], visual=inputs['visual'], q=inputs['q'], delta=inputs['delta'])
+                    st.info('Recommmended Sample')
+                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                    st.write(gbest_x)         
+                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    st.info('gbest_y: %s' %  best_y.item())   
+            
+            elif inputs['model'] == 'AFSA':
+                with col2:
+                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                        st.warning('the variable dim is not match')
+                    else:
+                        st.info('the variable dim is  %d' % inputs['n dim'])
+                with st.container():
+                    button_train = st.button('Opt', use_container_width=True)
+                if button_train:  
+                    def opt_func(x):
+                        x = x.reshape(1,-1)
+                        y_pred = model.predict(x)
+                        return y_pred  
+                    
+                    alg = AFSA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'],
+                            max_try_num=inputs['max try num'], step=inputs['step'], visual=inputs['visual'], q=inputs['q'], delta=inputs['delta'])
 
-                best_x, best_y = alg.run()
+                    best_x, best_y = alg.run()
 
-                st.info('Recommmended Sample')
-                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                st.write(gbest_x)         
-                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
-                st.info('gbest_y: %s' %  best_y.item())   
-        
-        elif inputs['model'] == 'SA':
-            with col2:
-                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                    st.warning('the variable dim is not match')
-                else:
-                    st.info('the variable dim is  %d' % inputs['n dim'])
-            with st.container():
-                button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
-                def opt_func(x):
-                    x = x.reshape(1,-1)
-                    y_pred = model.predict(x)
-                    return y_pred  
-                x0 = calculate_mean(inputs['lb'], inputs['ub'])
-                st.write(inputs['lb'])
-                st.write(inputs['ub'])
-                st.write(x0)
-                alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
-                            lb=inputs['lb'], ub=inputs['ub'])
+                    st.info('Recommmended Sample')
+                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                    st.write(gbest_x)         
+                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    st.info('gbest_y: %s' %  best_y.item())   
+            
+            elif inputs['model'] == 'SA':
+                with col2:
+                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                        st.warning('the variable dim is not match')
+                    else:
+                        st.info('the variable dim is  %d' % inputs['n dim'])
+                with st.container():
+                    button_train = st.button('Opt', use_container_width=True)
+                if button_train:  
+                    def opt_func(x):
+                        x = x.reshape(1,-1)
+                        y_pred = model.predict(x)
+                        return y_pred  
+                    x0 = calculate_mean(inputs['lb'], inputs['ub'])
+                    st.write(inputs['lb'])
+                    st.write(inputs['ub'])
+                    st.write(x0)
+                    alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
+                                lb=inputs['lb'], ub=inputs['ub'])
 
-                best_x, best_y = alg.run()
+                    best_x, best_y = alg.run()
 
-                st.info('Recommmended Sample')
-                gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                st.write(gbest_x)         
-                tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
-                st.info('gbest_y: %s' %  best_y.item())                   
+                    st.info('Recommmended Sample')
+                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
+                    st.write(gbest_x)         
+                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    st.info('gbest_y: %s' %  best_y.item())                   
+
+    elif sub_option == "多目标代理优化":
+
+        colored_header(label="多目标代理优化",description=" ",color_name="violet-90")
+        file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
+        if len(file) < 3:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','boundary','设计变量上下界'])
+            table.add_row(['file_2','model_1','目标1 模型'])
+            table.add_row(['file_3','model_2','目标2 模型'])
+            st.write(table)
+            st.info('You need unpload three files, the first is the feature variable boundary, the second and the three are the trained models.')  
+        if len(file) >= 3:      
+            model_1 = pickle.load(file[1])
+            model_2 = pickle.load(file[2])
+            model_path = './models/surrogate optimize'
+            template_alg = model_platform(model_path)
+
+            inputs, col2 = template_alg.show()
+            df_var = pd.read_csv(file[0])
+            features_name = df_var.columns.tolist()
+            range_var = df_var.values
+            vars_min = get_column_min(range_var)
+            vars_max = get_column_max(range_var)
+            inputs['lb'] = vars_min
+            inputs['ub'] = vars_max
+
 
 elif select_option == "其他":
     with st.sidebar:
@@ -3104,20 +3133,20 @@ elif select_option == "其他":
                             if inputs['base estimator'] == "DecisionTree":    
                                 clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
 
                             elif inputs['base estimator'] == "SupportVector": 
                                 clf.model = BaggingClassifier(estimator =SVC(), n_estimators=inputs['nestimators'], max_features=inputs['max features'])    
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
                                 
                             elif inputs['base estimator'] == "LogisticRegression": 
                                 clf.model = BaggingClassifier(estimator = LR(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1)                         
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
                 
@@ -3204,20 +3233,20 @@ elif select_option == "其他":
                             if inputs['base estimator'] == "DecisionTree":    
                                 clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
 
                             elif inputs['base estimator'] == "SupportVector": 
                                 clf.model = BaggingClassifier(estimator =SVC(), n_estimators=inputs['nestimators'], max_features=inputs['max features'])    
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
                                 
                             elif inputs['base estimator'] == "LogisticRegression": 
                                 clf.model = BaggingClassifier(estimator = LR(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1)                         
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
                 
@@ -3271,7 +3300,7 @@ elif select_option == "其他":
                                 clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
                                                                     random_state=inputs['random state'])
         
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
 
@@ -3327,7 +3356,7 @@ elif select_option == "其他":
                                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                             learning_rate=inputs['learning rate'])
         
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
                 
@@ -3382,7 +3411,7 @@ elif select_option == "其他":
                             clf.model = lgb.LGBMClassifier(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
                                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
 
-                            cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                            cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                             st.info('cv mean accuracy score: {}'.format(cvs.mean()))        
 
@@ -3435,7 +3464,7 @@ elif select_option == "其他":
                                 
                                 clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
         
-                                cvs = cross_val_score(clf.model, clf.features, clf.targets, cv = cv)
+                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean()))                 
     
