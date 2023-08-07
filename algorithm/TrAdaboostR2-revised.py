@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 import streamlit as st
 
-class TrAdaboostR2:
+class TwoStageTrAdaboostR2_revised:
     def __init__(self) -> None:
         # self.estimator = estimator
         # self.N = N
@@ -45,11 +45,9 @@ class TrAdaboostR2:
             self.beta_N[i] = error_rate / (1 - error_rate)
             # adjust the sample weight
             Z_t = np.abs(np.array(Ypred - Ytrain)).max()
-            if Z_t == 0: Z_t = 1e-5
-    
             for t in range(m):
                 weights[n + t] = weights[n+t] * np.power(self.beta_N[i], -np.abs(Ypred[n+t] - Ytrain[n+t]) / Z_t)
-            # st.write(weights)
+
             for s in range(n):
                 weights[s] = weights[s] * np.power(beta, np.abs(Ypred[s] - Ytrain[s]) / Z_t)
         # for j in range(row_A):
@@ -67,6 +65,7 @@ class TrAdaboostR2:
         
         Xtest = np.asarray(Xtest, order='C')
         self.predictions = np.ones([Xtest.shape[0], self.N])
+        st.write(self.predictions.shape)
         for i, estimator in zip(range(self.N), self.estimators):
             Ypred = estimator.predict(Xtest)
             self.predictions[:, i] = Ypred

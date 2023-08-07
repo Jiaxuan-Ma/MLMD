@@ -2241,38 +2241,99 @@ elif select_option == "迁移学习":
             # TrAdaBoostR2 = template_alg.TrAdaBoostR2(reg.)
             with col2:
                 st.write('')
+            
+            # reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+            #             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+            #             min_samples_split=inputs['min samples split']) 
 
-            reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                        min_samples_split=inputs['min samples split']) 
-            TrAdaboostR2 = TrAdaboostR2(reg.model, inputs['max iter'])
-            with st.container():
-                button_train = st.button('Train', use_container_width=True)
+            if inputs['model'] == 'TrAdaboostR2':
+                TrAdaboostR2 = TrAdaboostR2()
+                with st.container():
+                    button_train = st.button('Train', use_container_width=True)
 
-            if inputs['max iter'] > source_features.shape[0]:
-                st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
+                if inputs['max iter'] > source_features.shape[0]:
+                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
 
-            if button_train:
-                TrAdaboostR2.fit(source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option])
-                
-                Xtest = df_test[list(target_features.columns)]
-                predict = TrAdaboostR2.predict(Xtest)
-                prediction = pd.DataFrame(predict, columns=[target_selected_option])
-                try:
-                    Ytest = df_test[target_selected_option]
-                    plot = customPlot()
-                    plot.pred_vs_actual(Ytest, prediction)
-                    r2 = r2_score(Ytest, prediction)
-                    st.write('R2: {}'.format(r2))
-                    result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    with st.expander('预测结果'):
-                        st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
-                except KeyError:
-                    st.write("label does not exist in test data.")
-                    st.write(prediction)
+                if button_train:
+                    TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
+                    
+                    Xtest = df_test[list(target_features.columns)]
+                    predict = TrAdaboostR2.estimators_predict(Xtest)
+                    prediction = pd.DataFrame(predict, columns=[target_selected_option])
+                    try:
+                        Ytest = df_test[target_selected_option]
+                        plot = customPlot()
+                        plot.pred_vs_actual(Ytest, prediction)
+                        r2 = r2_score(Ytest, prediction)
+                        st.write('R2: {}'.format(r2))
+                        result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('预测结果'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    except KeyError:
+                        st.write("label does not exist in test data.")
+                        st.write(prediction)
+
+            elif inputs['model'] == 'TwoStageTrAdaboostR2':
+                TrAdaboostR2 = TrAdaboostR2()
+                with st.container():
+                    button_train = st.button('Train', use_container_width=True)
+
+                if inputs['max iter'] > source_features.shape[0]:
+                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
+
+                if button_train:
+                    TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
+                    
+                    Xtest = df_test[list(target_features.columns)]
+                    predict = TrAdaboostR2.estimators_predict(Xtest)
+                    prediction = pd.DataFrame(predict, columns=[target_selected_option])
+                    try:
+                        Ytest = df_test[target_selected_option]
+                        plot = customPlot()
+                        plot.pred_vs_actual(Ytest, prediction)
+                        r2 = r2_score(Ytest, prediction)
+                        st.write('R2: {}'.format(r2))
+                        result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('预测结果'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    except KeyError:
+                        st.write("label does not exist in test data.")
+                        st.write(prediction)
+            elif inputs['model'] == 'TwoStageTrAdaboostR2-revised':
+                TrAdaboostR2 = TrAdaboostR2()
+                with st.container():
+                    button_train = st.button('Train', use_container_width=True)
+
+                if inputs['max iter'] > source_features.shape[0]:
+                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
+
+                if button_train:
+                    TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
+                    
+                    Xtest = df_test[list(target_features.columns)]
+                    predict = TrAdaboostR2.estimators_predict(Xtest)
+                    prediction = pd.DataFrame(predict, columns=[target_selected_option])
+                    try:
+                        Ytest = df_test[target_selected_option]
+                        plot = customPlot()
+                        plot.pred_vs_actual(Ytest, prediction)
+                        r2 = r2_score(Ytest, prediction)
+                        st.write('R2: {}'.format(r2))
+                        result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('预测结果'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    except KeyError:
+                        st.write("label does not exist in test data.")
+                        st.write(prediction)
                 st.write('---')
 
     elif sub_option == "Neural Network":
@@ -2283,7 +2344,7 @@ elif select_option == "迁移学习":
 
 elif select_option == "代理优化":
     with st.sidebar:
-        sub_option = option_menu(None, ["单目标代理优化", "多目标代理优化"])
+        sub_option = option_menu(None, ["单目标代理优化", "多目标代理优化","迁移学习-单目标代理优化","迁移学习-多目标代理优化"])
     if sub_option == "单目标代理优化":
 
         colored_header(label="单目标代理优化",description=" ",color_name="violet-90")
@@ -2473,6 +2534,32 @@ elif select_option == "代理优化":
             inputs['lb'] = vars_min
             inputs['ub'] = vars_max
 
+    elif sub_option == "迁移学习-多目标代理优化":
+        colored_header(label="迁移学习-多目标代理优化",description=" ",color_name="violet-90")
+        file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
+        if len(file) < 5:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','boundary','设计变量上下界'])
+            table.add_row(['file_2','boundary','目标1 学习器权重'])
+            table.add_row(['file_3','boundary','目标2 学习器权重'])
+            table.add_row(['file_4','model','目标1 模型1'])
+            table.add_row(['file_5','model','目标2 模型2'])
+            st.write(table)
+            st.info('You need unpload multi files, the first is the feature variable boundary, the second and the three are the weight of models, the remains are models.')  
+        if len(file) >= 5:
+            pass
+    elif sub_option == "迁移学习-单目标代理优化":
+        colored_header(label="迁移学习-单目标代理优化",description=" ",color_name="violet-90")
+        file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
+        if len(file) < 3:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','boundary','设计变量上下界'])
+            table.add_row(['file_2','boundary','学习器权重'])
+            table.add_row(['file_3','model','模型'])
+            st.write(table)
+            st.info('You need unpload multi files, the first is the feature variable boundary, the second is the weight of models, the three is the model.')  
+        if len(file) >= 3:
+            pass
 
 elif select_option == "其他":
     with st.sidebar:
