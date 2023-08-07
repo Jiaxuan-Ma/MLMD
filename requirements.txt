@@ -21,3 +21,4 @@ xgboost==1.7.4
 sko==0.5.7
 SciencePlots==2.1.0
 prettytable==3.8.0
+tabulate
