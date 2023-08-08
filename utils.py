@@ -25,6 +25,8 @@ import pickle
 import uuid
 import re
 
+import scienceplots
+
 # ============ import model from file =======================
 
 def import_from_file(module_name: str, filepath: str):
@@ -672,8 +674,7 @@ class customPlot:
         # fig.savefig(img_path)
         st.pyplot(fig)    
 
-    def feature_importance(self,record_zero_importance, feature_importances,
-                           plot_n = 15):
+    def feature_importance(self,record_zero_importance, feature_importances, plot_n = 15):
       
         # Plots `plot_n` most important features and the cumulative importance of features.
         # If `threshold` is provided, prints the number of features needed to reach `threshold`
@@ -694,41 +695,42 @@ class customPlot:
         # assert len(options_selected) >= 4, "options insufficient !"
         # self.map_fontsize_options(options_selected)
         # color = self.map_color_options(options_selected)
-        fig, ax = plt.subplots()
-        # Need to reverse the index to plot most importance on top
-        # There might be a more efficient mothod to accomplish this
-        ax.barh(list(reversed(list(feature_importances.index[:plot_n]))), 
-            feature_importances['normalized_importance'][:plot_n], 
-            align = 'center', edgecolor = 'k')
-        # Set the yticks and labels
-        ax.set_yticks(list(reversed(list(feature_importances.index[:plot_n]))))
-        ax.set_yticklabels(feature_importances['feature'][:plot_n])
-        
-        plt.xlabel('Normalized Importance'); 
-        plt.title('Feature Importances')
-        plt.legend()
+        with plt.style.context(['nature','no-latex']):
+            fig, ax = plt.subplots()
+            # Need to reverse the index to plot most importance on top
+            # There might be a more efficient mothod to accomplish this
+            ax.barh(list(reversed(list(feature_importances.index[:plot_n]))), 
+                feature_importances['normalized_importance'][:plot_n], 
+                align = 'center', edgecolor = 'k')
+            # Set the yticks and labels
+            ax.set_yticks(list(reversed(list(feature_importances.index[:plot_n]))))
+            ax.set_yticklabels(feature_importances['feature'][:plot_n])
+            
+            plt.xlabel('Normalized Importance'); 
+            plt.title('Feature Importances')
+            plt.legend()
         # img_path = os.path.join(target_dir, 'Number of Unique Values Histogram.png')
         # fig.savefig(img_path)
-        st.pyplot(fig)   
+            st.pyplot(fig)   
 
     def pred_vs_actual(self,actual,pred):
-        
-        fig, ax = plt.subplots()  
-        ax.scatter(actual, pred, marker='o', s=18, color='#000080',zorder=1, facecolors='none')
-        lims = [
-            np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
-            np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
-                ]
-        ax.tick_params(direction='in', length=5)
- 
-        ax.plot(lims, lims, 'k-', zorder=2, linewidth=2, linestyle='solid', color='#FF0000')
-        ax.set_xlim(lims)
-        ax.set_ylim(lims)
-        plt.xlabel("Actual")
-        plt.ylabel("Prediction")
-        # img_path = os.path.join(target_dir, 'prediction vs label.png')
-        # fig.savefig(img_path)
-        st.pyplot(fig)
+        with plt.style.context(['nature','no-latex']):
+            fig, ax = plt.subplots()  
+            ax.scatter(actual, pred, marker='o', s=18, color='#000080',zorder=1, facecolors='none')
+            lims = [
+                np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
+                np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
+                    ]
+            ax.tick_params(direction='in', length=5)
+    
+            ax.plot(lims, lims, 'k-', zorder=2, linewidth=2, linestyle='solid', color='#FF0000')
+            ax.set_xlim(lims)
+            ax.set_ylim(lims)
+            plt.xlabel("Actual")
+            plt.ylabel("Prediction")
+            # img_path = os.path.join(target_dir, 'prediction vs label.png')
+            # fig.savefig(img_path)
+            st.pyplot(fig)
 
     def confusion_matrix(self,confusion_matrix):
         
