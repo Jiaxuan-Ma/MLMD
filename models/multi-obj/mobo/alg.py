@@ -35,10 +35,10 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['objective'] = st.selectbox('objective', ['max', 'min'])
-            inputs['method'] = st.selectbox('method', ['HV', 'EHVI','EGO', 'PI'])
-            inputs['obj1 ref'] = st.number_input('obj1 ref point', 0.0, 100.0, 2.0)
-            inputs['obj2 ref'] = st.number_input('obj2 ref point', 0.0, 100.0, 2.0)
+            inputs['method'] = st.selectbox('method', ['HV', 'EHVI','EGO'])
+            inputs['normalize'] = st.selectbox('normalize',[None, 'StandardScaler', 'MinMaxScaler'])
             inputs['num'] = st.number_input('number', 1, 10, 1)
+
             # inputs['n dim'] = st.number_input('variable dim', 1, 20, 1)
             # inputs['size pop'] = st.number_input('size pop', 1, 500, 50)
             # inputs['max iter'] = st.number_input('max iter', 1, 10000, 200)

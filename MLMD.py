@@ -76,7 +76,7 @@ from prettytable import PrettyTable
 import scienceplots
 
 from algorithm.TrAdaboostR2 import TrAdaboostR2
-from algorithm.mobo import mobo
+from algorithm.mobo import Mobo4mat
 
 
 
@@ -1943,8 +1943,13 @@ elif select_option == "主动学习":
                         vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
 
                         sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
-
+                
+                with st.expander('visual samples'):
+                    st.write(sp.vsfeatures)
+                    tmp_download_link = download_button(sp.vsfeatures, f'visual samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
                 Bgolearn = BGOS.Bgolearn()
+                
                 colored_header(label="Optimize", description=" ",color_name="violet-70")
                 with st.container():
                     button_train = st.button('Train', use_container_width=True)
@@ -2072,16 +2077,14 @@ elif select_option == "主动学习":
             reg.Xtrain = features
             reg.Ytrain = targets
 
-            colored_header(label="Multi-obj-opt", description=" ",color_name="violet-30")
+            colored_header(label="Sampling", description=" ",color_name="violet-30")
             model_path = './models/multi-obj'
 
             template_alg = model_platform(model_path)
             inputs, col2 = template_alg.show()  
 
             if inputs['model'] == 'MOBO':
-                pareto_front = find_non_dominated_solutions(reg.targets.values, target_selected_option)
-                pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
-                # st.write('pareto front of train data:', pareto_front)
+
                 with col2:
                     if len(file) == 2:
                         # features
@@ -2109,7 +2112,18 @@ elif select_option == "主动学习":
                     st.write(reg.Xtest)
                     tmp_download_link = download_button(reg.Xtest, f'visual samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
-
+    
+                pareto_front = find_non_dominated_solutions(reg.targets.values, target_selected_option)
+                pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+  
+                if inputs['objective'] == 'max':  
+                    # st.write(type(reg.targets.values))  
+                    reg.targets = - reg.targets
+                    pareto_front = find_non_dominated_solutions(reg.targets.values, target_selected_option)
+                    pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+                    pareto_front = -pareto_front
+                    reg.targets = -reg.targets
+                # st.write('pareto front of train data:', pareto_front)
                 col1, col2 = st.columns([2, 1])
                 with col1:
                     with plt.style.context(['nature','no-latex']):
@@ -2122,49 +2136,42 @@ elif select_option == "主动学习":
                         st.pyplot(fig)
                 with col2:
                     st.write(pareto_front)
-
-                kernel = RBF(length_scale=1.0)
-                reg.model = GaussianProcessRegressor(kernel=kernel)
-                reg.model.fit(reg.Xtrain, reg.Ytrain)
-                reg.Ypred, reg.Ystd = reg.model.predict(reg.Xtest, return_std=True)
-                reg.Ypred = pd.DataFrame(reg.Ypred, columns=reg.Ytrain.columns.tolist())
-
-                # ref_point = [inputs['obj1 ref'], inputs['obj2 ref']]
-                
                 ref_point = []
                 for i in range(len(target_selected_option)):
                     ref_point_loc = st.number_input(target_selected_option[i] + ' ref location', 0, 100000, 50)
                     ref_point.append(ref_point_loc)
-                if inputs['objective'] == 'max':
-                    pass
+                colored_header(label="Optimize", description=" ",color_name="violet-70")
+                with st.container():
+                    button_train = st.button('Opt', use_container_width=True)  
+                if button_train:        
+                    mobo = Mobo4mat()
+                    row_train = reg.Xtrain.shape[0]
+                    row_test = reg.Xtest.shape[0]
+                    if inputs['normalize'] == 'StandardScaler':
+                        reg.data = pd.concat([reg.Xtrain, reg.Xtest], axis = 0)
+                        reg.data, scaler = mobo.normalize(reg.data, normalize='StandardScaler')
+                    elif inputs['normalize'] == 'MinMaxScaler':
+                        reg.data = pd.concat([reg.Xtrain, reg.Xtest], axis = 0)
+                        reg.data, scaler = mobo.normalize(reg.data, normalize='MinMaxScaler')  
+                    else:
+                        reg.data = pd.concat([reg.Xtrain, reg.Xtest], axis = 0)
+                    reg.Xtrain = reg.data.iloc[:row_train]
+                    reg.Xtest = reg.data.iloc[row_train:]
 
+                    HV, recommend_point = mobo.fit(X = reg.Xtrain, y = reg.Ytrain, visual_data=reg.Xtest, method=inputs['method'],number= inputs['num'], objective=inputs['objective'], ref_point=ref_point)
+                    st.write('The maximum value of HV:')
+                    st.write(HV)
+                    st.write('The recommended point is :')
+                    if inputs['normalize'] == 'StandardScaler':
+                        recommend_point = mobo.inverse_normalize(recommend_point, scaler,  normalize='StandardScaler')
+                    elif inputs['normalize'] == 'MinMaxScaler':
+                        recommend_point = mobo.inverse_normalize(recommend_point, scaler,  normalize='MinMaxScaler')  
+                    else:
+                        recommend_point = recommend_point
 
-                if inputs['method'] == 'HV':
-                    with st.container():
-                        button_train = st.button('Opt', use_container_width=True)  
-                    if button_train:             
-                        HV_values = []
-                        for i in range(reg.Ypred.shape[0]):
-                            i_Ypred = reg.Ypred.iloc[i]
-                            Ytrain_i_Ypred = reg.Ytrain.append(i_Ypred)
-                            i_pareto_front = find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
-                            i_HV_value = dominated_hypervolume(i_pareto_front, ref_point)
-                            HV_values.append(i_HV_value)
-                        
-                        HV_values = pd.DataFrame(HV_values, columns=['HV values'])
-                        HV_values.set_index(reg.Xtest.index, inplace=True)
-
-                        max_idx = HV_values.nlargest(inputs['num'], 'HV values').index
-                        recommend_point = reg.Xtest.loc[max_idx]
-                        reg.Xtest = reg.Xtest.drop(max_idx)
-                        st.write('The maximum value of HV:')
-                        st.write(HV_values.loc[max_idx])
-                        st.write('The recommended point is :')
-                        st.write(recommend_point)
-                        tmp_download_link = download_button(recommend_point, f'recommended samples.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
-                elif inputs['method'] == 'EHVI':
-                    pass        
+                    st.write(recommend_point)
+                    tmp_download_link = download_button(recommend_point, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 elif select_option == "迁移学习":
     with st.sidebar:
@@ -2253,7 +2260,7 @@ elif select_option == "迁移学习":
 
                 if inputs['max iter'] > source_features.shape[0]:
                     st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
-
+                st.warning('the regression result have to been modified in the latter')
                 if button_train:
                     TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
                     
@@ -2273,67 +2280,14 @@ elif select_option == "迁移学习":
                             tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
                     except KeyError:
-                        st.write("label does not exist in test data.")
                         st.write(prediction)
-
+                        tmp_download_link = download_button(prediction, f'预测结果.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+            
             elif inputs['model'] == 'TwoStageTrAdaboostR2':
-                TrAdaboostR2 = TrAdaboostR2()
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-
-                if inputs['max iter'] > source_features.shape[0]:
-                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
-
-                if button_train:
-                    TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
-                    
-                    Xtest = df_test[list(target_features.columns)]
-                    predict = TrAdaboostR2.estimators_predict(Xtest)
-                    prediction = pd.DataFrame(predict, columns=[target_selected_option])
-                    try:
-                        Ytest = df_test[target_selected_option]
-                        plot = customPlot()
-                        plot.pred_vs_actual(Ytest, prediction)
-                        r2 = r2_score(Ytest, prediction)
-                        st.write('R2: {}'.format(r2))
-                        result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    except KeyError:
-                        st.write("label does not exist in test data.")
-                        st.write(prediction)
+                st.write('Please wait...')
             elif inputs['model'] == 'TwoStageTrAdaboostR2-revised':
-                TrAdaboostR2 = TrAdaboostR2()
-                with st.container():
-                    button_train = st.button('Train', use_container_width=True)
-
-                if inputs['max iter'] > source_features.shape[0]:
-                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
-
-                if button_train:
-                    TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
-                    
-                    Xtest = df_test[list(target_features.columns)]
-                    predict = TrAdaboostR2.estimators_predict(Xtest)
-                    prediction = pd.DataFrame(predict, columns=[target_selected_option])
-                    try:
-                        Ytest = df_test[target_selected_option]
-                        plot = customPlot()
-                        plot.pred_vs_actual(Ytest, prediction)
-                        r2 = r2_score(Ytest, prediction)
-                        st.write('R2: {}'.format(r2))
-                        result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    except KeyError:
-                        st.write("label does not exist in test data.")
-                        st.write(prediction)
+                st.write('Please wait...')
                 st.write('---')
 
     elif sub_option == "Neural Network":
@@ -2493,9 +2447,10 @@ elif select_option == "代理优化":
                         y_pred = model.predict(x)
                         return y_pred  
                     x0 = calculate_mean(inputs['lb'], inputs['ub'])
-                    st.write(inputs['lb'])
-                    st.write(inputs['ub'])
-                    st.write(x0)
+                    # st.write(inputs['lb'])
+                    # st.write(inputs['ub'])
+                    # st.write('pppppppppppppp')
+                    # st.write(x0)
                     alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
                                 lb=inputs['lb'], ub=inputs['ub'])
 

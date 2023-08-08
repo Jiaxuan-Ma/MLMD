@@ -35,10 +35,6 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['n dim'] = st.number_input('variable dim', 1, 20, 1)
-            inputs['size pop'] = st.number_input('size pop', 1, 500, 50)
-            inputs['max iter'] = st.number_input('max iter', 1, 10000, 200)
-            inputs['prob mut'] = st.slider('prob mut', 0.0, 1.0, 0.001)
-            inputs['F'] = st.slider('F', 0.0, 1.0, 0.5)
             inputs['T max'] = st.number_input('T max', 1, 10, 1)
             inputs['q'] = st.number_input('q', 0.0, 2.0, 0.99)
             
