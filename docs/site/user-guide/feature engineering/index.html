@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Feature Engineering - MLMD document</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Feature Engineering";
+        var mkdocs_page_input_path = "user-guide\\feature engineering.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> MLMD document
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../data%20preliminary/">Data Preliminary</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Feature Engineering</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_2">特征变量缺失值处理</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_3">丢弃特征变量缺失值</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_4">填补特征变量缺失值</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">特征变量唯一值处理</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">特征变量与目标变量相关性</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_7">特征变量与特征变量相关性</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#one-hot">类别特征变量one-hot编码</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_8">特征变量重要性排序</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../regression/">Regression</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../classification/">Classification</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../active%20learning/">Active Learning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/license/">License</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/release-notes/">Release Notes</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">MLMD document</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>User Guide &raquo;</li>
+      <li>Feature Engineering</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="_1">特征工程</h1>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231189726-148e0dc9-9655-4fb1-8527-cdae428c4b3a.jpg
+?raw=true" , width="400px" />
+</p>
+
+<hr />
+<h2 id="_2">特征变量缺失值处理</h2>
+<p><strong>Feature Engineering</strong>模块-<code>Missing Features</code></p>
+<h3 id="_3">丢弃特征变量缺失值</h3>
+<p>单击<code>Drop Missing Fearures</code>按钮，上传<code>.csv</code>文件之后，可以在<code>Drop Missing Features</code>功能下拉动<code>Missing Threshold</code>进度条，选择丢弃的缺失值特征的阈值，点击<code>download</code>可下载处理之后的数据。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231181931-19ba1f42-f2ec-4abe-9d7b-9d9e101f915b.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_4">填补特征变量缺失值</h3>
+<p>单击<code>Fill Missing Features</code>按钮，上传<code>.csv</code>文件之后，可以在<code>Fill Missing Features</code>功能下进行缺失值数据填补。<code>fill method</code> 选择填补方法，<code>missing feature</code>选择填补的特征，可以选择多个特征。
+<code>fill method</code>-<code>fill in normal method</code>中可以选择<code>mean, constant, median, most frequent</code>特征均值、常数（默认为0），中位数和众数四种填补方式。</p>
+<p><code>fill method</code>-<code>fill in RandomForestRegression</code>中使用随机森林算法进行所有特征的空缺值填补，其中<code>mean, constant, median, most frequent</code>表示随机森林训练时填补特征的方式。
+点击<code>download</code>可下载处理之后的数据。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231181946-16aaf6e1-ca86-4b06-806e-142645b0e5cd.jpg?raw=true" , width="400px" />
+</p>
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231181956-fcd93d65-338d-46e4-a37f-b64075d78bd8.jpg?raw=true" , width="400px" />
+</p>
+
+<h2 id="_5">特征变量唯一值处理</h2>
+<hr />
+<p>在<strong>Feature Engineering</strong>模块- <code>Drop Nunique Features</code>模块下:</p>
+<p>单击<code>Drop Nuniqe Fearures</code>按钮，上传<code>.csv</code>文件之后，在<code>Drop Nunqiue Features</code>功能下拉动<code>drop unique counts</code>进度条，选择丢弃的数值唯一性的特征的阈值，<code>count=1</code>代表丢弃数值在所有样本中都相同的特征，<code>count=2</code>代表丢弃数值在所有样本中只有两个值的特征，依次类推<code>count=3...</code>，在<code>drop unique counts</code>进度条下方的<code>nunqiue</code>表格中显示特征唯一值的统计数量。右侧表格显示处理之后的数据，点击<code>download</code>可下载。
+<code>Plot</code>扩展栏中绘制了特征数据唯一值数量统计直方图，可调节图像的颜色、字体、标题和刻度大小</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231192789-6751c135-b6c2-4a86-b86d-08103579ee65.jpg?raw=true" , width="400px" />
+</p>
+
+<h2 id="_6">特征变量与目标变量相关性</h2>
+<hr />
+<p>在<strong>Feature Engineering</strong>模块- <code>Correlation of Features vs Targets</code>模块下:
+点击<code>Drop Low Correlation Features vs Target</code>按钮， 上传<code>.csv</code>文件之后，在<code>Drop Low Correlation Features vs Target</code>功能下<code>choose target</code>选择目标变量，显示特征与所选择目标的相关性横向直方图。<code>correlation method</code>中选择相关性方法中选择<code>pearson,spearman,kendall,MIR</code> 皮尔森相关性系数、斯皮尔曼相关性系数、肯德尔相关性系数（类别变量）、互信息方法。<code>corr thershold f_t</code>进度条中选择特征数据和目标的相关性阈值，低于阈值的特征将被丢弃。<code>Processed Data</code>中可点击<code>download</code>下载处理之后的数据。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231193226-0defd2b0-fe45-4dcb-8020-6ff7e32f9b37.jpg?raw=true" , width="400px" />
+</p>
+
+<h2 id="_7">特征变量与特征变量相关性</h2>
+<hr />
+<p>在<strong>Feature Engineering</strong>模块- <code>Correlation of Features vs Features</code>模块下:</p>
+<p>点击<code>Drop Collinear Features</code>按钮， 上传<code>.csv</code>文件之后，在<code>Drop Collinear Features</code>功能下<code>choose target</code>选择目标变量，显示特征与所选择目标的相关性系数热力图。<code>correlation method</code>中选择相关性方法中选择<code>pearson,spearman,kendall,</code> 皮尔森相关性系数、斯皮尔曼相关性系数、肯德尔相关性系数（类别变量）。在<code>correlation threshold</code>进度条中选择特征数据和特征数据之间的相关性阈值，高于阈值的两个特征将被筛选出来，丢弃其中与目标相关性更低的特征。在<code>Processed Data</code>中可点击<code>download</code>下载处理之后的数据。<code>is mask</code>功能选择是否将热力图进行掩码展示。<code>drop features</code>中显示丢弃的特征。<code>Processed Data</code>中可点击<code>download</code>下载处理之后的数据。</p>
+<h2 id="one-hot">类别特征变量one-hot编码</h2>
+<hr />
+<p>在<strong>Feature Engineering</strong>模块- <code>One-hot Encoding Features</code>模块下:
+点击<code>One-hot Encoding</code>按钮，上传<code>.csv</code>文件之后，在<code>One-hot encoding Features</code>中将会显示one-hot编码之后的数据，如类别特征<code>Sex</code>中值<code>female</code>和<code>male</code>将被转换为<code>0,1</code>和<code>1,0</code>，并删除旧特征<code>Sex</code>，创建新特征<code>Sex_female</code>和<code>Sex_male</code>添加到数据集中。<code>Processed Data</code>中可点击<code>download</code>下载处理之后的数据。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231193382-d0a374b6-420d-4735-b7a4-8468df3f8ea0.jpg?raw=true" , width="400px" />
+</p>
+
+<h2 id="_8">特征变量重要性排序</h2>
+<hr />
+<p>在<strong>Feature Engineering</strong>模块- <code>Features Importance</code>模块下:
+点击<code>Feature Importance</code>按钮，上传<code>.csv</code>文件之后，在<code>Choose Target</code>功能下选择目标特征。在<code>Selector</code>功能下选择<code>model</code>，其中<code>RandomForestClassifier</code>负责分类目标数据的特征重要性排序。<code>LassoRegressor, LinearRegressor,RandomForestRegressor, RidgeRegressor</code>负责连续目标数据的特征重要性排序。<code>Hyper Parameters</code>中选择不同算法的超参数，<code>cumulative importance</code>选择按照特征重要性从大到小排列加和的阈值，舍弃阈值之后的特征。点击<code>Embedded method</code>将使用嵌入法按照特征从到小的顺序依次添加训练模型，可视化不同重要性的特征对模型的影响，<code>cv</code>可选择交叉验证的折数。
+点击<code>train</code>按钮，根据所选择的算法和超参数进行特征重要性排序，给出特征重要性计算表格，并绘制特征重要性直方图。<code>Processed Data</code>中可下载经过<code>dropped zero importance</code>的数据和经过<code>dropped low importance</code>的数据。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231182015-4e845d4a-7f2f-44e7-92a0-af0b4d9ab085.jpg?raw=true" , width="400px" />
+</p>
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231182027-aa332363-0e36-42d6-80be-a672d7d5628f.jpg?raw=true" , width="400px" />
+</p>
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231182056-02ac07fe-9c9f-4e11-b868-01d24a19cea8.jpg?raw=true" , width="400px" />
+</p>
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231182067-18178c0f-bab0-4463-a4d7-a66b5244e3e4.jpg?raw=true" , width="400px" />
+</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../data%20preliminary/" class="btn btn-neutral float-left" title="Data Preliminary"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../regression/" class="btn btn-neutral float-right" title="Regression">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../data%20preliminary/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../regression/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../javascripts/mathjax.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

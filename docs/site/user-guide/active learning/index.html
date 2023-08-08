@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Active Learning - MLMD document</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Active Learning";
+        var mkdocs_page_input_path = "user-guide\\active learning.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> MLMD document
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../data%20preliminary/">Data Preliminary</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../feature%20engineering/">Feature Engineering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../regression/">Regression</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../classification/">Classification</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Active Learning</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/license/">License</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/release-notes/">Release Notes</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">MLMD document</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>User Guide &raquo;</li>
+      <li>Active Learning</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="_1">主动学习模块 <a href="https://github.com/Bin-Cao/Bgolearn"><img alt="" src="https://img.shields.io/badge/Bgolearn-GitHub-green" /></a></h1>
+<p>本模块通过调用开源算法库 <strong>Bgolearn</strong>  实现(📒<a href="https://bgolearn.netlify.app/">手册</a>)。用于材料成分定向设计以及性能定向优化过程。<strong><em>通过已有实验数据（样本）及其测试性能，在给定的成分空间中搜索最优的材料成分设计，以将目标性能最大/最小化</em></strong>。推荐的成分通过实验合成后，变成新的数据加入数据集合，Bgolearn将利用更多的数据信息对下一次设计做出更加可靠的推荐。迭代这个过程可以高效地在给定的成分空间中，寻找到具有优秀性能的新材料。<strong><em>其中所有的实验过程也可以通过模拟过程代替</em></strong>。如下图：</p>
+<hr />
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/86995074/230322616-08fc629c-1858-42e7-8795-57fc8d076339.png" , width="400px" />
+</p>
+
+<p>关于主动学习中虚拟空间采样点的说明：</p>
+<ol>
+<li>
+<p>如果只上传一个数据文件，则文件默认为<a href="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg">标准数据集</a>，虚拟采样点通过主动学习模块的<code>sample space ratio</code>和<code>sample number</code>生成，注意自动生成的虚拟采样点可能违背物理规律（例如，特征数据为合金的成分时，推荐的样本成分总和大于100 w.t%）</p>
+</li>
+<li>
+<p>如果上传两个文件，则第一个文件默认为<a href="https://github.com/Jiaxuan-Ma/MLMDMarket/blob/main/data%20layout.jpg">标准数据集</a>，第二个文件默认为虚拟采样点文件。
+虚拟采样点<code>.csv</code>文件数据布局如下：</p>
+</li>
+</ol>
+<hr />
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231684019-26ee6d76-ae32-4386-a188-748fb78a34bc.jpg?raw=true" , width="400px" />
+</p>
+
+<p><strong>操作</strong></p>
+<p>在<code>Home</code>主页，进入<code>active learning</code>模块</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231684031-85ceb45c-c11f-4cb7-be13-ded376b743eb.jpg?raw=true" , width="400px" />
+</p>
+
+<p>页面弹出如下图所示的<code>.csv</code>文件上传框。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231178930-06bb0b95-1765-46bc-8011-d4932c7d7ea1.jpg?raw=true" , width="400px" />
+</p>
+
+<p><strong><em>Active Learning</em></strong> 模块 <a href="https://github.com/Bin-Cao/Bgolearn"><img alt="" src="https://img.shields.io/badge/Bgolearn-GitHub-green" /></a>  : </p>
+<p>上传数据之后，<code>Data Table</code>功能显示加载所上传的<code>.csv</code>文件的数据，通过调节<code>rows</code>调整显示的数据表的行数。</p>
+<p><code>Features vs Targets</code>功能显示数据集的特征变量和目标变量，默认<code>.csv</code>文件中的最后一列为目标变量，可通过<code>input target</code>调节目标变量的个数。</p>
+<ul>
+<li>
+<p><code>Choose Target</code>-选择目标特征</p>
+</li>
+<li>
+<p>在<code>Sampling</code>功能下选择<code>model</code>，在<code>Hyper Parameters</code>中可调节算法的超参数</p>
+</li>
+</ul>
+<p>Note : 超参数说明, 见 Bgolearn 📒<a href="https://bgolearn.netlify.app/recommend-r/">手册</a></p>
+<hr />
+<ul>
+<li>
+<p><code>simple number</code> 选择推荐的样本个数</p>
+</li>
+<li>
+<p><code>min search</code> 选择优化的方向（最小/最大）</p>
+</li>
+<li>
+<p><code>sample criterion</code> 选择bayes推荐算法, 共包括九种效用函数</p>
+</li>
+</ul>
+<blockquote>
+<p>1: <code>Expected Improvement algorith</code>-期望提升函数</p>
+<p>2:<code>Expected improvement with "plugin"</code>-有“plugin”的期望提升函数</p>
+<p>3:<code>Augmented Expected Improvement</code>-增广期望提升函数</p>
+<p>4:<code>Expected Quantile Improvement</code>-期望分位提升函数</p>
+<p>5:<code>Reinterpolation Expected Improvement</code>-重插值期望提升函数</p>
+<p>6:<code>Upper confidence bound</code>-高斯上确界函数</p>
+<p>7:<code>Probability of Improvement</code>-概率提升函数</p>
+<p>8:<code>Predictive Entropy Search</code>-预测熵搜索函数</p>
+<p>9:<code>Knowledge Gradient</code>-知识梯度函数</p>
+</blockquote>
+<hr />
+<ul>
+<li>在<code>sample space ratio</code>中选择虚拟空间采样点范围:</li>
+</ul>
+<div class="arithmatex">\[
+virtual_{sapce} = [ ratio_{min} \times X_{min},  ratio_{max} \times X_{max} ]
+\]</div>
+<ul>
+<li><code>sample numeber</code>选择每个特征的采样个数</li>
+</ul>
+<p>根据所选择的算法和超参数推荐的样本可点击<code>download</code>可下载。</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../classification/" class="btn btn-neutral float-left" title="Classification"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../about/license/" class="btn btn-neutral float-right" title="License">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../classification/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../about/license/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../javascripts/mathjax.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

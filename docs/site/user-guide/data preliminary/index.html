@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Data Preliminary - MLMD document</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Data Preliminary";
+        var mkdocs_page_input_path = "user-guide\\data preliminary.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> MLMD document
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Data Preliminary</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_2">数据表格智能分析</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">数据变量关系可视化分析</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_4">数据表格信息</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_5">数据统计信息</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_6">选择目标变量</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_7">特征变量分布</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_8">目标变量分布</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_9">特征变量配方分布</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_10">特征变量数据集分布</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_11">特征变量与目标变量</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_12">目标变量与目标变量</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../feature%20engineering/">Feature Engineering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../regression/">Regression</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../classification/">Classification</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../active%20learning/">Active Learning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/license/">License</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/release-notes/">Release Notes</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">MLMD document</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>User Guide &raquo;</li>
+      <li>Data Preliminary</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="_1">数据表格智能分析和可视化</h1>
+<hr />
+<p>该功能模块为特征工程提供初步的数据智能分析和可视化展示，主要实现特征变量和目标变量在数据集中的分布和关系可视化。</p>
+<h2 id="_2">数据表格智能分析</h2>
+<hr />
+<p>用户登录时，在<code>Data Preliminar</code>功能模块下，单击<code>Data Profiling</code>按钮。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231178901-1b5e3526-30ba-4366-81ef-8f74781330f8.jpg?raw=true" , width="400px" />
+</p>
+
+<p>进入<code>Data Profiling</code>模块，页面弹出如下图所示的<code>.csv</code>文件上传框。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231178930-06bb0b95-1765-46bc-8011-d4932c7d7ea1.jpg?raw=true" , width="400px" />
+</p>
+
+<p>上传数据之后，页面显示数据的智能分析报告。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231179512-8cbf9dbd-576b-47a5-9ec3-e123194b0756.jpg?raw=true" , width="400px" />
+</p>
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231179522-0a5d002a-0ee7-445d-a940-5cbcce1f5ca3.jpg?raw=true" , width="400px" />
+</p>
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231179563-b0cdd400-1ce0-4c9b-873f-cd5b21cae346.jpg?raw=true" , width="400px" />
+</p>
+
+<h2 id="_3">数据变量关系可视化分析</h2>
+<hr />
+<p>用户登录时，在<code>Data Preliminar</code>功能模块下，单击<code>Data Visualization</code>按钮。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180122-48b30a78-ba62-460c-b3e3-8a5ce082cd5b.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_4">数据表格信息</h3>
+<hr />
+<p>进入<code>Data Profiling</code>模块，上传数据之后，<code>Data Table</code>功能显示加载所上传的<code>.csv</code>文件的数据，可通过调节<code>rows</code>调整显示的数据表的行数。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180325-abd85f39-5495-4f6c-a5df-20292f5d3922.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_5">数据统计信息</h3>
+<hr />
+<p><code>Data Statistics</code>功能显示所上传数据的统计信息，点击<code>download</code>可进行下载</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180342-a1406efd-0899-4c1c-ba0e-4fa6d9383bb8.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_6">选择目标变量</h3>
+<hr />
+<p><code>Features vs Targets</code>功能显示数据集的特征变量和目标变量，默认<code>.csv</code>文件中的最后一列为目标变量，可通过<code>input target</code>调节目标变量的个数。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180375-bd881cc3-87cb-47b0-b667-d5d4110758e8.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_7">特征变量分布</h3>
+<hr />
+<p><code>Feature Statistics Distribution</code>功能显示每个特征变量分布统计直方图并给出核密度估计曲线，可通过<code>Plot parameters</code>功能调节图像的颜色、字体、标题和刻度大小。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180657-3a1c8288-a619-432a-aa3b-21a1efbeed0e.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_8">目标变量分布</h3>
+<hr />
+<p><code>Target Statistics Distribution</code>功能显示每个特征变量分布统计直方图并给出核密度估计曲线，可通过<code>Plot parameters</code>功能调节图像的颜色、字体、标题和刻度大小。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180682-0cb76fe7-5a43-41b6-b4e6-2f8a46501c13.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_9">特征变量配方分布</h3>
+<hr />
+<p><code>Feature Recipe Distribution</code>功能按照数据集中特征的顺序统计每个特征在样本中的数量，从而得知目标的常规配方，可通过<code>Plot parameters</code>功能调节图像的颜色、字体、标题和刻度大小。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180701-3dd3b1b5-ceab-483f-ae17-6cd0aaac7d3e.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_10">特征变量数据集分布</h3>
+<hr />
+<p><code>Distribution of Feature in Dataset</code>功能统计特征变量在数据集中的分布情况，可通过<code>Plot parameters</code>功能调节图像的颜色、字体、标题和刻度大小。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180730-fe3c5000-db26-49b4-a265-836a9b516c83.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_11">特征变量与目标变量</h3>
+<hr />
+<p><code>Features and Targets</code>功能显示特征变量和目标变量的关系，可通过<code>Plot parameters</code>功能调节图像的颜色、字体、标题和刻度大小。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180750-abe6389d-faf5-48b5-b2a3-e209a6a2a5b7.jpg?raw=true" , width="400px" />
+</p>
+
+<h3 id="_12">目标变量与目标变量</h3>
+<hr />
+<p><code>Tagrets and Targets</code>功能显示特征变量和目标变量的关系，可通过<code>Plot parameters</code>功能调节图像的颜色、字体、标题和刻度大小 。</p>
+<p>如果是多目标数据，<code>Tagrets and Targets</code>功能显示目标变量和目标变量的关系，可通过<code>Plot parameters</code>功能调节图像的颜色、字体、标题和刻度大小 。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231180773-438ef9ea-da77-40e3-ba23-37988d2d8f35.jpg?raw=true" , width="400px" />
+</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../introduction/" class="btn btn-neutral float-left" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../feature%20engineering/" class="btn btn-neutral float-right" title="Feature Engineering">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../introduction/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../feature%20engineering/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../javascripts/mathjax.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

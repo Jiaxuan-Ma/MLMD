@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Regression - MLMD document</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Regression";
+        var mkdocs_page_input_path = "user-guide\\regression.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> MLMD document
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../introduction/">Introduction</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../data%20preliminary/">Data Preliminary</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../feature%20engineering/">Feature Engineering</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Regression</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../classification/">Classification</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../active%20learning/">Active Learning</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/license/">License</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/release-notes/">Release Notes</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">MLMD document</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>User Guide &raquo;</li>
+      <li>Regression</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="_1">连续目标变量回归预测</h1>
+<hr />
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231191499-c3cf2b6c-ebaf-43b3-9b50-c1f85ae327b4.jpg?raw=true" , width="400px" />
+</p>
+
+<p>在<code>Prediction</code>模块下，单击<code>Regression</code>按钮。</p>
+<p>进入<strong>Regression</strong>模块，页面弹出如下图所示的<code>.csv</code>文件上传框。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231178930-06bb0b95-1765-46bc-8011-d4932c7d7ea1.jpg?raw=true" , width="400px" />
+</p>
+
+<hr />
+<p><strong>Regression</strong> - <code>Data Information</code>模块:</p>
+<p>上传数据之后，<code>Data Table</code>功能显示加载所上传的<code>.csv</code>文件的数据，可通过调节<code>rows</code>调整显示的数据表的行数。</p>
+<p><code>Features vs Targets</code>功能显示数据集的特征变量和目标变量，默认<code>.csv</code>文件中的最后一列为目标变量，可通过<code>input target</code>调节目标变量的个数。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231191657-64592343-55d6-488c-a14b-04e6c5b36009.jpg?raw=true" , width="400px" />
+</p>
+
+<hr />
+<p><code>Choose Target</code>功能选择目标特征</p>
+<p>在<code>Regressor</code>功能下选择<code>model</code>，在<code>Hyper Parameters</code>中可调节每个算法的超参数</p>
+<blockquote>
+<p>1:<code>DecisionTreeRegressosr</code> - 决策树</p>
+<p>2:<code>KNeighborsRegressor</code> - K紧邻</p>
+<p>3:<code>LassoRegressor</code> - Lasso</p>
+<p>4:<code>LinearRegressor</code> - 线性回归</p>
+<p>5:<code>MLPRegressor</code> - 多层感知机</p>
+<p>6:<code>RandomForestRegressor</code> - 随机森林</p>
+<p>7:<code>RidgeRegressor</code> - 岭回归</p>
+<p>8:<code>SupportRegressor</code> - 支持向量机</p>
+</blockquote>
+<p><strong><em>集成学习</em></strong></p>
+<blockquote>
+<p>1:<code>AdaboostRegressosr</code> - 自适应提升集成回归</p>
+<p>2:<code>BaggingRegressor</code> - 自主聚合集成回归</p>
+<p>3:<code>CatBoostRegressor</code> - 类别提升集成回归</p>
+<p>4:<code>GradientBoostingRegressor</code> - 梯度提升集成回归</p>
+<p>5:<code>LGBMRegressor</code> - 轻量梯度提升集成回归</p>
+<p>6:<code>XGBRegressor</code> - 极限梯度提升集成回归</p>
+</blockquote>
+<p><code>data preprocess</code>中可选择
+- <code>StandardScaler</code> - 标准化 
+-  <code>MinMaxScaler</code> - 归一化 </p>
+<p><code>StandardScaler</code> - 标准化 </p>
+<p>均值为0，标准差为1的标准化数学表达式为：</p>
+<div class="arithmatex">\[x^*=\frac{x-\mu}{\sigma}\]</div>
+<p>其中<span class="arithmatex">\(\mu=\frac{1}{n}\Sigma x_i\)</span>，注意此处标准差使用的是总体标准差<span class="arithmatex">\(\sigma=\sqrt{\frac{\Sigma(x_i-\mu)^2}{n}}\)</span></p>
+<p><code>MinMaxScaler</code> - 归一化 </p>
+<p>线性归一化数学表达式为：</p>
+<div class="arithmatex">\[x^*=\frac{x-min(x)}{max(x)-min(x)}\]</div>
+<p>这种归一化方法比较适用在数值比较集中的情况。这种方法有个缺陷，如果<span class="arithmatex">\(max\)</span>和<span class="arithmatex">\(min\)</span>不稳定，很容易使得归一化结果不稳定，此时最好选用标准差标准化。</p>
+<p><code>operator</code>中可选择<code>train test split, cross val score, leave one out</code>三种验证模型性能方法。 </p>
+<ul>
+<li><code>train test split</code>：</li>
+</ul>
+<p>点击<code>train</code>按钮，根据所选择的算法和超参数对<strong>划分的测试集</strong>回归预测，绘制真值和预测值比较图，并给真值和预测值表格，点击<code>download</code>可下载。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231191757-2b2c19a9-d61a-4d19-aa9d-874fa1fa097d.jpg?raw=true" , width="400px" />
+</p>
+
+<ul>
+<li><code>cross val score</code>：</li>
+</ul>
+<p>可选择交叉验证的折数，推荐5~10折，点击<code>train</code>按钮，根据所选择的算法和超参数进行回归预测，给出预测结果的R2和真值预测值表格，点击<code>download</code>可下载。</p>
+<ul>
+<li><code>leave one out</code>：</li>
+</ul>
+<p>点击<code>train</code>按钮，根据所选择的算法和超参数进行回归预测，绘制<strong>整个数据集</strong>真值和预测值比较图，并给真值和预测值表格，点击<code>download</code>可下载。</p>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/61132191/231191832-c736f268-167a-4b7e-af80-28ebfa2bfc01.jpg?raw=true" , width="400px" />
+</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../feature%20engineering/" class="btn btn-neutral float-left" title="Feature Engineering"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../classification/" class="btn btn-neutral float-right" title="Classification">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../feature%20engineering/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../classification/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../javascripts/mathjax.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
