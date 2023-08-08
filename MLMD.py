@@ -132,12 +132,12 @@ if select_option == "平台主页":
 
     st.write('''![](https://user-images.githubusercontent.com/61132191/231178382-aa223924-f1cb-4e0e-afa1-08c536111f3a.jpg?raw=true)''')
     
-    colored_header(label="致谢",description="",color_name="violet-90")
-    st.markdown(
-    '''
-    国家科技部重点研发计划(No. 2022YFB3707803)
+    # colored_header(label="致谢",description="",color_name="violet-90")
+    # st.markdown(
+    # '''
+    # 国家科技部重点研发计划(No. 2022YFB3707803)
     
-    ''')
+    # ''')
 
 elif select_option == "基础功能":
 
