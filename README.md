@@ -10,6 +10,9 @@ The MLMD platform (Machine Learning for Material Design) for Material or Enginee
 
 ![图片1](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa3fd53d-e922-4d7e-b4a3-ed7dc5ab62d6)
 
+![图片4](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/8d089d1e-7482-4665-97c4-a4eb090ba9a8)
+
+
 # 功能
 ## 单目标/多目标 嵌入代理模型的材料成分（工艺）设计流程
 
