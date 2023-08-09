@@ -7,7 +7,7 @@ The MLMD platform (Machine Learning for Material Design) for Material or Enginee
 
 材料基因组工程理念的发展将会大幅度提高新材料的研发效率、缩短研发周期、降低研发成本、全面加速材料从设计到工程化应用的进程。 因此MLMD旨在为材料试验科研人员提供快速上手，无编程的机器学习算法平台，致力于材料试验到材料设计的一体化。
 
-# MLMD框架
+
 ![图片1](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa3fd53d-e922-4d7e-b4a3-ed7dc5ab62d6)
 
 # 功能
