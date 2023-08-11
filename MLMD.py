@@ -3,6 +3,8 @@ Runs the streamlit app
 Call this file in the terminal via `streamlit run app.py`
 '''
 from streamlit_extras.badges import badge
+from streamlit_shap import st_shap
+import shap
 
 import streamlit as st
 
@@ -2564,7 +2566,7 @@ elif select_option == "其他":
             test_size = st.slider('test size',0.1, 0.5, 0.2) 
             random_state = st.checkbox('random state 1024',True)
             if random_state:
-                random_state = 1024
+                random_state = 42
             else:
                 random_state = None
                 
