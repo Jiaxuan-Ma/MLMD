@@ -2,14 +2,16 @@
 Runs the streamlit app
 Call this file in the terminal via `streamlit run app.py`
 '''
-from streamlit_extras.badges import badge
-from streamlit_shap import st_shap
+
+
 import shap
 
 import streamlit as st
 
 from streamlit_extras.colored_header import colored_header
 from streamlit_option_menu import option_menu
+from streamlit_extras.badges import badge
+from streamlit_shap import st_shap
 
 import numpy as np
 import pandas as pd
@@ -2262,12 +2264,11 @@ elif select_option == "迁移学习":
 
                 if inputs['max iter'] > source_features.shape[0]:
                     st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
-                st.warning('the regression result have to been modified in the latter')
                 if button_train:
                     TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
                     
                     Xtest = df_test[list(target_features.columns)]
-                    predict = TrAdaboostR2.estimators_predict(Xtest)
+                    predict = TrAdaboostR2.predict(Xtest)
                     prediction = pd.DataFrame(predict, columns=[target_selected_option])
                     try:
                         Ytest = df_test[target_selected_option]
@@ -2285,7 +2286,14 @@ elif select_option == "迁移学习":
                         st.write(prediction)
                         tmp_download_link = download_button(prediction, f'预测结果.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
-            
+                    
+                    with st.expander("模型下载"):
+                        i = 0
+                        model_name = 'decision_tree'
+                        for estimator in TrAdaboostR2.best_estimators:
+                            tmp_download_link = download_button(estimator, model_name+f'_model{i}.pkl', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                            i = i + 1                    
             elif inputs['model'] == 'TwoStageTrAdaboostR2':
                 st.write('Please wait...')
             elif inputs['model'] == 'TwoStageTrAdaboostR2-revised':

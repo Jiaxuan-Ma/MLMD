@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 import streamlit as st
+import statistics
 
 class TrAdaboostR2:
     def __init__(self) -> None:
@@ -44,52 +45,42 @@ class TrAdaboostR2:
             print(f"Iteration {i+1} / {self.N} | error rate in target data {error_rate:.3f}")
             self.beta_N[i] = error_rate / (1 - error_rate)
             # adjust the sample weight
+
             Z_t = np.abs(np.array(Ypred - Ytrain)).max()
             if Z_t == 0: Z_t = 1e-5
-    
             for t in range(m):
                 weights[n + t] = weights[n+t] * np.power(self.beta_N[i], -np.abs(Ypred[n+t] - Ytrain[n+t]) / Z_t)
-            # st.write(weights)
             for s in range(n):
                 weights[s] = weights[s] * np.power(beta, np.abs(Ypred[s] - Ytrain[s]) / Z_t)
-        # for j in range(row_A):
-        #     weights[j] = weights[j] * np.power(bata, np.abs(result_response[j, i] - response_A[j]) / D_t)
+
     def _calculate_weight(self, weights):
         sum_weight = np.sum(weights)
         return np.asarray(weights / sum_weight, order='C')
 
     def _calculate_error_rate(self, Ypred, Ytarget, weight_target):
         max_weight = np.abs(Ypred - Ytarget).max()
-        # misclassify_num = np.sum(np.abs(Ypred - Ytarget))
+
         return np.sum(weight_target[:, 0] / max_weight * np.abs(Ypred - Ytarget))
 
-    def estimators_predict(self, Xtest):
-        
+    def predict(self, Xtest):
         Xtest = np.asarray(Xtest, order='C')
-        self.predictions = np.ones([Xtest.shape[0], self.N])
+        self.estimators_predicts = np.ones([Xtest.shape[0], self.N])
         for i, estimator in zip(range(self.N), self.estimators):
             Ypred = estimator.predict(Xtest)
-            self.predictions[:, i] = Ypred
-        predict = []
-        for i in range(Xtest.shape[0]):
-            predict.append(np.sum(self.predictions[i, int(np.ceil(self.N/2)):self.N]) / (self.N - int(np.ceil(self.N/2))))
-        return predict
+            self.estimators_predicts[:, i] = Ypred
+        
+        predicts = self.beta_N[:self.N] + self.estimators_predicts
+        predicts = predicts[:, int(np.ceil(self.N/2)):self.N] 
+        median_predicts = []
+        self.best_estimators = []
+        for i in range(predicts.shape[0]):
+            # row_median = np.median(predicts[i, :])  # 计算每行中位数
+            row_idx = np.argsort(predicts[i, :])  # 排序后的索引
+            median_idx = len(row_idx) // 2 
+            median_predicts.append(self.estimators_predicts[i, int(np.ceil(self.N/2))+row_idx[median_idx]])
+            # log estimators
+            self.best_estimators.append(self.estimators[int(np.ceil(self.N/2))+row_idx[median_idx]])
+        # st.write(self.best_estimators)
+        return median_predicts
 
-    # def predict_weighted_median(self):
-    # sorted_predictions = sorted(zip(self.predictions, self.beta_N), reverse=True)
-    # total_weight = sum(self.beta_N)
-    # half_weight = np.ceil(total_weight / 2.0)
-    # cumulative_weight = 0.0
-    # median_predictions = []
-    # for prediction, weight in sorted_predictions:
-    #     cumulative_weight += weight
-    #     median_predictions.append(prediction)
-    #     if cumulative_weight >= half_weight:
-    #         break
-    #     return median_predictions[-1]
-    # # for i in range(row_T):
-    # #     predict[i] = np.sum(
-    # #         result_response[row_A + row_S + i, int(np.floor(N / 2)):N]) / (N - int(np.floor(N / 2)))
-
-
-
+    
