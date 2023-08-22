@@ -1,7 +1,5 @@
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
-import streamlit as st
-import statistics
 
 class TrAdaboostR2:
     def __init__(self) -> None:
@@ -74,8 +72,8 @@ class TrAdaboostR2:
         median_predicts = []
         self.best_estimators = []
         for i in range(predicts.shape[0]):
-            # row_median = np.median(predicts[i, :])  # 计算每行中位数
-            row_idx = np.argsort(predicts[i, :])  # 排序后的索引
+            # row_median = np.median(predicts[i, :])  # median value
+            row_idx = np.argsort(predicts[i, :])  # median index
             median_idx = len(row_idx) // 2 
             median_predicts.append(self.estimators_predicts[i, int(np.ceil(self.N/2))+row_idx[median_idx]])
             # log estimators
