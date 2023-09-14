@@ -44,9 +44,9 @@ def show():
             inputs['nestimators'] = st.number_input('number estimators',1, 1000, 100)
             inputs['learning rate'] = st.number_input('learning rate',0.001,10.0,1.0)
 
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 

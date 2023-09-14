@@ -10,6 +10,7 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import silhouette_score
 from sklearn.metrics import r2_score
+from sklearn.model_selection import KFold
 ######for GP
 
 
@@ -476,12 +477,14 @@ class customPlot:
         options = self.fontsize_option
         options_selected = st.selectbox('title fontsize', options, key=key)
         return options_selected
-            
     def set_label_fontsize(self, key):
         options = self.fontsize_option
         options_selected = st.selectbox('label fontsize', options, key=key)
         return options_selected
-    
+    def set_annot_fontsize(self, key):
+        options = self.fontsize_option
+        options_selected = st.selectbox('annot fontsize', options, key=key)
+        return options_selected       
     def set_legend_fontsize(self, key):
         options = self.fontsize_option
         options_selected = st.selectbox('legend fontsize', options, key=key)
@@ -619,20 +622,23 @@ class customPlot:
         st.pyplot(fig)
 
     def corr_cofficient(self, options_selected, is_mask, corr_matrix):
-        assert len(options_selected) >= 4, "options insufficient !"
-        self.map_fontsize_options(options_selected)
+        # assert len(options_selected) >= 4, "options insufficient !"
+        options = np.array([self.fontsize_dict[x] for x in options_selected[:4]])
+        plt.rc('xtick', labelsize=options[0])  
+        plt.rc('ytick', labelsize=options[0])    
         cmap = sns.diverging_palette(220, 10, as_cmap=True)
+        annot_kws = {"size": options[1]}
         fig, ax = plt.subplots()
         if is_mask == "Yes":
             mask = np.zeros_like(corr_matrix, dtype=bool)
             mask[np.triu_indices_from(mask)] = True
-            ax = sns.heatmap(corr_matrix, mask=mask, cmap=cmap, linewidths=0.5,square = True, annot=True)
+            ax = sns.heatmap(corr_matrix, mask=mask, cmap=cmap, linewidths=0.5,square = True, annot=True, annot_kws=annot_kws)
             plt.legend()
             # img_path = os.path.join(target_dir, 'Correlation Matrix.png')
             # fig.savefig(img_path)
             st.pyplot(fig)
         else:
-            ax = sns.heatmap(corr_matrix,cmap = cmap, linewidths=0.5,square = True, annot=True)
+            ax = sns.heatmap(corr_matrix,cmap = cmap, linewidths=0.5,square = True, annot=True, annot_kws=annot_kws)
             plt.legend()
             # img_path = os.path.join(target_dir, 'Correlation Cofficient.png')
             # fig.savefig(img_path)
@@ -1439,18 +1445,22 @@ def plot_and_export_results(model, model_name):
             tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-def plot_cross_val_results(cvs, model_name):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            st.write(cvs['test_score'])
-        with col2:
-            with st.expander("模型下载"):
-                i = 0
-                for estimator in cvs['estimator']:
-                    tmp_download_link = download_button(estimator, model_name+f'_model{i}.pkl', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    i = i + 1
-        st.write('R2: {}'.format(cvs['test_score'].mean()))
+def export_cross_val_results(model, F, model_name):
+
+    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model)    
+    st.write('R2: {}'.format(r2_score(y_true=Y_test, y_pred=Y_pred)))
+    plot = customPlot()
+    plot.pred_vs_actual(Y_test, Y_pred)                    
+    with st.expander("模型下载"):
+        tmp_download_link = download_button(model.model, model_name+'.pickle', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+    result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
+    result_data.columns = ['actual', 'prediction']
+    with st.expander('预测结果'):
+        st.write(result_data)
+        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
 
 def export_loo_results(model, loo, model_name):
     Y_pred  =[]
@@ -1565,3 +1575,17 @@ def dominated_hypervolume(pareto_data, ref_point):
     return S
 
 
+def Ffold_cross_val(Xtrain, Ytrain, F, estimator):
+    Xtrain = np.array(Xtrain)
+    Ytrain = np.array(Ytrain)
+    row_Xtrain = Xtrain.shape[0]
+    kf = KFold(n_splits=F)
+    predict = np.zeros([row_Xtrain, 1])
+    real = np.zeros([row_Xtrain, 1])
+    for train_index, val_index in kf.split(Xtrain):
+        x_train, x_val = [Xtrain[i] for i in train_index], [Xtrain[i] for i in val_index]
+        y_train, y_val = [Ytrain[i] for i in train_index], [Ytrain[i] for i in val_index]
+        estimator.fit(x_train, y_train)
+        predict[val_index] = estimator.predict(x_val).reshape(-1,1)
+        real[val_index] = np.array(y_val).reshape(-1,1)
+    return predict, real

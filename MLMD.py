@@ -82,8 +82,6 @@ import scienceplots
 from algorithm.TrAdaboostR2 import TrAdaboostR2
 from algorithm.mobo import Mobo4mat
 
-
-
 warnings.filterwarnings('ignore')
 
 st.set_page_config(
@@ -104,25 +102,25 @@ footer {visibility:hidden;}
 st.markdown(sysmenu,unsafe_allow_html=True)
 # arrow-repeat
 with st.sidebar:
-    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程", "回归预测", "主动学习","迁移学习", "代理优化", "其他"],
+    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程", "回归预测", "分类预测", "主动学习","迁移学习", "代理优化", "其他"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'arrow-repeat','subtract', 'app', 'microsoft'],
                     menu_icon="boxes", default_index=0)
 if select_option == "平台主页":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
 
 # st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2, col3, col4 = st.columns([1,0.25,0.2,0.5])
-    with col1:
-        pass
-        # st.write('''
-        #     Check out [help document](https://mlmd.netlify.app/) for more information
-        #     ''')
-    with col2:
-        st.write('[![](https://img.shields.io/badge/MLMD-Github-yellowgreen)](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design)')
-    with col3:
-        badge(type="github", name="Jiaxuan-Ma/MLMD")
-    with col4:
-        st.write("")
+    # col1, col2, col3, col4 = st.columns([1,0.25,0.2,0.5])
+    # with col1:
+    #     pass
+    #     # st.write('''
+    #     #     Check out [help document](https://mlmd.netlify.app/) for more information
+    #     #     ''')
+    # with col2:
+    #     st.write('[![](https://img.shields.io/badge/MLMD-Github-yellowgreen)](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design)')
+    # with col3:
+    #     badge(type="github", name="Jiaxuan-Ma/MLMD")
+    # with col4:
+    #     st.write("")
     colored_header(label="材料设计的机器学习平台",description="Machine Learning for Material Design",color_name="violet-90")
     # st.write("## Machine Learning for Material Design")
     # st.write("## 材料的机器学习平台")
@@ -136,17 +134,17 @@ if select_option == "平台主页":
 
     st.write('''![](https://user-images.githubusercontent.com/61132191/231178382-aa223924-f1cb-4e0e-afa1-08c536111f3a.jpg?raw=true)''')
     
-    # colored_header(label="致谢",description="",color_name="violet-90")
-    # st.markdown(
-    # '''
-    # 国家科技部重点研发计划(No. 2022YFB3707803)
+    colored_header(label="致谢",description="",color_name="violet-90")
+    st.markdown(
+    '''
+    国家科技部重点研发计划(No. 2022YFB3707803)
     
-    # ''')
+    ''')
 
 elif select_option == "基础功能":
 
     colored_header(label="数据可视化",description=" ",color_name="violet-90")
-    file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+    file = st.file_uploader("Upload `.csv` file", type=['csv'], label_visibility="collapsed")
     if file is None:
         table = PrettyTable(['上传文件名称', '名称','数据说明'])
         table.add_row(['file_1','dataset','数据集'])
@@ -158,7 +156,7 @@ elif select_option == "基础功能":
         
         colored_header(label="数据信息",description=" ",color_name="violet-70")
 
-        nrow = st.slider("rows", 1, len(df)-1, 5)
+        nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
@@ -183,13 +181,31 @@ elif select_option == "基础功能":
         with col_target:   
             st.write(targets.head())
 
-        colored_header(label="特征变量统计分布", description=" ",color_name="violet-30")
+        # colored_header(label="特征变量统计分布", description=" ",color_name="violet-30")
 
-        feature_selected_name = st.selectbox('选择特征变量',list(features))
+        # feature_selected_name = st.selectbox('选择特征变量',list(features))
     
+        # feature_selected_value = features[feature_selected_name]
+        # plot = customPlot()
+        # col1, col2 = st.columns([1,3])
+        # with col1:  
+        #     with st.expander("绘图参数"):
+        #         options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
+        #                     plot.set_tick_fontsize(3),plot.set_legend_fontsize(4),plot.set_color('line color',6,5),plot.set_color('bin color',0,6)]
+        # with col2:
+        #     plot.feature_hist_kde(options_selected,feature_selected_name,feature_selected_value)
+        colored_header(label="特征变量在数据集中的分布", description=" ",color_name="violet-30")
+        feature_selected_name = st.selectbox('选择特征变量', list(features),1)
         feature_selected_value = features[feature_selected_name]
         plot = customPlot()
         col1, col2 = st.columns([1,3])
+        with col1:  
+            with st.expander("绘图参数"):
+                options_selected = [plot.set_title_fontsize(18),plot.set_label_fontsize(19),
+                            plot.set_tick_fontsize(20),plot.set_legend_fontsize(21), plot.set_color('bin color', 0, 22)]
+        with col2:
+            plot.feature_distribution(options_selected,feature_selected_name,feature_selected_value)
+        
         with col1:  
             with st.expander("绘图参数"):
                 options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
@@ -233,36 +249,27 @@ elif select_option == "基础功能":
         with col2:
             plot.featureSets_statistics_hist(options_selected,IDs, Counts)
 
-        colored_header(label="特征变量在数据集中的分布", description=" ",color_name="violet-30")
-        feature_selected_name = st.selectbox('选择特征变量', list(features),1)
-        feature_selected_value = features[feature_selected_name]
-        col1, col2 = st.columns([1,3])
-        with col1:  
-            with st.expander("绘图参数"):
-                options_selected = [plot.set_title_fontsize(18),plot.set_label_fontsize(19),
-                            plot.set_tick_fontsize(20),plot.set_legend_fontsize(21), plot.set_color('bin color', 0, 22)]
-        with col2:
-            plot.feature_distribution(options_selected,feature_selected_name,feature_selected_value)
 
-        colored_header(label="特征变量和目标变量关系", description=" ",color_name="violet-30")
-        col1, col2 = st.columns([1,3])
-        with col1:  
-            with st.expander("绘图参数"):
-                options_selected = [plot.set_title_fontsize(23),plot.set_label_fontsize(24),
-                            plot.set_tick_fontsize(25),plot.set_legend_fontsize(26),plot.set_color('scatter color',0, 27),plot.set_color('line color',6,28)]
-        with col2:
-            plot.features_and_targets(options_selected,df, list(features), list(targets))
+
+        # colored_header(label="特征变量和目标变量关系", description=" ",color_name="violet-30")
+        # col1, col2 = st.columns([1,3])
+        # with col1:  
+        #     with st.expander("绘图参数"):
+        #         options_selected = [plot.set_title_fontsize(23),plot.set_label_fontsize(24),
+        #                     plot.set_tick_fontsize(25),plot.set_legend_fontsize(26),plot.set_color('scatter color',0, 27),plot.set_color('line color',6,28)]
+        # with col2:
+        #     plot.features_and_targets(options_selected,df, list(features), list(targets))
         
-        # st.write("### Targets and Targets ")
-        if targets.shape[1] != 1:
-            colored_header(label="目标变量和目标变量关系", description=" ",color_name="violet-30")
-            col1, col2 = st.columns([1,3])
-            with col1:  
-                with st.expander("绘图参数"):
-                    options_selected = [plot.set_title_fontsize(29),plot.set_label_fontsize(30),
-                                plot.set_tick_fontsize(31),plot.set_legend_fontsize(32),plot.set_color('scatter color',0, 33),plot.set_color('line color',6,34)]
-            with col2:
-                plot.targets_and_targets(options_selected,df, list(targets))
+        # # st.write("### Targets and Targets ")
+        # if targets.shape[1] != 1:
+        #     colored_header(label="目标变量和目标变量关系", description=" ",color_name="violet-30")
+        #     col1, col2 = st.columns([1,3])
+        #     with col1:  
+        #         with st.expander("绘图参数"):
+        #             options_selected = [plot.set_title_fontsize(29),plot.set_label_fontsize(30),
+        #                         plot.set_tick_fontsize(31),plot.set_legend_fontsize(32),plot.set_color('scatter color',0, 33),plot.set_color('line color',6,34)]
+        #     with col2:
+        #         plot.targets_and_targets(options_selected,df, list(targets))
     st.write('---')
 
 elif select_option == "特征工程":
@@ -287,7 +294,7 @@ elif select_option == "特征工程":
                 st.stop()
                 
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -519,7 +526,7 @@ elif select_option == "特征工程":
             # 检测缺失值
             check_string_NaN(df)
 
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -581,7 +588,7 @@ elif select_option == "特征工程":
             # 检测缺失值
             check_string_NaN(df)
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -616,8 +623,7 @@ elif select_option == "特征工程":
 
                 is_mask = st.selectbox('掩码',('Yes', 'No'))
                 with st.expander('绘图参数'):
-                    options_selected = [plot.set_title_fontsize(19),plot.set_label_fontsize(20),
-                                        plot.set_tick_fontsize(21),plot.set_legend_fontsize(22)]
+                    options_selected = [plot.set_tick_fontsize(21), plot.set_tick_fontsize(22)]
                 with st.expander('丢弃的特征变量'):
                     st.write(fs.record_collinear)
             with col2:
@@ -643,7 +649,7 @@ elif select_option == "特征工程":
             # 检测缺失值
             check_string_NaN(df)
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -716,7 +722,7 @@ elif select_option == "特征工程":
             # 检测缺失值
             check_string_NaN(df)
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -762,7 +768,7 @@ elif select_option == "特征工程":
             # 检测缺失值
             check_string_NaN(df)
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -807,7 +813,7 @@ elif select_option == "特征工程":
                     option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
                 with st.container():
                     button_train = st.button('train', use_container_width=True)
                 if button_train:
@@ -844,7 +850,7 @@ elif select_option == "特征工程":
                     option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
 
                 with st.container():
                     button_train = st.button('train', use_container_width=True)
@@ -886,7 +892,7 @@ elif select_option == "特征工程":
                     option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
                 with st.container():
                     button_train = st.button('train', use_container_width=True)
                 if button_train:
@@ -924,7 +930,7 @@ elif select_option == "特征工程":
                     option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
                 with st.container():
                     button_train = st.button('train', use_container_width=True)
                 if button_train:
@@ -966,7 +972,7 @@ elif select_option == "特征工程":
                             option_cumulative_importance = st.slider('累计重要性阈值',0.5, 1.0, 0.95)
                             Embedded_method = st.checkbox('Embedded method',False)
                             if Embedded_method:
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                             
                         with st.container():
                             button_train = st.button('train', use_container_width=True)
@@ -1017,7 +1023,7 @@ elif select_option == "回归预测":
         check_string_NaN(df)
 
         colored_header(label="数据信息", description=" ",color_name="violet-70")
-        nrow = st.slider("rows", 1, len(df)-1, 5)
+        nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
@@ -1061,7 +1067,7 @@ elif select_option == "回归预测":
                         reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
 
                     elif operator == 'cross val score':
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
                     
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
@@ -1094,9 +1100,8 @@ elif select_option == "回归预测":
                         max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
                         min_samples_split=inputs['min samples split']) 
 
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    plot_cross_val_results(cvs, "DTR_cv")    
-
+                    export_cross_val_results(reg, cv, "DTR_cv")
+        
                 elif operator == 'leave one out':
 
                     reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
@@ -1104,7 +1109,6 @@ elif select_option == "回归预测":
                         min_samples_split=inputs['min samples split']) 
                     
                     export_loo_results(reg, loo, "DTR_loo")
-
 
 
         if inputs['model'] == 'RandomForestRegressor':
@@ -1115,7 +1119,7 @@ elif select_option == "回归预测":
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                     elif operator == 'cross val score':
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
 
                     elif operator == 'leave one out':
                         loo = LeaveOneOut()
@@ -1148,9 +1152,7 @@ elif select_option == "回归预测":
                                                 min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
                                                 n_jobs=inputs['njobs'])
 
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-        
-                    plot_cross_val_results(cvs, "RFR_cv") 
+                    export_cross_val_results(reg, cv, "RFR_cv")
     
                 elif operator == 'oob score':
 
@@ -1193,7 +1195,7 @@ elif select_option == "回归预测":
                             reg.features = StandardScaler().fit_transform(reg.features)
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
 
                     elif operator == 'leave one out':
                         if preprocess == 'StandardScaler':
@@ -1220,8 +1222,7 @@ elif select_option == "回归预测":
 
                     reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
 
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    plot_cross_val_results(cvs, "SVR_cv")  
+                    export_cross_val_results(reg, cv, "SVR_cv")
 
 
                 elif operator == 'leave one out':
@@ -1254,7 +1255,7 @@ elif select_option == "回归预测":
                             reg.features = StandardScaler().fit_transform(reg.features)
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
 
                     elif operator == 'leave one out':
                         if preprocess == 'StandardScaler':
@@ -1282,9 +1283,7 @@ elif select_option == "回归预测":
 
                     reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
 
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                    plot_cross_val_results(cvs, "KNR_cv") 
+                    export_cross_val_results(reg, cv, "KNR_cv")
 
                 elif operator == 'leave one out':
 
@@ -1316,7 +1315,7 @@ elif select_option == "回归预测":
                             reg.features = StandardScaler().fit_transform(reg.features)
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
     
                     elif operator == 'leave one out':
                         if preprocess == 'StandardScaler':
@@ -1346,9 +1345,8 @@ elif select_option == "回归预测":
 
                     reg.model = LinearR()
 
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                    export_cross_val_results(reg, cv, "LinearR_cv")
 
-                    plot_cross_val_results(cvs, "linearR_cv")    
 
                 elif operator == 'leave one out':
 
@@ -1381,7 +1379,7 @@ elif select_option == "回归预测":
                             reg.features = StandardScaler().fit_transform(reg.features)
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
 
                     elif operator == 'leave one out':
                         if preprocess == 'StandardScaler':
@@ -1409,9 +1407,7 @@ elif select_option == "回归预测":
 
                     reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
 
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                    plot_cross_val_results(cvs, "LassoR_cv")   
+                    export_cross_val_results(reg, cv, "LassoR_cv")
 
                 elif operator == 'leave one out':
 
@@ -1443,7 +1439,7 @@ elif select_option == "回归预测":
                             reg.features = StandardScaler().fit_transform(reg.features)
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
                     
                     elif operator == 'leave one out':
                         if preprocess == 'StandardScaler':
@@ -1471,16 +1467,14 @@ elif select_option == "回归预测":
 
                     reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
 
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                    plot_cross_val_results(cvs, "LassoR_cv") 
+                    export_cross_val_results(reg, cv, "RidgeR_cv")
 
 
                 elif operator == 'leave one out':
 
                     reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
                 
-                    export_loo_results(reg, loo, "LassoR_loo")
+                    export_loo_results(reg, loo, "RidgeR_loo")
 
         if inputs['model'] == 'MLPRegressor':
 
@@ -1506,7 +1500,7 @@ elif select_option == "回归预测":
                             reg.features = StandardScaler().fit_transform(reg.features)
                         if preprocess == 'MinMaxScaler':
                             reg.features = MinMaxScaler().fit_transform(reg.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
                     
                     elif operator == 'leave one out':
                         if preprocess == 'StandardScaler':
@@ -1535,8 +1529,7 @@ elif select_option == "回归预测":
                                             batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
                                             random_state=inputs['random state'])
                     
-                    cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    plot_cross_val_results(cvs, "MLP_cv") 
+                    export_cross_val_results(reg, cv, "MLP_cv")
 
                 elif operator == 'leave one out':
 
@@ -1548,15 +1541,19 @@ elif select_option == "回归预测":
 
             st.write('---')
                             
-elif select_option == "分类":
-    
+elif select_option == "分类预测":
+
+    colored_header(label="分类预测",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+    if file is None:
+        table = PrettyTable(['上传文件名称', '名称','数据说明'])
+        table.add_row(['file_1','dataset','数据集'])
+        st.write(table)
     if file is not None:
         df = pd.read_csv(file)
-        # 检测缺失值
         check_string_NaN(df)
         colored_header(label="数据信息", description=" ",color_name="violet-70")
-        nrow = st.slider("rows", 1, len(df)-1, 5)
+        nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
@@ -1602,7 +1599,7 @@ elif select_option == "分类":
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                     elif data_process == 'cross val score':
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
 
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
@@ -1613,7 +1610,6 @@ elif select_option == "分类":
                                                             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
                                                                
                     clf.DecisionTreeClassifier()
-
                     plot = customPlot()
                     cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
                     plot.confusion_matrix(cm)
@@ -1645,7 +1641,7 @@ elif select_option == "分类":
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                     elif data_process == 'cross val score':
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
              
                     elif data_process == 'oob score':
                         inputs['oob score']  = st.checkbox('oob score',True)
@@ -1714,7 +1710,7 @@ elif select_option == "分类":
                             clf.features = StandardScaler().fit_transform(clf.features)
                         if preprocess == 'MinMaxScaler':
                             clf.features = MinMaxScaler().fit_transform(clf.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             
@@ -1761,7 +1757,7 @@ elif select_option == "分类":
                             clf.features = StandardScaler().fit_transform(clf.features)
                         if preprocess == 'MinMaxScaler':
                             clf.features = MinMaxScaler().fit_transform(clf.features)
-                        cv = st.number_input('cv',1,10,5)
+                        cv = st.number_input('cv',1,20,5)
    
             with st.container():
                 button_train = st.button('Train', use_container_width=True)   
@@ -1782,7 +1778,6 @@ elif select_option == "分类":
                         tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-            
                 elif data_process == 'cross val score':
                     clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
                                                                                              
@@ -1800,7 +1795,7 @@ elif select_option == "聚类":
         # 检测缺失值
         check_string_NaN(df)
         colored_header(label="数据信息", description=" ",color_name="violet-70")
-        nrow = st.slider("rows", 1, len(df)-1, 5)
+        nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
@@ -1874,23 +1869,23 @@ elif select_option == "主动学习":
             table.add_row(['file_1','dataset','数据集'])
             table.add_row(['file_2','visual data','虚拟采样点'])
             st.write(table)
-            st.info("If only one dataset is uploaded, the range of virtual sampling points can be adjusted in the program based on a ratio of 0.8~1.2 relative to the size of each feature dimension.")
-        if len(file) > 2:
-            st.error('May uploaded two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
-            st.stop()
+            st.info("'May uploaded two files, the first is the dataset, the second is the virtual sample point")
+        # if len(file) > 2:
+        #     st.error('May uploaded two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
+        #     st.stop()
         # if len(file) == 2:
         #     st.info('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
-        if len(file) > 0:
+        if len(file) == 2:
             
             colored_header(label="数据信息",description=" ",color_name="violet-70")
 
             # with st.expander('Data Information'):
             df = pd.read_csv(file[0])
-            if len(file) == 2:
-                df_vs = pd.read_csv(file[1])
+            # if len(file) == 2:
+            df_vs = pd.read_csv(file[1])
             check_string_NaN(df)
 
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -1928,25 +1923,25 @@ elif select_option == "主动学习":
             if inputs['model'] == 'BayeSampling':
 
                 with col2:
-                    if len(file) == 2:
-                        sp.vsfeatures = df_vs
-                        st.info('You have upoaded the visual sample point file.')
-                        feature_name = sp.features.columns.tolist()
-                    else:
-                        feature_name = sp.features.columns.tolist()
-                        mm = MinMaxScaler()
-                        mm.fit(sp.features)
-                        data_min = mm.data_min_
-                        data_max = mm.data_max_
-                        sp.trans_features = mm.transform(sp.features)
-                        min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
+                    # if len(file) == 2:
+                    sp.vsfeatures = df_vs
+                    st.info('You have upoaded the visual sample point file.')
+                    feature_name = sp.features.columns.tolist()
+                    # else:
+                    #     feature_name = sp.features.columns.tolist()
+                    #     mm = MinMaxScaler()
+                    #     mm.fit(sp.features)
+                    #     data_min = mm.data_min_
+                    #     data_max = mm.data_max_
+                    #     sp.trans_features = mm.transform(sp.features)
+                    #     min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
             
-                        sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
-                        feature_num = sp.trans_features.shape[1]
+                    #     sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
+                    #     feature_num = sp.trans_features.shape[1]
 
-                        vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+                    #     vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
 
-                        sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
+                    #     sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
                 
                 with st.expander('visual samples'):
                     st.write(sp.vsfeatures)
@@ -2047,12 +2042,12 @@ elif select_option == "主动学习":
                 check_string_NaN(df_vs)
             check_string_NaN(df)
 
-            nrow = st.slider("rows", 1, len(df)-1, 5, key=1)
+            nrow = st.slider("rows", 1, len(df), 5, key=1)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
@@ -2542,7 +2537,7 @@ elif select_option == "其他":
             # 检测缺失值
             check_string_NaN(df)
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
@@ -2640,7 +2635,7 @@ elif select_option == "其他":
                 check_string_NaN(df)
 
                 colored_header(label="数据信息", description=" ",color_name="violet-70")
-                nrow = st.slider("rows", 1, len(df)-1, 5)
+                nrow = st.slider("rows", 1, len(df), 5)
                 df_nrow = df.head(nrow)
                 st.write(df_nrow)
 
@@ -2697,7 +2692,7 @@ elif select_option == "其他":
                                     reg.features = StandardScaler().fit_transform(reg.features)
                                 if preprocess == 'MinMaxScaler':
                                     reg.features = MinMaxScaler().fit_transform(reg.features)
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
 
                             elif operator == 'leave one out':
                                 if preprocess == 'StandardScaler':
@@ -2755,7 +2750,7 @@ elif select_option == "其他":
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
 
-                                plot_cross_val_results(cvs, "BaggingR_cv")   
+                                export_cross_val_results(cvs, "BaggingR_cv")   
 
                             elif inputs['base estimator'] == "SupportVector": 
 
@@ -2764,7 +2759,7 @@ elif select_option == "其他":
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                plot_cross_val_results(cvs, "BaggingR_cv")   
+                                export_cross_val_results(cvs, "BaggingR_cv")   
 
                             elif inputs['base estimator'] == "LinearRegression":
                                 reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
@@ -2772,7 +2767,7 @@ elif select_option == "其他":
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                plot_cross_val_results(cvs, "BaggingR_cv")   
+                                export_cross_val_results(cvs, "BaggingR_cv")   
 
                         elif operator == 'leave one out':
                             if inputs['base estimator'] == "DecisionTree": 
@@ -2804,7 +2799,7 @@ elif select_option == "其他":
                                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                                 reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                             elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                             elif operator == 'leave one out':
                                 loo = LeaveOneOut()
                     colored_header(label="Training", description=" ",color_name="violet-30")
@@ -2856,14 +2851,14 @@ elif select_option == "其他":
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                plot_cross_val_results(cvs, "AdaBoostR_cv")  
+                                export_cross_val_results(cvs, "AdaBoostR_cv")  
 
                             elif inputs['base estimator'] == "LinearRegression":
                                 reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                plot_cross_val_results(cvs, "AdaBoostR_cv")  
+                                export_cross_val_results(cvs, "AdaBoostR_cv")  
 
                         elif operator == 'leave one out':
                             if inputs['base estimator'] == "DecisionTree": 
@@ -2892,7 +2887,7 @@ elif select_option == "其他":
                                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                                 reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                             elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                             elif operator == 'leave one out':
                                 loo = LeaveOneOut()
 
@@ -2917,7 +2912,7 @@ elif select_option == "其他":
                                 reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
                                                                     random_state=inputs['random state'])  
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                plot_cross_val_results(cvs, "GradientBoostingR_cv")    
+                                export_cross_val_results(cvs, "GradientBoostingR_cv")    
 
                         elif operator == 'leave one out':
                                 reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
@@ -2935,7 +2930,7 @@ elif select_option == "其他":
                                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                                 reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                             elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                             elif operator == 'leave one out':
                                 loo = LeaveOneOut()
                     colored_header(label="Training", description=" ",color_name="violet-30")
@@ -2961,7 +2956,7 @@ elif select_option == "其他":
                                                             learning_rate=inputs['learning rate'])
                                 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                plot_cross_val_results(cvs, "DTR_cv")    
+                                export_cross_val_results(cvs, "DTR_cv")    
 
 
                         elif operator == 'leave one out':
@@ -2982,7 +2977,7 @@ elif select_option == "其他":
                                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                                 reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                             elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                             elif operator == 'leave one out':
                                 loo = LeaveOneOut()
                     colored_header(label="Training", description=" ",color_name="violet-30")
@@ -3007,7 +3002,7 @@ elif select_option == "其他":
                                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
                                 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                plot_cross_val_results(cvs, "LGBMR_cv")    
+                                export_cross_val_results(cvs, "LGBMR_cv")    
 
                         elif operator == 'leave one out':
                                 reg.model = lgb.LGBMRegressor(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
@@ -3024,7 +3019,7 @@ elif select_option == "其他":
                                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                                 reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                             elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                             elif operator == 'leave one out':
                                 loo = LeaveOneOut()
                     colored_header(label="Training", description=" ",color_name="violet-30")
@@ -3047,7 +3042,7 @@ elif select_option == "其他":
                                 reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
                                 
                                 cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                plot_cross_val_results(cvs, "CatBoostR_cv")    
+                                export_cross_val_results(cvs, "CatBoostR_cv")    
 
                         elif operator == 'leave one out':
                                 reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
@@ -3064,7 +3059,7 @@ elif select_option == "其他":
                     check_string_NaN(df)
                     
                     colored_header(label="Data", description=" ",color_name="blue-70")
-                    nrow = st.slider("rows", 1, len(df)-1, 5)
+                    nrow = st.slider("rows", 1, len(df), 5)
                     df_nrow = df.head(nrow)
                     st.write(df_nrow)
 
@@ -3124,7 +3119,7 @@ elif select_option == "其他":
                                     clf.features = StandardScaler().fit_transform(clf.features)
                                 if preprocess == 'MinMaxScaler':
                                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                 
                     
                     with st.container():
@@ -3224,7 +3219,7 @@ elif select_option == "其他":
                                     clf.features = StandardScaler().fit_transform(clf.features)
                                 if preprocess == 'MinMaxScaler':
                                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                 
                     
                     with st.container():
@@ -3324,7 +3319,7 @@ elif select_option == "其他":
                                     clf.features = StandardScaler().fit_transform(clf.features)
                                 if preprocess == 'MinMaxScaler':
                                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                 
                     
                     with st.container():
@@ -3378,7 +3373,7 @@ elif select_option == "其他":
                                     clf.features = StandardScaler().fit_transform(clf.features)
                                 if preprocess == 'MinMaxScaler':
                                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                 
                     
                     with st.container():
@@ -3434,7 +3429,7 @@ elif select_option == "其他":
                                     clf.features = StandardScaler().fit_transform(clf.features)
                                 if preprocess == 'MinMaxScaler':
                                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                 
                     
                     with st.container():
@@ -3489,7 +3484,7 @@ elif select_option == "其他":
                                     clf.features = StandardScaler().fit_transform(clf.features)
                                 if preprocess == 'MinMaxScaler':
                                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,10,5)
+                                cv = st.number_input('cv',1,20,5)
                 
                     
                     with st.container():
@@ -3523,7 +3518,7 @@ elif select_option == "其他":
     elif sub_option == "模型推理":
         
         colored_header(label="模型推理",description=" ",color_name="violet-90")
-        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
+        file = st.file_uploader("Upload `.csv`file", label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 2:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
             table.add_row(['file_1','data set','数据集'])
@@ -3536,7 +3531,7 @@ elif select_option == "其他":
             check_string_NaN(df)
 
             colored_header(label="数据信息", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df)-1, 5)
+            nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 

@@ -40,9 +40,9 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['alpha'] = st.number_input('alpha',0, 100, 1)
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 

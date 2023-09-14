@@ -40,15 +40,13 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['kernel'] = st.selectbox('kernel',['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'])
-            inputs['C'] = st.number_input('C', 1, 1000, 1)
-            random_state = st.checkbox('random state 1024',True)
+            inputs['C'] = st.number_input('C', 1, 50000, 1000)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
-
     return inputs,col2
-
 
 # To test the alg independent of the app or template, just run 
 # `streamlit run alg.py` from within this folder.

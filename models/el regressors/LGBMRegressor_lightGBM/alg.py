@@ -43,9 +43,9 @@ def show():
             inputs['num_leaves'] = st.number_input('leaves number',31) 
             inputs['learning rate'] = st.number_input('learning rate',0.001,0.5,0.1)
             inputs['max depth'] = st.number_input('max depth',0, 100, 0)
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 

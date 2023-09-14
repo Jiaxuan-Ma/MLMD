@@ -42,9 +42,9 @@ def show():
             inputs['n neighbors'] = st.number_input('n neighbors', 1, 1000, 1)
             # inputs['min samples split'] = st.number_input('min samples split', 2, 1000, 2)
             
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 

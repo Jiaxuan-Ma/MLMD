@@ -48,9 +48,9 @@ def show():
             inputs['learning rate'] = st.selectbox('constant', ['constant', 'invscaling', 'adaptive'])
             inputs['batch size'] = st.number_input('batch size',4, 64,16)
             inputs['max iter'] = st.number_input('max iter', 1, 1000, 300)
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 
