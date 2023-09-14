@@ -1460,7 +1460,6 @@ def export_cross_val_results(model, F, model_name):
         st.write(result_data)
         tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
- 
 
 def export_loo_results(model, loo, model_name):
     Y_pred  =[]
@@ -1517,7 +1516,6 @@ def get_column_max(matrix):
 def calculate_mean(list1, list2):
     result = [(x + y) / 2 for x, y in zip(list1, list2)]
     return result
-
 
 def non_dominated_sorting(fitness_values):
     num_objectives = fitness_values.shape[1]
