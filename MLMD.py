@@ -2195,7 +2195,7 @@ elif select_option == "迁移学习":
             df_test = pd.read_csv(file[0])
             df_target = pd.read_csv(file[1])
             df_source = pd.read_csv(file[2])
-            if len(file) > 3:
+            if len(file) >= 3:
                 df_test = pd.read_csv(file[0])
                 df_target = pd.read_csv(file[1])
                 source_files = file[2:]
