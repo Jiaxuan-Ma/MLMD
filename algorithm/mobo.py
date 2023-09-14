@@ -78,9 +78,9 @@ class Mobo4mat:
 
         elif method == 'EHVI':
             pass
-        elif objective == 'max':
+        elif method == 'EGO':
             pass
-        return HV_values.loc[max_idx], recommend_point
+        return HV_values.loc[max_idx].values, recommend_point
     
     def normalize(self, data, normalize: Optional[str]=None):
         columns = data.columns

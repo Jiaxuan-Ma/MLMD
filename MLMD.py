@@ -1864,12 +1864,12 @@ elif select_option == "主动学习":
         colored_header(label="单目标主动学习",description=" ",color_name="violet-70")
 
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) == 0:
+        if len(file) != 2:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
             table.add_row(['file_1','dataset','数据集'])
             table.add_row(['file_2','visual data','虚拟采样点'])
             st.write(table)
-            st.info("'May uploaded two files, the first is the dataset, the second is the virtual sample point")
+            st.info("May uploaded two files, the first is the dataset, the second is the virtual sample point")
         # if len(file) > 2:
         #     st.error('May uploaded two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
         #     st.stop()
@@ -2022,31 +2022,21 @@ elif select_option == "主动学习":
 
         colored_header(label="多目标主动学习",description=" ",color_name="violet-70")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) == 0:
+        if len(file) != 2:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
             table.add_row(['file_1','dataset','数据集'])
             table.add_row(['file_2','visual data','虚拟采样点'])
             st.write(table)
-            st.info("If only one dataset is uploaded, the range of virtual sampling points can be adjusted in the program based on a ratio of 0.8~1.2 relative to the size of each feature dimension.")
-        if len(file) > 2:
-            st.error('May upload two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
-            st.stop() 
-        if len(file) > 0:
-            
+            st.info("May upload two files, the first is the dataset, the second is the the virtual space sample point. ")
+        elif len(file) == 2:    
             colored_header(label="数据信息",description=" ",color_name="violet-70")
-
             # with st.expander('Data Information'):
             df = pd.read_csv(file[0])
-            if len(file) == 2:
-                df_vs = pd.read_csv(file[1])
-                check_string_NaN(df_vs)
+        
+            df_vs = pd.read_csv(file[1])
+            check_string_NaN(df_vs)
             check_string_NaN(df)
 
-            nrow = st.slider("rows", 1, len(df), 5, key=1)
-            df_nrow = df.head(nrow)
-            st.write(df_nrow)
-
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
@@ -2075,7 +2065,7 @@ elif select_option == "主动学习":
             reg.targets = targets[target_selected_option]
             reg.Xtrain = features
             reg.Ytrain = targets
-
+            feature_name = reg.Xtrain.columns
             colored_header(label="Sampling", description=" ",color_name="violet-30")
             model_path = './models/multi-obj'
 
@@ -2084,37 +2074,49 @@ elif select_option == "主动学习":
 
             if inputs['model'] == 'MOBO':
 
+                mobo = Mobo4mat()
+
                 with col2:
-                    if len(file) == 2:
-                        # features
-                        vs_features = df_vs.iloc[:,:-target_num]
-                        # targets
-                        vs_targets = df_vs.iloc[:,-target_num:]
-                        reg.Xtest = vs_features
-                        st.info('You have upoaded the visual sample point file.')
-                    else:
-                        feature_name = features.columns.tolist()
-                        mm = MinMaxScaler()
-                        mm.fit(features)
-                        data_min = mm.data_min_
-                        data_max = mm.data_max_
-                        trans_features = mm.transform(features)
-                        min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
+                    # if len(file) == 2:
+                    # features
+                    # vs_features = df_vs.iloc[:,:-target_num]
+                    vs_features = df_vs
+                    # targets
+                    # vs_targets = df_vs.iloc[:,-target_num:]
+                    reg.Xtest = vs_features
+                    st.info('You have upoaded the visual sample point file.')
+                    # else:
+                    #     feature_name = features.columns.tolist()
+                    #     mm = MinMaxScaler()
+                    #     mm.fit(features)
+                    #     data_min = mm.data_min_
+                    #     data_max = mm.data_max_
+                    #     trans_features = mm.transform(features)
+                    #     min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
             
-                        sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
-                        feature_num = trans_features.shape[1]
+                    #     sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
+                    #     feature_num = trans_features.shape[1]
 
-                        vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
-                        reg.Xtest = pd.DataFrame(vs, columns=feature_name)
+                    #     vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
+                    #     reg.Xtest = pd.DataFrame(vs, columns=feature_name)
 
-                with st.expander('visual samples'):
-                    st.write(reg.Xtest)
-                    tmp_download_link = download_button(reg.Xtest, f'visual samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-    
+
+                    if inputs['normalize'] == 'StandardScaler':
+                        reg.X = pd.concat([reg.Xtrain, reg.Xtest])
+                        reg.X, scaler = mobo.normalize(reg.X, "StandardScaler")
+                        reg.X = pd.DataFrame(reg.X, columns=feature_name)  
+                        reg.Xtrain = reg.X.iloc[:len(reg.Xtrain),:]     
+                        reg.Xtest = reg.X.iloc[len(reg.Xtrain):,:].reset_index(drop=True)
+                    elif inputs['normalize'] == 'MinMaxScaler':
+                        reg.X = pd.concat([reg.Xtrain, reg.Xtest])
+                        reg.X, scaler = mobo.normalize(reg.X, "StandardScaler")
+                        reg.X = pd.DataFrame(reg.X, columns=feature_name)  
+                        reg.Xtrain = reg.X.iloc[:len(reg.Xtrain),:]     
+                        reg.Xtest = reg.X.iloc[len(reg.Xtrain):,:].reset_index(drop=True) 
+
                 pareto_front = find_non_dominated_solutions(reg.targets.values, target_selected_option)
                 pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
-  
+
                 if inputs['objective'] == 'max':  
                     # st.write(type(reg.targets.values))  
                     reg.targets = - reg.targets
@@ -2122,7 +2124,7 @@ elif select_option == "主动学习":
                     pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
                     pareto_front = -pareto_front
                     reg.targets = -reg.targets
-                # st.write('pareto front of train data:', pareto_front)
+    
                 col1, col2 = st.columns([2, 1])
                 with col1:
                     with plt.style.context(['nature','no-latex']):
@@ -2135,6 +2137,9 @@ elif select_option == "主动学习":
                         st.pyplot(fig)
                 with col2:
                     st.write(pareto_front)
+                    tmp_download_link = download_button(pareto_front, f'Pareto_front.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                
                 ref_point = []
                 for i in range(len(target_selected_option)):
                     ref_point_loc = st.number_input(target_selected_option[i] + ' ref location', 0, 100000, 50)
@@ -2142,45 +2147,40 @@ elif select_option == "主动学习":
                 colored_header(label="Optimize", description=" ",color_name="violet-70")
                 with st.container():
                     button_train = st.button('Opt', use_container_width=True)  
-                if button_train:        
-                    mobo = Mobo4mat()
-                    row_train = reg.Xtrain.shape[0]
-                    row_test = reg.Xtest.shape[0]
+                if button_train:      
+                    HV_value, recommend_point = mobo.fit(X = reg.Xtrain, y = reg.Ytrain, visual_data=reg.Xtest, 
+                                                    method=inputs['method'],number= inputs['num'], objective=inputs['objective'], ref_point=ref_point)
+                    HV_value = pd.DataFrame(HV_value, columns=["HV value"]) 
+                    st.write(HV_value)
+                    recommend_point = pd.DataFrame(recommend_point, columns=feature_name)  
+                    
                     if inputs['normalize'] == 'StandardScaler':
-                        reg.data = pd.concat([reg.Xtrain, reg.Xtest], axis = 0)
-                        reg.data, scaler = mobo.normalize(reg.data, normalize='StandardScaler')
+                        recommend_point  = mobo.inverse_normalize(recommend_point, scaler, "StandardScaler")
                     elif inputs['normalize'] == 'MinMaxScaler':
-                        reg.data = pd.concat([reg.Xtrain, reg.Xtest], axis = 0)
-                        reg.data, scaler = mobo.normalize(reg.data, normalize='MinMaxScaler')  
-                    else:
-                        reg.data = pd.concat([reg.Xtrain, reg.Xtest], axis = 0)
-                    reg.Xtrain = reg.data.iloc[:row_train]
-                    reg.Xtest = reg.data.iloc[row_train:]
-
-                    HV, recommend_point = mobo.fit(X = reg.Xtrain, y = reg.Ytrain, visual_data=reg.Xtest, method=inputs['method'],number= inputs['num'], objective=inputs['objective'], ref_point=ref_point)
-                    st.write('The maximum value of HV:')
-                    st.write(HV)
-                    st.write('The recommended point is :')
-                    if inputs['normalize'] == 'StandardScaler':
-                        recommend_point = mobo.inverse_normalize(recommend_point, scaler,  normalize='StandardScaler')
-                    elif inputs['normalize'] == 'MinMaxScaler':
-                        recommend_point = mobo.inverse_normalize(recommend_point, scaler,  normalize='MinMaxScaler')  
-                    else:
-                        recommend_point = recommend_point
-
+                        recommend_point  = mobo.inverse_normalize(recommend_point, scaler, "MinMaxScaler")
+                    
                     st.write(recommend_point)
-                    tmp_download_link = download_button(recommend_point, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    tmp_download_link = download_button(recommend_point, f'推荐试验样本.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True) 
+                
+                with st.expander('visual samples'):
+                    if inputs['normalize'] == 'StandardScaler':
+                        reg.Xtest  = mobo.inverse_normalize(reg.Xtest, scaler, "StandardScaler")
+                    elif inputs['normalize'] == 'MinMaxScaler':
+                        reg.Xtest  = mobo.inverse_normalize(reg.Xtest, scaler, "MinMaxScaler")
+                    st.write(reg.Xtest)
+                    tmp_download_link = download_button(reg.Xtest, f'visual samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)                   
 
 elif select_option == "迁移学习":
     with st.sidebar:
-        sub_option = option_menu(None, ["Boosting", "Neural Network"])
-
+        # sub_option = option_menu(None, ["Boosting", "Neural Network"])
+        sub_option = option_menu(None, ["Boosting"])
     if sub_option == "Boosting":
         colored_header(label="基于boosting迁移学习",description=" ",color_name="violet-90")
-        sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
-                                icons=['list-task',  "list-task","list-task"],
-                                menu_icon="cast", default_index=0, orientation="horizontal")
+        # sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
+        #                         icons=['list-task',  "list-task","list-task"],
+        #                         menu_icon="cast", default_index=0, orientation="horizontal")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 3:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
@@ -2295,11 +2295,11 @@ elif select_option == "迁移学习":
                 st.write('Please wait...')
                 st.write('---')
 
-    elif sub_option == "Neural Network":
-        colored_header(label="基于Neural Network迁移学习",description=" ",color_name="violet-90")
-        sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
-                                icons=['list-task',  "list-task","list-task"],
-                                menu_icon="cast", default_index=0, orientation="horizontal")      
+    # elif sub_option == "Neural Network":
+    #     colored_header(label="基于Neural Network迁移学习",description=" ",color_name="violet-90")
+    #     sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
+    #                             icons=['list-task',  "list-task","list-task"],
+    #                             menu_icon="cast", default_index=0, orientation="horizontal")      
 
 elif select_option == "代理优化":
     with st.sidebar:
