@@ -1862,7 +1862,7 @@ elif select_option == "主动学习":
     
     if sub_option == "单目标主动学习":
 
-        colored_header(label="单目标主动学习",description=" ",color_name="violet-70")
+        colored_header(label="单目标主动学习",description=" ",color_name="violet-90")
 
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
         if len(file) != 2:
@@ -2021,7 +2021,7 @@ elif select_option == "主动学习":
 
     elif sub_option == "多目标主动学习":
 
-        colored_header(label="多目标主动学习",description=" ",color_name="violet-70")
+        colored_header(label="多目标主动学习",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
         if len(file) != 2:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
@@ -2301,7 +2301,7 @@ elif select_option == "代理优化":
         sub_option = option_menu(None, ["单目标代理优化", "多目标代理优化","迁移学习-单目标代理优化","迁移学习-多目标代理优化"])
     if sub_option == "单目标代理优化":
 
-        colored_header(label="单目标代理优化",description=" ",color_name="violet-90")
+        colored_header(label="单目标代理优化（成分/工艺）",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 2:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
@@ -2321,7 +2321,8 @@ elif select_option == "代理优化":
             colored_header(label="特征变量范围", description=" ", color_name="violet-70")
             vars_bound = pd.DataFrame(vars_bound, columns=features_name)
             st.write(vars_bound)
-
+            
+            colored_header(label="Optimize", description=" ", color_name="violet-70")
             model = pickle.load(file[1])
             model_path = './models/surrogate optimize'
             template_alg = model_platform(model_path)
@@ -2329,12 +2330,12 @@ elif select_option == "代理优化":
             inputs, col2 = template_alg.show()
             inputs['lb'] = vars_min
             inputs['ub'] = vars_max
-  
             with col2:
                 if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
                     st.warning('the variable number should be %d' % vars_bound.shape[1])
                 else:
                     st.info("the variable number is correct")
+ 
             with st.container():
                 button_train = st.button('Opt', use_container_width=True)
             if button_train:  
@@ -2436,14 +2437,15 @@ elif select_option == "代理优化":
 
         colored_header(label="多目标代理优化",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) < 3:
+        if len(file) != 3 or len(file) !=4:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
             table.add_row(['file_1','boundary','设计变量上下界'])
             table.add_row(['file_2','model_1','目标1 模型'])
             table.add_row(['file_3','model_2','目标2 模型'])
+            table.add_row(['file_4','model_3','目标3 模型'])
             st.write(table)
-            st.info('You need unpload three files, the first is the feature variable boundary, the second and the three are the trained models.')  
-        if len(file) >= 3:      
+            st.info('You can unpload three or four files, the first is the feature variable boundary, the second and the others are the trained models.')  
+        elif len(file) == 3:      
             model_1 = pickle.load(file[1])
             model_2 = pickle.load(file[2])
             model_path = './models/surrogate optimize'
@@ -2457,6 +2459,14 @@ elif select_option == "代理优化":
             vars_max = get_column_max(range_var)
             inputs['lb'] = vars_min
             inputs['ub'] = vars_max
+
+
+
+        elif len(file) == 4:
+            pass
+
+
+
 
     elif sub_option == "迁移学习-多目标代理优化":
         colored_header(label="迁移学习-多目标代理优化",description=" ",color_name="violet-90")
