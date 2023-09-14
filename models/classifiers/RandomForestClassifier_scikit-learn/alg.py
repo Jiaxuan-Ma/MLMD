@@ -52,9 +52,9 @@ def show():
             inputs['oob score'] = False
             inputs['warm start'] = False
 
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
              # graph parameter

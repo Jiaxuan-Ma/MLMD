@@ -40,12 +40,12 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['kernel'] = st.selectbox('kernel',['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'])
-            inputs['C'] = st.number_input('C', 1, 1000, 1)
+            inputs['C'] = st.number_input('C', 1, 20000, 1000)
             # inputs['min samples split'] = st.number_input('min samples split', 2, 1000, 2)
             
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
              # graph parameter
