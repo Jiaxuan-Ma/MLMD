@@ -57,7 +57,7 @@ from catboost import CatBoostRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 import Bgolearn.BGOsampling as BGOS
 
-
+from typing import Optional
 import graphviz
 
 import shap
@@ -74,6 +74,10 @@ from sko.DE import DE
 from sko.AFSA import AFSA
 from sko.SA import SAFast
 
+from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.problems import get_problem
+from pymoo.optimize import minimize
+from pymoo.visualization.scatter import Scatter
 # import sys
 from prettytable import PrettyTable
 
@@ -104,7 +108,7 @@ st.markdown(sysmenu,unsafe_allow_html=True)
 # arrow-repeat
 with st.sidebar:
     select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程", "回归预测", "分类预测", "主动学习","迁移学习", "代理优化", "其他"],
-                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'arrow-repeat','subtract', 'app', 'microsoft'],
+                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
                     menu_icon="boxes", default_index=0)
 if select_option == "平台主页":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
@@ -1110,7 +1114,6 @@ elif select_option == "回归预测":
                         min_samples_split=inputs['min samples split']) 
                     
                     export_loo_results(reg, loo, "DTR_loo")
-
 
         if inputs['model'] == 'RandomForestRegressor':
             with col2:
@@ -2303,14 +2306,33 @@ elif select_option == "代理优化":
 
         colored_header(label="单目标代理优化（成分/工艺）",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) < 2:
+        if len(file) < 3:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','boundary','设计变量上下界'])
-            table.add_row(['file_2','model','模型'])
+            table.add_row(['file_1','dataset','数据集'])
+            table.add_row(['file_2','boundary','设计变量上下界'])
+            table.add_row(['file_3','model','模型'])
             st.write(table)
-            st.info('You need unpload two files, the first is the feature variable boundary, the second is the trained models.')       
-        if len(file) >= 2:    
-            df_var = pd.read_csv(file[0])
+            st.info('You need unpload three files, the first is the dataset, the second is the feature variable boundary, the other is the trained models.')       
+        if len(file) >= 3:
+
+            df = pd.read_csv(file[0])
+            check_string_NaN(df)
+
+            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+
+            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            
+            col_feature, col_target = st.columns(2)
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
+
+            df_var = pd.read_csv(file[1])
             features_name = df_var.columns.tolist()
             range_var = df_var.values
             vars_min = get_column_min(range_var)
@@ -2321,9 +2343,9 @@ elif select_option == "代理优化":
             colored_header(label="特征变量范围", description=" ", color_name="violet-70")
             vars_bound = pd.DataFrame(vars_bound, columns=features_name)
             st.write(vars_bound)
-            
+        
             colored_header(label="Optimize", description=" ", color_name="violet-70")
-            model = pickle.load(file[1])
+            model = pickle.load(file[2])
             model_path = './models/surrogate optimize'
             template_alg = model_platform(model_path)
 
@@ -2331,18 +2353,31 @@ elif select_option == "代理优化":
             inputs['lb'] = vars_min
             inputs['ub'] = vars_max
             with col2:
-                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                    st.warning('the variable number should be %d' % vars_bound.shape[1])
-                else:
-                    st.info("the variable number is correct")
- 
+                preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
+                data = pd.concat([features,vars_bound])
+                # st.write(data)
+                if preprocess == 'StandardScaler':
+                    features, scaler = normalize(data, 'StandardScaler')
+                    vars_bound = features.tail(2)
+                elif preprocess == 'MinMaxScaler':
+                    features, scaler = normalize(data, 'MinMaxScaler')
+                    vars_bound = features.tail(2)
+
+            if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                st.warning('the variable number should be %d' % vars_bound.shape[1])
+            else:
+                st.info("the variable number is correct")
+
             with st.container():
                 button_train = st.button('Opt', use_container_width=True)
             if button_train:  
                 def opt_func(x):
                     x = x.reshape(1,-1)
                     y_pred = model.predict(x)
+                    if inputs['objective'] == 'max':
+                        y_pred = -y_pred
                     return y_pred
+                
                 plot = customPlot()  
                 if inputs['model'] == 'PSO':    
                     
@@ -2354,11 +2389,18 @@ elif select_option == "代理优化":
                     best_y = alg.gbest_y
 
                     loss_history = alg.gbest_y_hist
+                    if inputs['objective'] == 'max':
+                        loss_history = -np.array(loss_history)                    
 
                     st.info('Recommmended Sample')
                     truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
-                    best_x = truncate_func(best_x)
-                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
+                    best_x = truncate_func(best_x).reshape(1,-1)
+
+                    best_x = pd.DataFrame(best_x, columns = features_name)
+                    if preprocess == 'StandardScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    elif preprocess == 'MinMaxScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
 
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
@@ -2375,10 +2417,18 @@ elif select_option == "代理优化":
                     best_x, best_y = alg.run()
 
                     loss_history = alg.generation_best_Y
+
+                    if inputs['objective'] == 'max':
+                        loss_history = -np.array(loss_history)     
                     st.info('Recommmended Sample')
                     truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
-                    best_x = truncate_func(best_x)
-                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
+                    best_x = truncate_func(best_x).reshape(1,-1)
+                    
+                    best_x = pd.DataFrame(best_x, columns = features_name)
+                    if preprocess == 'StandardScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    elif preprocess == 'MinMaxScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
 
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
@@ -2395,11 +2445,20 @@ elif select_option == "代理优化":
                     best_x, best_y = alg.run()
 
                     loss_history = alg.generation_best_Y
+                    if inputs['objective'] == 'max':
+                        loss_history = -np.array(loss_history)     
 
                     st.info('Recommmended Sample')
                     truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
-                    best_x = truncate_func(best_x)
-                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
+                    best_x = truncate_func(best_x).reshape(1,-1)
+                    
+
+                    best_x = pd.DataFrame(best_x, columns = features_name)
+
+                    if preprocess == 'StandardScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    elif preprocess == 'MinMaxScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
 
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
@@ -2417,12 +2476,19 @@ elif select_option == "代理优化":
                     best_x, best_y = alg.run()
 
                     loss_history = alg.generation_best_Y
+                    if inputs['objective'] == 'max':
+                        loss_history = -np.array(loss_history)     
 
                     st.info('Recommmended Sample')
                     truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
-                    best_x = truncate_func(best_x)
-                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
+                    best_x = truncate_func(best_x).reshape(1,-1)
 
+                    best_x = pd.DataFrame(best_x, columns = features_name)
+                    if preprocess == 'StandardScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    elif preprocess == 'MinMaxScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
+                    
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
@@ -2435,9 +2501,9 @@ elif select_option == "代理优化":
                 
     elif sub_option == "多目标代理优化":
 
-        colored_header(label="多目标代理优化",description=" ",color_name="violet-90")
+        colored_header(label="多目标代理优化（成分/工艺）",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) != 3 or len(file) !=4:
+        if len(file) < 3:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
             table.add_row(['file_1','boundary','设计变量上下界'])
             table.add_row(['file_2','model_1','目标1 模型'])
@@ -2445,25 +2511,47 @@ elif select_option == "代理优化":
             table.add_row(['file_4','model_3','目标3 模型'])
             st.write(table)
             st.info('You can unpload three or four files, the first is the feature variable boundary, the second and the others are the trained models.')  
-        elif len(file) == 3:      
-            model_1 = pickle.load(file[1])
-            model_2 = pickle.load(file[2])
-            model_path = './models/surrogate optimize'
-            template_alg = model_platform(model_path)
-
-            inputs, col2 = template_alg.show()
+        elif len(file) == 3:        
             df_var = pd.read_csv(file[0])
             features_name = df_var.columns.tolist()
             range_var = df_var.values
             vars_min = get_column_min(range_var)
             vars_max = get_column_max(range_var)
+            array_vars_min = np.array(vars_min).reshape(1,-1)
+            array_vars_max = np.array(vars_max).reshape(1,-1)
+            vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
+            colored_header(label="特征变量范围", description=" ", color_name="violet-70")
+            vars_bound = pd.DataFrame(vars_bound, columns=features_name)
+            st.write(vars_bound)
+
+            colored_header(label="Optimize", description=" ", color_name="violet-70")
+            model_1 = pickle.load(file[1])
+            model_2 = pickle.load(file[2])
+            model_path = './models/multi-obj'
+            template_alg = model_platform(model_path)
+
+            inputs, col2 = template_alg.show()
             inputs['lb'] = vars_min
             inputs['ub'] = vars_max
-
-
-
-        elif len(file) == 4:
-            pass
+    
+            with col2:
+                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                    st.warning('the variable number should be %d' % vars_bound.shape[1])
+                else:
+                    st.info("the variable number is correct")
+            with st.container():
+                button_train = st.button('Opt', use_container_width=True)
+            if button_train:  
+                def opt_func(x):
+                    x = x.reshape(1,-1)
+                    y_pred = model.predict(x)
+                    return y_pred
+                plot = customPlot()  
+        
+        
+        
+        elif len(file) >= 4:
+            st.write('hah')
 
 
 
@@ -2589,7 +2677,6 @@ elif select_option == "其他":
 
             # ind_perc = shap_values.abs.percentile(95, 0).argsort[-1]
             # st_shap(shap.plots.scatter(shap_values[:, ind_mean]))           
-
     
     elif sub_option == "集成学习":
         colored_header(label="集成学习",description=" ",color_name="violet-90")

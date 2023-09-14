@@ -4,7 +4,7 @@ import streamlit as st
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "GA",
+    "model": "MOO",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 
@@ -35,14 +35,11 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['objective'] = st.selectbox('objective', ['max', 'min'])
+            inputs['method'] = st.selectbox('method', ['NSGA-II'])
+            inputs['normalize'] = st.selectbox('normalize',[None, 'StandardScaler', 'MinMaxScaler'])
             inputs['n dim'] = st.number_input('variable dim', 1, 20, 10)
-            inputs['size pop'] = st.number_input('size pop', 1, 500, 20)
-            inputs['max iter'] = st.number_input('max iter', 1, 10000, 50)
-            inputs['prob mut'] = st.slider('prob mut', 0.0, 1.0, 0.001)
+            # inputs['num'] = st.number_input('number', 1, 10, 1)
 
-
-            # inputs['lb']  = st.number_input('lb',  )  # 跟据虚拟样本空间的最大值和最小值进行调整
-            # inputs['ub'] = st.number_input('ub', )
     return inputs,col2
         
 # To test the alg independent of the app or template, just run 

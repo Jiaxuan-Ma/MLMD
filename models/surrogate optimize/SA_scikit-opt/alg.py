@@ -34,7 +34,8 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['n dim'] = st.number_input('variable dim', 1, 20, 1)
+            inputs['objective'] = st.selectbox('objective', ['max', 'min'])
+            inputs['n dim'] = st.number_input('variable dim', 1, 20, 10)
             inputs['T max'] = st.number_input('T max', 1, 10, 1)
             inputs['q'] = st.number_input('q', 0.0, 2.0, 0.99)
             

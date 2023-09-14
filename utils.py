@@ -11,9 +11,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import silhouette_score
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 ######for GP
 
-
+from typing import Optional
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -75,7 +77,6 @@ def model_platform(model_path):
     else:
         template_dir = template_dict[task]
 
-    # 使用import_from_file函数导入template_dir路径下的sidebar.py模块，并将其赋值给template_sidebar变量
     template_alg = import_from_file(
     "template_alg", os.path.join(template_dir, "alg.py")
     )
@@ -1595,3 +1596,30 @@ def Ffold_cross_val(Xtrain, Ytrain, F, estimator):
         predict[val_index] = estimator.predict(x_val).reshape(-1,1)
         real[val_index] = np.array(y_val).reshape(-1,1)
     return predict, real
+
+def normalize(data, normalize: Optional[str]=None):
+
+    columns = data.columns
+    X = data.values
+    # y = data.iloc[:,-target_number:]
+    if normalize == 'StandardScaler':
+        scaler = StandardScaler()
+        X = scaler.fit_transform(X)
+    elif normalize == 'MinMaxScaler':
+        scaler = MinMaxScaler()
+        X = scaler.fit_transform(X)
+
+    X = pd.DataFrame(X, columns=columns)
+    return X, scaler
+
+def inverse_normalize(data, scaler, normalize: Optional[str]=None):
+    columns = data.columns
+    X = data.values
+    # y = data.iloc[:,-target_number:]
+    if normalize == 'StandardScaler':
+        X = scaler.inverse_transform(data)
+
+    elif normalize == 'MinMaxScaler':
+        X = scaler.inverse_transform(data)
+    X = pd.DataFrame(X, columns=columns)        
+    return X

@@ -34,7 +34,8 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['n dim'] = st.number_input('variable dim', 1, 20, 1)
+            inputs['objective'] = st.selectbox('objective', ['max', 'min'])
+            inputs['n dim'] = st.number_input('variable dim', 1, 20, 10)
             inputs['size pop'] = st.number_input('size pop', 1, 500, 20)
             inputs['max iter'] = st.number_input('max iter', 1, 10000, 50)
             inputs['w'] = st.slider('w', 0.0, 2.0, 0.8)
