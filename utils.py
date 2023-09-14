@@ -749,7 +749,15 @@ class customPlot:
         # img_path = os.path.join(target_dir, 'prediction vs label.png')
         # fig.savefig(img_path)
         st.pyplot(fig)
-       
+    def evolutionary_history(self, fitness_history, algName):
+        fig, ax = plt.subplots()
+        ax = plt.plot(np.array(fitness_history), label=algName)
+        plt.title(" Evolutionary history ")
+        plt.xlabel("Genetation")
+        plt.ylabel("Fitness")
+        plt.tight_layout()
+        plt.legend()
+        st.pyplot(fig)       
 
 
 class FeatureSelector:

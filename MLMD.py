@@ -81,6 +81,7 @@ import scienceplots
 
 from algorithm.TrAdaboostR2 import TrAdaboostR2
 from algorithm.mobo import Mobo4mat
+import scienceplots
 
 warnings.filterwarnings('ignore')
 
@@ -2215,8 +2216,7 @@ elif select_option == "迁移学习":
             col_feature, col_target = st.columns(2)
             # features
             target_features = df_target.iloc[:,:-target_num]
-            source_features = df_source.iloc[:,:-target_num]
-            
+            source_features = df_source.iloc[:,:-target_num]            
             # targets
             target_targets = df_target.iloc[:,-target_num:]
             source_targets = df_source.iloc[:,-target_num:]
@@ -2278,10 +2278,10 @@ elif select_option == "迁移学习":
                         st.markdown(tmp_download_link, unsafe_allow_html=True)         
                     with st.expander("基学习器及权重下载"):
                         model_name = 'estimators'
-                        tmp_download_link = download_button(TrAdaboostR2.estimators, model_name+f'.pkl', button_text='download')
+                        tmp_download_link = download_button(TrAdaboostR2.estimators, model_name+f'.pickle', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
                         data_name = 'estimator_weights'       
-                        tmp_download_link = download_button(TrAdaboostR2.estimator_weight, data_name+f'_data.pkl', button_text='download')
+                        tmp_download_link = download_button(TrAdaboostR2.estimator_weight, data_name+f'.pickle', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)        
 
             elif inputs['model'] == 'TwoStageTrAdaboostR2':
@@ -2310,159 +2310,128 @@ elif select_option == "代理优化":
             st.write(table)
             st.info('You need unpload two files, the first is the feature variable boundary, the second is the trained models.')       
         if len(file) >= 2:    
-            model = pickle.load(file[1])
-            model_path = './models/surrogate optimize'
-            template_alg = model_platform(model_path)
-
-            inputs, col2 = template_alg.show()
             df_var = pd.read_csv(file[0])
             features_name = df_var.columns.tolist()
             range_var = df_var.values
             vars_min = get_column_min(range_var)
             vars_max = get_column_max(range_var)
+            array_vars_min = np.array(vars_min).reshape(1,-1)
+            array_vars_max = np.array(vars_max).reshape(1,-1)
+            vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
+            colored_header(label="特征变量范围", description=" ", color_name="violet-70")
+            vars_bound = pd.DataFrame(vars_bound, columns=features_name)
+            st.write(vars_bound)
+
+            model = pickle.load(file[1])
+            model_path = './models/surrogate optimize'
+            template_alg = model_platform(model_path)
+
+            inputs, col2 = template_alg.show()
             inputs['lb'] = vars_min
             inputs['ub'] = vars_max
-
-            if inputs['model'] == 'PSO':      
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
+  
+            with col2:
+                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                    st.warning('the variable number should be %d' % vars_bound.shape[1])
+                else:
+                    st.info("the variable number is correct")
+            with st.container():
+                button_train = st.button('Opt', use_container_width=True)
+            if button_train:  
+                def opt_func(x):
+                    x = x.reshape(1,-1)
+                    y_pred = model.predict(x)
+                    return y_pred
+                plot = customPlot()  
+                if inputs['model'] == 'PSO':    
                     
                     alg = PSO(func=opt_func, dim=inputs['n dim'], pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
                             w=inputs['w'], c1=inputs['c1'], c2=inputs['c2'])
             
                     alg.run()
+                    best_x = alg.gbest_x
+                    best_y = alg.gbest_y
+
+                    loss_history = alg.gbest_y_hist
 
                     st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': alg.gbest_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' % alg.gbest_y.item())
-            
-            elif inputs['model'] == 'GA':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
+                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    best_x = truncate_func(best_x)
+                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
 
+                    st.write(best_x)         
+                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    st.info('PSO best_y: %s' % best_y.item())
+                    plot.evolutionary_history(loss_history, 'PSO')
+                    loss_history = pd.DataFrame(loss_history)
+                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif inputs['model'] == 'GA':
                     alg = GA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
                             prob_mut = inputs['prob mut'])
 
                     best_x, best_y = alg.run()
 
+                    loss_history = alg.generation_best_Y
                     st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    best_x = truncate_func(best_x)
+                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
+
+                    st.write(best_x)         
+                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())
-                    
-
-                    # demo_func = lambda x: (x[0] - 1) ** 2 + (x[1] - 0.05) ** 2 + x[2] ** 2
-                    # ga = GA(func=demo_func, n_dim=3, max_iter=500, lb=[-1, -1, -1], ub=[5, 1, 1], precision=[2, 1, 1e-7])
-                    # best_x, best_y = ga.run()
-                    # st.write('best_x:', best_x, '\n', 'best_y:', best_y)
-
-            elif inputs['model'] == 'DE':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
-                    
+                    st.info('GA best_y: %s' %  best_y.item())
+                    plot.evolutionary_history(loss_history, 'GA')   
+                    loss_history = pd.DataFrame(loss_history)
+                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif inputs['model'] == 'DE':
                     alg = DE(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
                             prob_mut = inputs['prob mut'], F=inputs['F'])
 
                     best_x, best_y = alg.run()
 
-                    st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())   
-            
-            elif inputs['model'] == 'AFSA':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
-                    
-                    alg = AFSA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'],
-                            max_try_num=inputs['max try num'], step=inputs['step'], visual=inputs['visual'], q=inputs['q'], delta=inputs['delta'])
-
-                    best_x, best_y = alg.run()
+                    loss_history = alg.generation_best_Y
 
                     st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
+                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    best_x = truncate_func(best_x)
+                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
+
+                    st.write(best_x)         
+                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())   
-            
-            elif inputs['model'] == 'SA':
-                with col2:
-                    if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                        st.warning('the variable dim is not match')
-                    else:
-                        st.info('the variable dim is  %d' % inputs['n dim'])
-                with st.container():
-                    button_train = st.button('Opt', use_container_width=True)
-                if button_train:  
-                    def opt_func(x):
-                        x = x.reshape(1,-1)
-                        y_pred = model.predict(x)
-                        return y_pred  
+                    st.info('DE best_y: %s' %  best_y.item())    
+                    plot.evolutionary_history(loss_history, 'DE')  
+                    loss_history = pd.DataFrame(loss_history)
+                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                elif inputs['model'] == 'SA':
                     x0 = calculate_mean(inputs['lb'], inputs['ub'])
-                    # st.write(inputs['lb'])
-                    # st.write(inputs['ub'])
-                    # st.write('pppppppppppppp')
-                    # st.write(x0)
                     alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
                                 lb=inputs['lb'], ub=inputs['ub'])
 
                     best_x, best_y = alg.run()
 
-                    st.info('Recommmended Sample')
-                    gbest_x = pd.DataFrame({'Feature':features_name, 'value': best_x})
-                    st.write(gbest_x)         
-                    tmp_download_link = download_button(gbest_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('gbest_y: %s' %  best_y.item())                   
+                    loss_history = alg.generation_best_Y
 
+                    st.info('Recommmended Sample')
+                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    best_x = truncate_func(best_x)
+                    best_x = pd.DataFrame({'Feature':features_name, 'value': best_x}).transpose()
+
+                    st.write(best_x)         
+                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    st.info('SA best_y: %s' %  best_y.item()) 
+                    plot.evolutionary_history(loss_history, 'SA')  
+
+                    loss_history = pd.DataFrame(loss_history)
+                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                
     elif sub_option == "多目标代理优化":
 
         colored_header(label="多目标代理优化",description=" ",color_name="violet-90")
