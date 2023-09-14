@@ -2173,7 +2173,6 @@ elif select_option == "主动学习":
                     st.markdown(tmp_download_link, unsafe_allow_html=True)                   
 
 elif select_option == "迁移学习":
-    from sklearn.ensemble import AdaBoostRegressor
     with st.sidebar:
         # sub_option = option_menu(None, ["Boosting", "Neural Network"])
         sub_option = option_menu(None, ["Boosting"])
