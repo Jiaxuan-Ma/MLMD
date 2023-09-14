@@ -2313,8 +2313,8 @@ elif select_option == "代理优化":
             table.add_row(['file_3','model','模型'])
             st.write(table)
             st.info('You need unpload three files, the first is the dataset, the second is the feature variable boundary, the other is the trained models.')       
+        
         if len(file) >= 3:
-
             df = pd.read_csv(file[0])
             check_string_NaN(df)
 
