@@ -36,9 +36,9 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['estimator'] = st.selectbox('estimator', ['DecisionTreeRegressor'])
-            inputs['max iter'] = st.number_input('max iter', 1, 10000, 20)
+            inputs['max iter'] = st.number_input('max iter', 1, 10000, 10)
             if inputs['estimator'] == 'DecisionTreeRegressor':
-                inputs['splitter'] = st.selectbox('splitter',('best','random'))
+                inputs['splitter'] = st.selectbox('splitter',['random', 'best'])
                 max_depth = st.checkbox('max depth', None)
                 inputs['max depth'] = None
                 if max_depth:
@@ -46,7 +46,7 @@ def show():
                 inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 1000, 1)
                 inputs['min samples split'] = st.number_input('min samples split', 2, 1000, 2)
 
-                random_state = st.checkbox('random state 1024',True)
+                random_state = st.checkbox('random state 42',True)
                 if random_state:
                     inputs['random state'] = 42
                 else:

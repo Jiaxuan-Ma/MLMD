@@ -2173,6 +2173,7 @@ elif select_option == "主动学习":
                     st.markdown(tmp_download_link, unsafe_allow_html=True)                   
 
 elif select_option == "迁移学习":
+    from sklearn.ensemble import AdaBoostRegressor
     with st.sidebar:
         # sub_option = option_menu(None, ["Boosting", "Neural Network"])
         sub_option = option_menu(None, ["Boosting"])
@@ -2205,8 +2206,7 @@ elif select_option == "迁移学习":
             colored_header(label="数据信息", description=" ",color_name="violet-70")
 
             # show target data
-
-            nrow = st.slider("rows", 1, len(df_target)-1, 5)
+            nrow = st.slider("rows", 1, len(df_target), 5)
             df_nrow = df_target.head(nrow)
             st.write(df_nrow)
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
@@ -2247,10 +2247,6 @@ elif select_option == "迁移学习":
             # TrAdaBoostR2 = template_alg.TrAdaBoostR2(reg.)
             with col2:
                 st.write('')
-            
-            # reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-            #             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-            #             min_samples_split=inputs['min samples split']) 
 
             if inputs['model'] == 'TrAdaboostR2':
                 TrAdaboostR2 = TrAdaboostR2()
@@ -2264,7 +2260,7 @@ elif select_option == "迁移学习":
                     
                     Xtest = df_test[list(target_features.columns)]
                     predict = TrAdaboostR2.predict(Xtest)
-                    prediction = pd.DataFrame(predict, columns=[target_selected_option])
+                    prediction = pd.DataFrame(predict, columns=[reg.targets.name])
                     try:
                         Ytest = df_test[target_selected_option]
                         plot = customPlot()
@@ -2280,15 +2276,15 @@ elif select_option == "迁移学习":
                     except KeyError:
                         st.write(prediction)
                         tmp_download_link = download_button(prediction, f'预测结果.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)         
+                    with st.expander("基学习器及权重下载"):
+                        model_name = 'estimators'
+                        tmp_download_link = download_button(TrAdaboostR2.estimators, model_name+f'.pkl', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    
-                    with st.expander("模型下载"):
-                        i = 0
-                        model_name = 'decision_tree'
-                        for estimator in TrAdaboostR2.best_estimators:
-                            tmp_download_link = download_button(estimator, model_name+f'_model{i}.pkl', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-                            i = i + 1                    
+                        data_name = 'estimator_weights'       
+                        tmp_download_link = download_button(TrAdaboostR2.estimator_weight, data_name+f'_data.pkl', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)        
+
             elif inputs['model'] == 'TwoStageTrAdaboostR2':
                 st.write('Please wait...')
             elif inputs['model'] == 'TwoStageTrAdaboostR2-revised':

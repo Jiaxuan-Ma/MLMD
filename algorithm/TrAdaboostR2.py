@@ -1,11 +1,12 @@
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
-
+import streamlit as st
 class TrAdaboostR2:
     def __init__(self) -> None:
         # self.estimator = estimator
         # self.N = N
         self.estimators = []
+        self.estimator_weight = np.array([])
         # predictions = []
     def fit(self, params, Xsource, Xtarget, Ysource, Ytarget, N):
         self.N = N
@@ -43,7 +44,6 @@ class TrAdaboostR2:
             print(f"Iteration {i+1} / {self.N} | error rate in target data {error_rate:.3f}")
             self.beta_N[i] = error_rate / (1 - error_rate)
             # adjust the sample weight
-
             Z_t = np.abs(np.array(Ypred - Ytrain)).max()
             if Z_t == 0: Z_t = 1e-5
             for t in range(m):
@@ -61,24 +61,22 @@ class TrAdaboostR2:
         return np.sum(weight_target[:, 0] / max_weight * np.abs(Ypred - Ytarget))
 
     def predict(self, Xtest):
+        # Evaluate predictions of all estimators
         Xtest = np.asarray(Xtest, order='C')
         self.estimators_predicts = np.ones([Xtest.shape[0], self.N])
         for i, estimator in zip(range(self.N), self.estimators):
             Ypred = estimator.predict(Xtest)
             self.estimators_predicts[:, i] = Ypred
         
-        predicts = self.beta_N[:self.N] + self.estimators_predicts
-        predicts = predicts[:, int(np.ceil(self.N/2)):self.N] 
-        median_predicts = []
-        self.best_estimators = []
-        for i in range(predicts.shape[0]):
-            # row_median = np.median(predicts[i, :])  # median value
-            row_idx = np.argsort(predicts[i, :])  # median index
-            median_idx = len(row_idx) // 2 
-            median_predicts.append(self.estimators_predicts[i, int(np.ceil(self.N/2))+row_idx[median_idx]])
-            # log estimators
-            self.best_estimators.append(self.estimators[int(np.ceil(self.N/2))+row_idx[median_idx]])
-        # st.write(self.best_estimators)
-        return median_predicts
+        self.estimator_weight = 1.0 / 2.0 * np.log(1.0 / self.beta_N)
 
-    
+        sorted_idx = np.argsort(self.estimators_predicts, axis=1)
+        weight_cdf = np.cumsum(self.estimator_weight[sorted_idx], axis=1)
+        median_or_above = weight_cdf >= 0.5 * weight_cdf[:, -1][:, np.newaxis]
+        median_idx = median_or_above.argmax(axis=1)
+        
+        median_estimators = sorted_idx[np.arange(Xtest.shape[0]), median_idx]
+        
+        return self.estimators_predicts[np.arange(Xtest.shape[0]), median_estimators]  
+
+
