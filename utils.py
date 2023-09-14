@@ -1446,7 +1446,7 @@ def plot_and_export_results(model, model_name):
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 def export_cross_val_results(model, F, model_name):
-
+    # 交叉验证的模型的选择？目前选择最后一个模型，不是很合理
     Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model)    
     st.write('R2: {}'.format(r2_score(y_true=Y_test, y_pred=Y_pred)))
     plot = customPlot()
@@ -1460,7 +1460,7 @@ def export_cross_val_results(model, F, model_name):
         st.write(result_data)
         tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
-
+ 
 
 def export_loo_results(model, loo, model_name):
     Y_pred  =[]
