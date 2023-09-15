@@ -7,6 +7,7 @@ Call this file in the terminal via `streamlit run app.py`
 import shap
 
 import streamlit as st
+import streamlit_analytics
 
 from streamlit_extras.colored_header import colored_header
 from streamlit_option_menu import option_menu
@@ -88,6 +89,8 @@ from algorithm.mobo import Mobo4mat
 import scienceplots
 
 warnings.filterwarnings('ignore')
+
+streamlit_analytics.start_tracking()
 
 st.set_page_config(
         page_title="MLMD",
@@ -2611,14 +2614,13 @@ elif select_option == "其他":
             with col_target:   
                 st.write(targets.head())
 
-
             colored_header(label="Shapley value",description=" ",color_name="violet-70")
 
             fs = FeatureSelector(features, targets)
 
             target_selected_option = st.selectbox('choose target', list(fs.targets))
             fs.targets = fs.targets[target_selected_option]
-            # regressor = st.selectbox('tree',['linear','kernel','sampling'])
+
             reg = RFR()
             X_train, X_test, y_train, y_test = TTS(fs.features, fs.targets, random_state=0) 
             test_size = st.slider('test size',0.1, 0.5, 0.2) 
@@ -2655,21 +2657,11 @@ elif select_option == "其他":
 
             colored_header(label="SHAP Dependence", description=" ",color_name="violet-30")
             
-            # shap.dependence_plot('Si', shap_values, X[cols], interaction_index='Mn', show=False)
             shap_values = explainer.shap_values(fs.features) 
             list_features = fs.features.columns.tolist()
             feature = st.selectbox('feature',list_features)
             interact_feature = st.selectbox('interact feature', list_features)
             st_shap(shap.dependence_plot(feature, shap_values, fs.features, display_features=fs.features,interaction_index=interact_feature))
-            
-            # colored_header(label="SHAP Most Important Feature", description=" ",color_name="violet-30")
-            # shap_values = explainer(fs.features)
-            # ind_mean = shap_values.abs.mean(0).argsort[-1]
-
-            # ind_max = shap_values.abs.max(0).argsort[-1]
-
-            # ind_perc = shap_values.abs.percentile(95, 0).argsort[-1]
-            # st_shap(shap.plots.scatter(shap_values[:, ind_mean]))           
     
     elif sub_option == "集成学习":
         colored_header(label="集成学习",description=" ",color_name="violet-90")
@@ -3632,3 +3624,5 @@ elif select_option == "其他":
 
     elif sub_option == "符号回归":
         st.write("sisso")
+
+streamlit_analytics.stop_tracking()
