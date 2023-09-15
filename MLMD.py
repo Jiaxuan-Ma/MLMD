@@ -69,10 +69,17 @@ from streamlit_extras.badges import badge
 from sklearn.gaussian_process.kernels import RBF
 import warnings
 
-from sko.GA import GA
+# from sko.GA import GA
+from pymoo.algorithms.soo.nonconvex.ga import GA
+from pymoo.optimize import minimize
+from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.pm import PM
+from pymoo.core.problem import ElementwiseProblem
+from pymoo.termination import get_termination
+
 from sko.PSO import PSO
 from sko.DE import DE
-from sko.AFSA import AFSA
+# from sko.AFSA import AFSA
 from sko.SA import SAFast
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -2392,7 +2399,7 @@ elif select_option == "代理优化":
                         loss_history = -np.array(loss_history)                    
 
                     st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
                     best_x = truncate_func(best_x).reshape(1,-1)
 
                     best_x = pd.DataFrame(best_x, columns = features_name)
@@ -2404,23 +2411,62 @@ elif select_option == "代理优化":
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    if inputs['objective'] == 'max':
+                        best_= -best_y
                     st.info('PSO best_y: %s' % best_y.item())
                     plot.evolutionary_history(loss_history, 'PSO')
                     loss_history = pd.DataFrame(loss_history)
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 elif inputs['model'] == 'GA':
-                    alg = GA(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                            prob_mut = inputs['prob mut'])
+                    
+                    alg = GA(pop_size=inputs['size pop'], 
+                            crossover=SBX(prob=0.9, eta=15),
+                            mutation=PM(eta=20),
+                            eliminate_duplicates=True)
 
-                    best_x, best_y = alg.run()
-
-                    loss_history = alg.generation_best_Y
-
+                    termination = get_termination("n_gen", inputs['max iter'])                    
+                    class MyProblem(ElementwiseProblem):
+                        def __init__(self):
+                            super().__init__(n_var=inputs['n dim'],
+                                            n_obj=1,
+                                            xl=np.array(inputs['lb']),
+                                            xu=np.array(inputs['ub']))
+                        def _evaluate(self, x, out, *args, **kwargs):
+                            x = x.reshape(1,-1)
+                            y_pred = model.predict(x)
+                            if inputs['objective'] == 'max':
+                                y_pred = -y_pred
+                            out["F"] = y_pred
+                            
+                    problem = MyProblem()                    
+                    res = minimize(problem,
+                                    alg,
+                                    termination,
+                                    seed=1,
+                                    save_history=True,
+                                    verbose=False)
                     if inputs['objective'] == 'max':
-                        loss_history = -np.array(loss_history)     
+                        best_y = -res.F
+                    else:
+                        best_y = res.F
+                    best_x = res.X
+                    hist = res.history
+                    hist_F = []              # the objective space values in each generation
+                    # st.write("Best solution found: \nX = %s\nF = %s" % (best_x, y_pred))
+                    for algo in hist:
+                        # retrieve the optimum from the algorithm
+                        opt = algo.opt
+                        # filter out only the feasible and append and objective space values
+                        feas = np.where(opt.get("feasible"))[0]
+                        hist_F.append(opt.get("F")[feas])
+                    # replace this line by `hist_cv` if you like to analyze the least feasible optimal solution and not the population
+                    if inputs['objective'] == 'max':
+                        loss_history = - np.array(hist_F).reshape(-1,1)
+                    else:
+                        loss_history = np.array(hist_F).reshape(-1,1)
                     st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
                     best_x = truncate_func(best_x).reshape(1,-1)
                     
                     best_x = pd.DataFrame(best_x, columns = features_name)
@@ -2448,7 +2494,7 @@ elif select_option == "代理优化":
                         loss_history = -np.array(loss_history)     
 
                     st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
                     best_x = truncate_func(best_x).reshape(1,-1)
                     
 
@@ -2462,6 +2508,8 @@ elif select_option == "代理优化":
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    if inputs['objective'] == 'max':
+                        best_y = -best_y               
                     st.info('DE best_y: %s' %  best_y.item())    
                     plot.evolutionary_history(loss_history, 'DE')  
                     loss_history = pd.DataFrame(loss_history)
@@ -2479,7 +2527,7 @@ elif select_option == "代理优化":
                         loss_history = -np.array(loss_history)     
 
                     st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.3f}'.format(x))
+                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
                     best_x = truncate_func(best_x).reshape(1,-1)
 
                     best_x = pd.DataFrame(best_x, columns = features_name)
@@ -2491,6 +2539,8 @@ elif select_option == "代理优化":
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    if inputs['objective'] == 'max':
+                        best_y = -best_y  
                     st.info('SA best_y: %s' %  best_y.item()) 
                     plot.evolutionary_history(loss_history, 'SA')  
 
@@ -2526,7 +2576,7 @@ elif select_option == "代理优化":
             colored_header(label="Optimize", description=" ", color_name="violet-70")
             model_1 = pickle.load(file[1])
             model_2 = pickle.load(file[2])
-            model_path = './models/multi-obj'
+            model_path = './models/surrogate moo'
             template_alg = model_platform(model_path)
 
             inputs, col2 = template_alg.show()
@@ -2548,7 +2598,7 @@ elif select_option == "代理优化":
                         y_pred = -y_pred
                     return y_pred
                 plot = customPlot()  
-
+                
         elif len(file) >= 4:
             st.write('hah')
 
