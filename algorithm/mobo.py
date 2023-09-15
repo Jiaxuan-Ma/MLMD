@@ -81,32 +81,6 @@ class Mobo4mat:
         elif method == 'EGO':
             pass
         return HV_values.loc[max_idx].values, recommend_point
-    
-    def normalize(self, data, normalize: Optional[str]=None):
-        columns = data.columns
-        X = data.values
-        # y = data.iloc[:,-target_number:]
-        if normalize == 'StandardScaler':
-            scaler = StandardScaler()
-            X = scaler.fit_transform(X)
-        elif normalize == 'MinMaxScaler':
-            scaler = MinMaxScaler()
-            X = scaler.fit_transform(X)
-
-        X = pd.DataFrame(X, columns=columns)
-        return X, scaler
-
-    def inverse_normalize(self, data, scaler, normalize: Optional[str]=None):
-        columns = data.columns
-        X = data.values
-        # y = data.iloc[:,-target_number:]
-        if normalize == 'StandardScaler':
-            X = scaler.inverse_transform(data)
-
-        elif normalize == 'MinMaxScaler':
-            X = scaler.inverse_transform(data)
-        X = pd.DataFrame(X, columns=columns)        
-        return X
 
     def non_dominated_sorting(self, fitness_values): # min
         num_solutions = fitness_values.shape[0]

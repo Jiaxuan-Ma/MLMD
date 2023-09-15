@@ -1357,7 +1357,6 @@ elif select_option == "回归预测":
                     reg.model = LinearR()
                     
                     export_loo_results(reg, loo, "LinearR_loo")
-        
                                 
         if inputs['model'] == 'LassoRegressor':
 
@@ -2107,13 +2106,13 @@ elif select_option == "主动学习":
 
                     if inputs['normalize'] == 'StandardScaler':
                         reg.X = pd.concat([reg.Xtrain, reg.Xtest])
-                        reg.X, scaler = mobo.normalize(reg.X, "StandardScaler")
+                        reg.X, scaler = normalize(reg.X, "StandardScaler")
                         reg.X = pd.DataFrame(reg.X, columns=feature_name)  
                         reg.Xtrain = reg.X.iloc[:len(reg.Xtrain),:]     
                         reg.Xtest = reg.X.iloc[len(reg.Xtrain):,:].reset_index(drop=True)
                     elif inputs['normalize'] == 'MinMaxScaler':
                         reg.X = pd.concat([reg.Xtrain, reg.Xtest])
-                        reg.X, scaler = mobo.normalize(reg.X, "StandardScaler")
+                        reg.X, scaler = normalize(reg.X, "StandardScaler")
                         reg.X = pd.DataFrame(reg.X, columns=feature_name)  
                         reg.Xtrain = reg.X.iloc[:len(reg.Xtrain),:]     
                         reg.Xtest = reg.X.iloc[len(reg.Xtrain):,:].reset_index(drop=True) 
@@ -2159,9 +2158,9 @@ elif select_option == "主动学习":
                     recommend_point = pd.DataFrame(recommend_point, columns=feature_name)  
                     
                     if inputs['normalize'] == 'StandardScaler':
-                        recommend_point  = mobo.inverse_normalize(recommend_point, scaler, "StandardScaler")
+                        recommend_point  = inverse_normalize(recommend_point, scaler, "StandardScaler")
                     elif inputs['normalize'] == 'MinMaxScaler':
-                        recommend_point  = mobo.inverse_normalize(recommend_point, scaler, "MinMaxScaler")
+                        recommend_point  = inverse_normalize(recommend_point, scaler, "MinMaxScaler")
                     
                     st.write(recommend_point)
                     tmp_download_link = download_button(recommend_point, f'推荐试验样本.csv', button_text='download')
@@ -2169,9 +2168,9 @@ elif select_option == "主动学习":
                 
                 with st.expander('visual samples'):
                     if inputs['normalize'] == 'StandardScaler':
-                        reg.Xtest  = mobo.inverse_normalize(reg.Xtest, scaler, "StandardScaler")
+                        reg.Xtest  = inverse_normalize(reg.Xtest, scaler, "StandardScaler")
                     elif inputs['normalize'] == 'MinMaxScaler':
-                        reg.Xtest  = mobo.inverse_normalize(reg.Xtest, scaler, "MinMaxScaler")
+                        reg.Xtest  = inverse_normalize(reg.Xtest, scaler, "MinMaxScaler")
                     st.write(reg.Xtest)
                     tmp_download_link = download_button(reg.Xtest, f'visual samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)                   
@@ -2194,17 +2193,16 @@ elif select_option == "迁移学习":
             table.add_row(['...','...','...'])
             table.add_row(['file_n','source_data_n','n 源域数据'])
             st.write(table)
-        else:
-            # if len(file) == 3:
+        # elif len(file) == 3:
+        #     df_test = pd.read_csv(file[0])
+        #     df_target = pd.read_csv(file[1])
+        #     df_source = pd.read_csv(file[2])
+        elif len(file) >= 3:
             df_test = pd.read_csv(file[0])
             df_target = pd.read_csv(file[1])
-            df_source = pd.read_csv(file[2])
-            if len(file) >= 3:
-                df_test = pd.read_csv(file[0])
-                df_target = pd.read_csv(file[1])
-                source_files = file[2:]
-                df = [pd.read_csv(f) for f in source_files]
-                df_source = pd.concat(df, axis=0)
+            source_files = file[2:]
+            df = [pd.read_csv(f) for f in source_files]
+            df_source = pd.concat(df, axis=0)
 
             colored_header(label="数据信息", description=" ",color_name="violet-70")
 
@@ -2248,15 +2246,13 @@ elif select_option == "迁移学习":
             inputs, col2 = template_alg.show()
             # TrAdaBoostR2 = template_alg.TrAdaBoostR2(reg.)
             with col2:
-                st.write('')
+                if inputs['max iter'] > source_features.shape[0]:
+                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
 
             if inputs['model'] == 'TrAdaboostR2':
                 TrAdaboostR2 = TrAdaboostR2()
                 with st.container():
                     button_train = st.button('Train', use_container_width=True)
-
-                if inputs['max iter'] > source_features.shape[0]:
-                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
                 if button_train:
                     TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
                     
@@ -2545,16 +2541,13 @@ elif select_option == "代理优化":
                 def opt_func(x):
                     x = x.reshape(1,-1)
                     y_pred = model.predict(x)
+                    if inputs['objective'] == 'max':
+                        y_pred = -y_pred
                     return y_pred
                 plot = customPlot()  
-        
-        
-        
+
         elif len(file) >= 4:
             st.write('hah')
-
-
-
 
     elif sub_option == "迁移学习-多目标代理优化":
         colored_header(label="迁移学习-多目标代理优化",description=" ",color_name="violet-90")
