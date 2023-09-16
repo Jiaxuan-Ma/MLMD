@@ -146,7 +146,7 @@ if select_option == "平台主页":
 
     st.write('''![](https://github.com/Jiaxuan-Ma/Jiaxuan-Ma/assets/61132191/470e2fc4-0e99-4a28-afc3-1c93c44758da?raw=true)''')
     st.write(
-        '''*为了保证合金的各个元素的质量分数总和为100%, 因此使用代理优化模块时需要去掉基元素列*''')
+        '''*为了保证合金的各个元素的质量分数总和为100%, 因此使用**代理优化**模块时需要去掉基元素列*''')
     colored_header(label="致谢",description="",color_name="violet-90")
     st.markdown(
     '''
