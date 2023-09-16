@@ -40,7 +40,7 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
        
-            inputs['base estimator'] = st.selectbox('base estimator',['DecisionTree', 'SupportVector','LinearRegression'])
+            inputs['base estimator'] = st.selectbox('base estimator',['DecisionTree'])
             inputs['nestimators'] = st.number_input('number estimators',1, 1000, 100)
             inputs['learning rate'] = st.number_input('learning rate',0.001,10.0,1.0)
 

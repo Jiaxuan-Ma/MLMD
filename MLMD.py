@@ -69,10 +69,11 @@ from streamlit_extras.badges import badge
 from sklearn.gaussian_process.kernels import RBF
 import warnings
 
-# from sko.GA import GA
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.optimize import minimize
 from pymoo.operators.crossover.sbx import SBX
+from pymoo.algorithms.moo.nsga2 import SBX as nsgaSBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.termination import get_termination
@@ -82,10 +83,6 @@ from sko.DE import DE
 # from sko.AFSA import AFSA
 from sko.SA import SAFast
 
-from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.problems import get_problem
-from pymoo.optimize import minimize
-from pymoo.visualization.scatter import Scatter
 # import sys
 from prettytable import PrettyTable
 
@@ -147,8 +144,9 @@ if select_option == "平台主页":
     ''')
     colored_header(label="数据布局",description="only support `.csv` file",color_name="violet-90")
 
-    st.write('''![](https://user-images.githubusercontent.com/61132191/231178382-aa223924-f1cb-4e0e-afa1-08c536111f3a.jpg?raw=true)''')
-    
+    st.write('''![](https://github.com/Jiaxuan-Ma/Jiaxuan-Ma/assets/61132191/470e2fc4-0e99-4a28-afc3-1c93c44758da?raw=true)''')
+    st.write(
+        '''*为了保证合金的各个元素的质量分数总和为100%, 因此使用代理优化模块时需要去掉基元素列*''')
     colored_header(label="致谢",description="",color_name="violet-90")
     st.markdown(
     '''
@@ -852,11 +850,12 @@ elif select_option == "特征工程":
                             scores.append(score)
                         cumu_importance = np.array(cumuImportance)
                         scores = np.array(scores) 
-                        fig, ax = plt.subplots()
-                        ax = plt.plot(cumu_importance, scores,'o-')
-                        plt.xlabel("cumulative feature importance")
-                        plt.ylabel("r2")
-                        st.pyplot(fig)
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            ax = plt.plot(cumu_importance, scores,'o-')
+                            plt.xlabel("cumulative feature importance")
+                            plt.ylabel("r2")
+                            st.pyplot(fig)
             elif inputs['model'] == 'LassoRegressor':
                 
                 fs.model = Lasso(random_state=inputs['random state'])
@@ -893,11 +892,12 @@ elif select_option == "特征工程":
                             scores.append(score)
                         cumu_importance = np.array(cumuImportance)
                         scores = np.array(scores) 
-                        fig, ax = plt.subplots()
-                        ax = plt.plot(cumu_importance, scores,'o-')
-                        plt.xlabel("cumulative feature importance")
-                        plt.ylabel("r2")
-                        st.pyplot(fig)
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            ax = plt.plot(cumu_importance, scores,'o-')
+                            plt.xlabel("cumulative feature importance")
+                            plt.ylabel("r2")
+                            st.pyplot(fig)
 
             elif inputs['model'] == 'RidgeRegressor':
 
@@ -932,11 +932,12 @@ elif select_option == "特征工程":
                             scores.append(score)
                         cumu_importance = np.array(cumuImportance)
                         scores = np.array(scores) 
-                        fig, ax = plt.subplots()
-                        ax = plt.plot(cumu_importance, scores,'o-')
-                        plt.xlabel("cumulative feature importance")
-                        plt.ylabel("r2")
-                        st.pyplot(fig)
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            ax = plt.plot(cumu_importance, scores,'o-')
+                            plt.xlabel("cumulative feature importance")
+                            plt.ylabel("r2")
+                            st.pyplot(fig)
             elif inputs['model'] == 'LassoRegressor':
                 
                 fs.model = Lasso(random_state=inputs['random state'])
@@ -972,11 +973,12 @@ elif select_option == "特征工程":
                             scores.append(score)
                         cumu_importance = np.array(cumuImportance)
                         scores = np.array(scores) 
-                        fig, ax = plt.subplots()
-                        ax = plt.plot(cumu_importance, scores,'o-')
-                        plt.xlabel("cumulative feature importance")
-                        plt.ylabel("r2")
-                        st.pyplot(fig)
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            ax = plt.plot(cumu_importance, scores,'o-')
+                            plt.xlabel("cumulative feature importance")
+                            plt.ylabel("r2")
+                            st.pyplot(fig)
 
             elif inputs['model'] == 'RandomForestRegressor':
                         
@@ -1016,11 +1018,12 @@ elif select_option == "特征工程":
                                     scores.append(score)
                                 cumu_importance = np.array(cumuImportance)
                                 scores = np.array(scores) 
-                                fig, ax = plt.subplots()
-                                ax = plt.plot(cumu_importance, scores,'o-')
-                                plt.xlabel("cumulative feature importance")
-                                plt.ylabel("r2")
-                                st.pyplot(fig)
+                                with plt.style.context(['nature','no-latex']):
+                                    fig, ax = plt.subplots()
+                                    ax = plt.plot(cumu_importance, scores,'o-')
+                                    plt.xlabel("cumulative feature importance")
+                                    plt.ylabel("r2")
+                                    st.pyplot(fig)
 
             st.write('---')
 
@@ -2055,7 +2058,7 @@ elif select_option == "主动学习":
             st.write(df_nrow)
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=2)
+            target_num = st.number_input('目标变量数量',  min_value=2, max_value=10, value=2)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -2419,7 +2422,7 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 elif inputs['model'] == 'GA':
-                    
+
                     alg = GA(pop_size=inputs['size pop'], 
                             crossover=SBX(prob=0.9, eta=15),
                             mutation=PM(eta=20),
@@ -2552,16 +2555,34 @@ elif select_option == "代理优化":
 
         colored_header(label="多目标代理优化（成分/工艺）",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) < 3:
+        if len(file) < 4:
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','boundary','设计变量上下界'])
-            table.add_row(['file_2','model_1','目标1 模型'])
-            table.add_row(['file_3','model_2','目标2 模型'])
-            table.add_row(['file_4','model_3','目标3 模型'])
+            table.add_row(['file_1','dataset','数据集'])
+            table.add_row(['file_2','boundary','设计变量上下界'])
+            table.add_row(['file_3','model_1','目标1 模型'])
+            table.add_row(['file_4','model_2','目标2 模型'])
+            table.add_row(['file_5','...','...'])
             st.write(table)
             st.info('You can unpload three or four files, the first is the feature variable boundary, the second and the others are the trained models.')  
-        elif len(file) == 3:        
-            df_var = pd.read_csv(file[0])
+        elif len(file) == 4:        
+            df = pd.read_csv(file[0])
+            check_string_NaN(df)
+            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+
+            target_num = st.number_input('目标变量数量',  min_value=2, max_value=10, value=2)
+            
+            col_feature, col_target = st.columns(2)
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
+            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            target_selected_option = st.multiselect('target', list(targets)[::-1], default=targets.columns.tolist())
+            df_var = pd.read_csv(file[1])
             features_name = df_var.columns.tolist()
             range_var = df_var.values
             vars_min = get_column_min(range_var)
@@ -2574,9 +2595,9 @@ elif select_option == "代理优化":
             st.write(vars_bound)
 
             colored_header(label="Optimize", description=" ", color_name="violet-70")
-            model_1 = pickle.load(file[1])
-            model_2 = pickle.load(file[2])
-            model_path = './models/surrogate moo'
+            model_1 = pickle.load(file[2])
+            model_2 = pickle.load(file[3])
+            model_path = './models/moo'
             template_alg = model_platform(model_path)
 
             inputs, col2 = template_alg.show()
@@ -2584,21 +2605,126 @@ elif select_option == "代理优化":
             inputs['ub'] = vars_max
     
             with col2:
-                if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                    st.warning('the variable number should be %d' % vars_bound.shape[1])
-                else:
-                    st.info("the variable number is correct")
+                preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
+                data = pd.concat([features,vars_bound])
+                if preprocess == 'StandardScaler':
+                    features, scaler = normalize(data, 'StandardScaler')
+                    vars_bound = features.tail(2)
+                elif preprocess == 'MinMaxScaler':
+                    features, scaler = normalize(data, 'MinMaxScaler')
+                    vars_bound = features.tail(2)
+
+            if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+                st.warning('the variable number should be %d' % vars_bound.shape[1])
+            else:
+                st.info("the variable number is correct")
+
+
+                pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
+                pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+
+                if inputs['objective'] == 'max':  
+
+                    targets = - targets
+                    pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
+                    pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+                    pareto_front = -pareto_front
+                    targets = -targets
+    
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    with plt.style.context(['nature','no-latex']):
+                        fig, ax = plt.subplots()
+                        ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
+                        ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
+                        ax.set_xlabel(target_selected_option[0])
+                        ax.set_ylabel(target_selected_option[1])
+                        ax.set_title('Pareto front of visual space')
+                        st.pyplot(fig)
+                with col2:
+                    st.write(pareto_front)
+                    tmp_download_link = download_button(pareto_front, f'Pareto_front.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+
             with st.container():
                 button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
-                def opt_func(x):
-                    x = x.reshape(1,-1)
-                    y_pred = model.predict(x)
-                    if inputs['objective'] == 'max':
-                        y_pred = -y_pred
-                    return y_pred
+
+            if button_train:               
                 plot = customPlot()  
-                
+                if inputs['model'] == 'NSGA-II':
+                    alg = NSGA2(
+                        pop_size=inputs['size pop'],
+                        # n_offsprings=inputs['n_offsprings'],
+                        crossover=nsgaSBX(prob=0.9, eta=15),
+                        mutation=PM(eta=20),
+                        eliminate_duplicates=True
+                    )
+                    termination = get_termination("n_gen", inputs['max iter'])                    
+                    class MyProblem(ElementwiseProblem):
+                        def __init__(self):
+                            super().__init__(n_var=inputs['n dim'],
+                                            n_obj=2,
+                                            xl=np.array(inputs['lb']),
+                                            xu=np.array(inputs['ub']))
+                        def _evaluate(self, x, out, *args, **kwargs):
+                            x = x.reshape(1,-1)
+                            y1_pred = model_1.predict(x)
+                            if inputs['objective'] == 'max':
+                                y1_pred = -y1_pred
+                            y2_pred = model_2.predict(x)
+                            if inputs['objective'] == 'max':
+                                y2_pred = -y2_pred
+                            out["F"] = [y1_pred, y2_pred]
+    
+                    problem = MyProblem()                    
+                    res = minimize(problem,
+                                    alg,
+                                    termination,
+                                    seed=inputs['random state'],
+                                    save_history=True,
+                                    verbose=False)
+                    
+                    if inputs['objective'] == 'max':
+                        best_y = -res.F
+                    else:
+                        best_y = res.F
+                    best_y[:, [0, 1]] = best_y[:, [1, 0]]
+                    iter_data = np.concatenate([targets.values, best_y], axis = 0)
+
+                    iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
+                    iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
+                    with plt.style.context(['nature','no-latex']):
+                        fig, ax = plt.subplots()
+                        ax.plot(iter_pareto_front[target_selected_option[0]],iter_pareto_front[target_selected_option[1]], 'r--')
+                        ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
+                        ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
+                        ax.scatter(best_y[:, 0], best_y[:,1])
+                        ax.set_xlabel(target_selected_option[0])
+                        ax.set_ylabel(target_selected_option[1])
+                        ax.set_title('Pareto front of visual space')
+                        st.pyplot(fig)                    
+                    best_x = res.X
+
+                    st.info('Recommmended Sample')
+                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+
+                    best_x = truncate_func(best_x)
+                    
+                    best_x = pd.DataFrame(best_x, columns = features_name)
+                    if preprocess == 'StandardScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    elif preprocess == 'MinMaxScaler':
+                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.write(best_x)         
+                        tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    with col2:
+                        st.write(iter_pareto_front)
+                        tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
         elif len(file) >= 4:
             st.write('hah')
 
@@ -2715,7 +2841,7 @@ elif select_option == "其他":
     
     elif sub_option == "集成学习":
         colored_header(label="集成学习",description=" ",color_name="violet-90")
-        sub_sub_option = option_menu(None, ["回归"],
+        sub_sub_option = option_menu(None, ["回归", "分类"],
                                 icons=['house',  "list-task"],
                                 menu_icon="cast", default_index=0, orientation="horizontal")
         
@@ -2769,32 +2895,32 @@ elif select_option == "其他":
                 if inputs['model'] == 'BaggingRegressor':
                     with col2:
                         with st.expander('Operator'):
-                            preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                            # preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
 
                             operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                             if operator == 'train test split':
                                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                if preprocess == 'StandardScaler':
-                                    reg.features = StandardScaler().fit_transform(reg.features)
-                                if preprocess == 'MinMaxScaler':
-                                    reg.features = MinMaxScaler().fit_transform(reg.features)
+                                # if preprocess == 'StandardScaler':
+                                #     reg.features = StandardScaler().fit_transform(reg.features)
+                                # if preprocess == 'MinMaxScaler':
+                                #     reg.features = MinMaxScaler().fit_transform(reg.features)
                                 
                                 reg.features = pd.DataFrame(reg.features)    
                                 
                                 reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
 
                             elif operator == 'cross val score':
-                                if preprocess == 'StandardScaler':
-                                    reg.features = StandardScaler().fit_transform(reg.features)
-                                if preprocess == 'MinMaxScaler':
-                                    reg.features = MinMaxScaler().fit_transform(reg.features)
+                                # if preprocess == 'StandardScaler':
+                                #     reg.features = StandardScaler().fit_transform(reg.features)
+                                # if preprocess == 'MinMaxScaler':
+                                #     reg.features = MinMaxScaler().fit_transform(reg.features)
                                 cv = st.number_input('cv',1,20,5)
 
                             elif operator == 'leave one out':
-                                if preprocess == 'StandardScaler':
-                                    reg.features = StandardScaler().fit_transform(reg.features)
-                                if preprocess == 'MinMaxScaler':
-                                    reg.features = MinMaxScaler().fit_transform(reg.features)
+                                # if preprocess == 'StandardScaler':
+                                #     reg.features = StandardScaler().fit_transform(reg.features)
+                                # if preprocess == 'MinMaxScaler':
+                                #     reg.features = MinMaxScaler().fit_transform(reg.features)
                                 reg.features = pd.DataFrame(reg.features)    
                                 loo = LeaveOneOut()
 
@@ -2805,85 +2931,86 @@ elif select_option == "其他":
 
                         if operator == 'train test split':
 
-                            if inputs['base estimator'] == "DecisionTree": 
-                                reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                
-                                reg.BaggingRegressor()
-                
+                        # if inputs['base estimator'] == "DecisionTree": 
+                            reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                            
+                            reg.BaggingRegressor()
+            
 
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
+                            result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            result_data.columns = ['actual','prediction']
 
-                                plot_and_export_results(reg, "BaggingR")
+                            plot_and_export_results(reg, "BaggingR")
 
                             
-                            elif inputs['base estimator'] == "SupportVector": 
-                                reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
-                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                reg.BaggingRegressor()
+                            # elif inputs['base estimator'] == "SupportVector": 
+                            #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
+                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                            #     reg.BaggingRegressor()
 
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
+                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            #     result_data.columns = ['actual','prediction']
 
-                                plot_and_export_results(reg, "BaggingR")
+                            #     export_cross_val_results(reg, cv, "DTR_cv")
                             
-                            elif inputs['base estimator'] == "LinearRegression": 
-                                reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                reg.BaggingRegressor()
+                            # elif inputs['base estimator'] == "LinearRegression": 
+                            #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                            #     reg.BaggingRegressor()
                 
 
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
+                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            #     result_data.columns = ['actual','prediction']
 
-                                plot_and_export_results(reg, "BaggingR")
+                            #     plot_and_export_results(reg, "BaggingR")
 
                         elif operator == 'cross val score':
-                            if inputs['base estimator'] == "DecisionTree": 
-                                reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        # if inputs['base estimator'] == "DecisionTree": 
+                            reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                            # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
 
-                                export_cross_val_results(cvs, "BaggingR_cv")   
+                            # export_cross_val_results(cvs, "BaggingR_cv")   
+                            export_cross_val_results(reg, cv, "BaggingR_cv")
 
-                            elif inputs['base estimator'] == "SupportVector": 
+                            # elif inputs['base estimator'] == "SupportVector": 
 
-                                reg.model = BaggingRegressor(estimator =  SVR(),n_estimators=inputs['nestimators'],
-                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                            #     reg.model = BaggingRegressor(estimator =  SVR(),n_estimators=inputs['nestimators'],
+                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                export_cross_val_results(cvs, "BaggingR_cv")   
+                            #     export_cross_val_results(cvs, "BaggingR_cv")   
 
-                            elif inputs['base estimator'] == "LinearRegression":
-                                reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                            # elif inputs['base estimator'] == "LinearRegression":
+                            #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                export_cross_val_results(cvs, "BaggingR_cv")   
+                            #     export_cross_val_results(cvs, "BaggingR_cv")   
 
                         elif operator == 'leave one out':
-                            if inputs['base estimator'] == "DecisionTree": 
-                                reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                            
-                                export_loo_results(reg, loo, "BaggingR_loo")
+                        # if inputs['base estimator'] == "DecisionTree": 
+                            reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        
+                            export_loo_results(reg, loo, "BaggingR_loo")
 
-                            elif inputs['base estimator'] == "SupportVector": 
+                            # elif inputs['base estimator'] == "SupportVector": 
 
-                                reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
-                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                            #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
+                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                                 
-                                export_loo_results(reg, loo, "BaggingR_loo")
+                            #     export_loo_results(reg, loo, "BaggingR_loo")
 
-                            elif inputs['base estimator'] == "LinearRegression":
-                                reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                            # elif inputs['base estimator'] == "LinearRegression":
+                            #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                 
-                                export_loo_results(reg, loo, "BaggingR_loo")
+                            #     export_loo_results(reg, loo, "BaggingR_loo")
 
                 if inputs['model'] == 'AdaBoostRegressor':
 
@@ -2905,73 +3032,73 @@ elif select_option == "其他":
 
                         if operator == 'train test split':
 
-                            if inputs['base estimator'] == "DecisionTree": 
-                                reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                                
-                                reg.AdaBoostRegressor()
-                
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-
-                                plot_and_export_results(reg, "AdaBoostR")
+                            # if inputs['base estimator'] == "DecisionTree": 
+                            reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                             
-                            elif inputs['base estimator'] == "SupportVector": 
+                            reg.AdaBoostRegressor()
+            
+                            result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            result_data.columns = ['actual','prediction']
 
-                                reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                                
-                                reg.AdaBoostRegressor()
-
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-
-                                plot_and_export_results(reg, "AdaBoostR")
+                            plot_and_export_results(reg, "AdaBoostR")
                             
-                            elif inputs['base estimator'] == "LinearRegression": 
-                                reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                                reg.AdaBoostRegressor()
+                            # elif inputs['base estimator'] == "SupportVector": 
 
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
+                            #     reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                                 
-                                plot_and_export_results(reg, "AdaBoostR")
+                            #     reg.AdaBoostRegressor()
+
+                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            #     result_data.columns = ['actual','prediction']
+
+                            #     plot_and_export_results(reg, "AdaBoostR")
+                            
+                            # elif inputs['base estimator'] == "LinearRegression": 
+                            #     reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                            #     reg.AdaBoostRegressor()
+
+                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            #     result_data.columns = ['actual','prediction']
+                                
+                            #     plot_and_export_results(reg, "AdaBoostR")
 
                         elif operator == 'cross val score':
-                            if inputs['base estimator'] == "DecisionTree": 
-                                reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                                cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
+                            # if inputs['base estimator'] == "DecisionTree": 
+                            reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                            # cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
+                            export_cross_val_results(reg, cv, "AdaBoostR_cv")
+                            #     st.write('mean cross val R2:', cvs.mean())
+                            # elif inputs['base estimator'] == "SupportVector": 
+
+                            #     reg.model =  AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+
+                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                st.write('mean cross val R2:', cvs.mean())
-                            elif inputs['base estimator'] == "SupportVector": 
+                            #     export_cross_val_results(cvs, "AdaBoostR_cv")  
 
-                                reg.model =  AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                            # elif inputs['base estimator'] == "LinearRegression":
+                            #     reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
 
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                     
-                                export_cross_val_results(cvs, "AdaBoostR_cv")  
-
-                            elif inputs['base estimator'] == "LinearRegression":
-                                reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    
-                                export_cross_val_results(cvs, "AdaBoostR_cv")  
+                            #     export_cross_val_results(cvs, "AdaBoostR_cv")  
 
                         elif operator == 'leave one out':
-                            if inputs['base estimator'] == "DecisionTree": 
-                                reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                            # if inputs['base estimator'] == "DecisionTree": 
+                            reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                        
+                            export_loo_results(reg, loo, "AdaBoostR_loo")
                             
-                                export_loo_results(reg, loo, "AdaBoostR_loo")
-                            
-                            elif inputs['base estimator'] == "SupportVector": 
+                            # elif inputs['base estimator'] == "SupportVector": 
 
-                                reg.model = reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                            #     reg.model = reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                                 
-                                export_loo_results(reg, loo, "AdaBoostR_loo")
+                            #     export_loo_results(reg, loo, "AdaBoostR_loo")
 
-                            elif inputs['base estimator'] == "LinearRegression":
-                                reg.model = reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                            # elif inputs['base estimator'] == "LinearRegression":
+                            #     reg.model = reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                                                     
-                                export_loo_results(reg, loo, "AdaBoostR_loo")
+                            #     export_loo_results(reg, loo, "AdaBoostR_loo")
                             
                 if inputs['model'] == 'GradientBoostingRegressor':
 
@@ -2994,10 +3121,10 @@ elif select_option == "其他":
 
                         if operator == 'train test split':
 
-                                reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
                                                                     random_state=inputs['random state']) 
                                 
-                                reg.AdaBoostRegressor()
+                                reg.GradientBoostingRegressor()
                 
 
                                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
@@ -3007,9 +3134,9 @@ elif select_option == "其他":
                         elif operator == 'cross val score':
                                 reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
                                                                     random_state=inputs['random state'])  
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                export_cross_val_results(cvs, "GradientBoostingR_cv")    
-
+                                # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                                # export_cross_val_results(cvs, "GradientBoostingR_cv")    
+                                export_cross_val_results(reg, cv, "GradientBoostingR_cv")
                         elif operator == 'leave one out':
                                 reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
                                                                     random_state=inputs['random state']) 
@@ -3051,60 +3178,16 @@ elif select_option == "其他":
                                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                             learning_rate=inputs['learning rate'])
                                 
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                export_cross_val_results(cvs, "DTR_cv")    
-
+                                # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                                # export_cross_val_results(cvs, "DTR_cv")    
+                                export_cross_val_results(reg, cv, "XGBR_cv")
 
                         elif operator == 'leave one out':
                                 reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                             learning_rate=inputs['learning rate'])
                             
-                                export_loo_results(reg, loo, "DTR_loo")
-
-
-                if inputs['model'] == 'LGBMRegressor':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                        
-                            if operator == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,20,5)
-                            elif operator == 'leave one out':
-                                loo = LeaveOneOut()
-                    colored_header(label="Training", description=" ",color_name="violet-30")
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    if button_train:
-
-                        if operator == 'train test split':
-
-                                reg.model = lgb.LGBMRegressor(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
-                                                            num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
-
-                                reg.LGBMRegressor()
-
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-
-                                plot_and_export_results(reg, "LGBMR")
-
-                        elif operator == 'cross val score':
-                                reg.model = lgb.LGBMRegressor(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
-                                                            num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
-                                
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                export_cross_val_results(cvs, "LGBMR_cv")    
-
-                        elif operator == 'leave one out':
-                                reg.model = lgb.LGBMRegressor(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
-                                                            num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
-                                
-                                export_loo_results(reg, loo, "LGBMR_loo")
+                                export_loo_results(reg, loo, "XGBR_loo")
 
                 if inputs['model'] == 'CatBoostRegressor':
                     with col2:
@@ -3137,8 +3220,9 @@ elif select_option == "其他":
                         elif operator == 'cross val score':
                                 reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
                                 
-                                cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                export_cross_val_results(cvs, "CatBoostR_cv")    
+                                # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                                # export_cross_val_results(cvs, "CatBoostR_cv")    
+                                export_cross_val_results(reg, cv, "CatBoostR_cv")
 
                         elif operator == 'leave one out':
                                 reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
@@ -3503,60 +3587,60 @@ elif select_option == "其他":
 
                                 st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
                 
-                if inputs['model'] == 'LGBMClassifier':
+                # if inputs['model'] == 'LGBMClassifier':
 
-                    with col2:
-                        with st.expander('Operator'):
+                #     with col2:
+                #         with st.expander('Operator'):
                             
-                            preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                #             preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
                             
-                            data_process = st.selectbox('data process', ('train test split','cross val score'))
-                            if data_process == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                #             data_process = st.selectbox('data process', ('train test split','cross val score'))
+                #             if data_process == 'train test split':
+                #                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                #                 if preprocess == 'StandardScaler':
+                #                     clf.features = StandardScaler().fit_transform(clf.features)
+                #                 if preprocess == 'MinMaxScaler':
+                #                     clf.features = MinMaxScaler().fit_transform(clf.features)
+                #                 clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                                 
-                            elif data_process == 'cross val score':
+                #             elif data_process == 'cross val score':
 
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,20,5)
+                #                 if preprocess == 'StandardScaler':
+                #                     clf.features = StandardScaler().fit_transform(clf.features)
+                #                 if preprocess == 'MinMaxScaler':
+                #                     clf.features = MinMaxScaler().fit_transform(clf.features)
+                #                 cv = st.number_input('cv',1,20,5)
                 
                     
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
+                #     with st.container():
+                #         button_train = st.button('Train', use_container_width=True)
                     
-                    if button_train:
-                        if data_process == 'train test split':
+                #     if button_train:
+                #         if data_process == 'train test split':
                         
-                            clf.model = lgb.LGBMClassifier(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
-                                                            num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
+                #             clf.model = lgb.LGBMClassifier(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
+                #                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
 
-                            clf.LGBMClassifier()
+                #             clf.LGBMClassifier()
                             
-                            plot = customPlot()
-                            cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                            plot.confusion_matrix(cm)
-                            result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                            result_data.columns = ['actual','prediction']
-                            with st.expander('Actual vs Predict'):
-                                st.write(result_data)
-                                tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                st.markdown(tmp_download_link, unsafe_allow_html=True)
+                #             plot = customPlot()
+                #             cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
+                #             plot.confusion_matrix(cm)
+                #             result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                #             result_data.columns = ['actual','prediction']
+                #             with st.expander('Actual vs Predict'):
+                #                 st.write(result_data)
+                #                 tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-                        elif data_process == 'cross val score':
+                #         elif data_process == 'cross val score':
                                 
-                            clf.model = lgb.LGBMClassifier(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
-                                                            num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
+                #             clf.model = lgb.LGBMClassifier(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
+                #                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
 
-                            cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+                #             cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
-                            st.info('cv mean accuracy score: {}'.format(cvs.mean()))        
+                #             st.info('cv mean accuracy score: {}'.format(cvs.mean()))        
 
                 if inputs['model'] == 'CatBoostClassifier':
 

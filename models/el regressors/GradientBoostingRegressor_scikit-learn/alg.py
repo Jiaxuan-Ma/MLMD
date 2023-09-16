@@ -42,10 +42,12 @@ def show():
             inputs['learning rate'] = st.number_input('learning rate',0.001,10.0,0.1)
             inputs['nestimators'] = st.number_input('number estimators',1, 1000, 100)
             inputs['max features'] = st.selectbox('max features', ['auto', 'sqrt', 'log2'])
-            max_depth = st.checkbox('max depth', None)
-            inputs['max depth'] = None
-            if max_depth:
-                inputs['max depth'] = st.number_input('max depth',1, 100, 3)
+            inputs['max depth'] = st.number_input('max depth',1, 1000, 3)
+            # max_depth = st.checkbox('max depth', None)
+            # inputs['max depth'] = None
+            # if max_depth:
+            #     inputs['max depth'] = st.number_input('max depth',1, 100, 3)
+
             random_state = st.checkbox('random state 42',True)
             if random_state:
                 inputs['random state'] = 42

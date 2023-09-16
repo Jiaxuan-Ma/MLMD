@@ -1527,7 +1527,6 @@ def calculate_mean(list1, list2):
     return result
 
 def non_dominated_sorting(fitness_values):
-    num_objectives = fitness_values.shape[1]
     num_solutions = fitness_values.shape[0]
 
     domination_counts = np.zeros(num_solutions, dtype=int)

@@ -4,7 +4,7 @@ import streamlit as st
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "MOO",
+    "model": "NSGA-II",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 
@@ -35,9 +35,14 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
             inputs['objective'] = st.selectbox('objective', ['max', 'min'])
-            inputs['method'] = st.selectbox('method', ['NSGA-II'])
-            inputs['normalize'] = st.selectbox('normalize',[None, 'StandardScaler', 'MinMaxScaler'])
             inputs['n dim'] = st.number_input('variable dim', 1, 20, 10)
+            inputs['size pop'] = st.number_input('size pop', 1, 500, 20)
+            inputs['max iter'] = st.number_input('max iter', 1, 10000, 50)
+            random_state = st.checkbox('random state 42',True)
+            if random_state:
+                inputs['random state'] = 42
+            else:
+                inputs['random state'] = None
             # inputs['num'] = st.number_input('number', 1, 10, 1)
 
     return inputs,col2
