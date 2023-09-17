@@ -4,9 +4,9 @@ import streamlit as st
 class TrAdaboostR2:
     def __init__(self) -> None:
         # self.estimator = estimator
-        # self.N = N
+        self.N = 0
         self.estimators = []
-        self.estimator_weight = np.array([])
+        self.estimator_weight = []
         # predictions = []
     def fit(self, params, Xsource, Xtarget, Ysource, Ytarget, N):
         self.N = N
@@ -50,7 +50,6 @@ class TrAdaboostR2:
                 weights[n + t] = weights[n+t] * np.power(self.beta_N[i], -np.abs(Ypred[n+t] - Ytrain[n+t]) / Z_t)
             for s in range(n):
                 weights[s] = weights[s] * np.power(beta, np.abs(Ypred[s] - Ytrain[s]) / Z_t)
-
     def _calculate_weight(self, weights):
         sum_weight = np.sum(weights)
         return np.asarray(weights / sum_weight, order='C')
@@ -74,9 +73,21 @@ class TrAdaboostR2:
         weight_cdf = np.cumsum(self.estimator_weight[sorted_idx], axis=1)
         median_or_above = weight_cdf >= 0.5 * weight_cdf[:, -1][:, np.newaxis]
         median_idx = median_or_above.argmax(axis=1)
-        
         median_estimators = sorted_idx[np.arange(Xtest.shape[0]), median_idx]
         
         return self.estimators_predicts[np.arange(Xtest.shape[0]), median_estimators]  
 
+    def inference(self, Xtest):
+        Xtest = np.asarray(Xtest, order='C')
+        self.estimators_predicts = np.ones([Xtest.shape[0], self.N])
+        for i, estimator in zip(range(self.N), self.estimators):
+            Ypred = estimator.predict(Xtest)
+            self.estimators_predicts[:, i] = Ypred
 
+        sorted_idx = np.argsort(self.estimators_predicts, axis=1)
+        weight_cdf = np.cumsum(self.estimator_weight[sorted_idx], axis=1)
+        median_or_above = weight_cdf >= 0.5 * weight_cdf[:, -1][:, np.newaxis]
+        median_idx = median_or_above.argmax(axis=1)
+        median_estimators = sorted_idx[np.arange(Xtest.shape[0]), median_idx]
+        
+        return self.estimators_predicts[np.arange(Xtest.shape[0]), median_estimators]  
