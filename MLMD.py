@@ -34,6 +34,7 @@ from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPRegressor
+from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
 
 from sklearn.svm import SVR
 from sklearn.svm import SVC
@@ -55,7 +56,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 import xgboost as xgb
 from catboost import CatBoostClassifier
 from catboost import CatBoostRegressor
-from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process import GaussianProcessRegressor as GPR
 import Bgolearn.BGOsampling as BGOS
 
 from typing import Optional
@@ -1251,7 +1252,87 @@ elif select_option == "回归预测":
                     reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
                 
                     export_loo_results(reg, loo, "SVR_loo")
+
+        if inputs['model'] == 'GPRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,20,5)
+
+                    elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        loo = LeaveOneOut()
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+                if operator == 'train test split':
+                    if inputs['kernel'] == None:
+                        kernel = None
+                    elif inputs['kernel'] == 'DotProduct':
+                        kernel = DotProduct()
+                    elif inputs['kernel'] == 'WhiteKernel':
+                        kernel = WhiteKernel()
+                    else:
+                        kernel = DotProduct() + WhiteKernel()
+                    reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
                     
+                    reg.GPRegressor()
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+                    
+                    plot_and_export_results(reg, "GPR")
+
+                elif operator == 'cross val score':
+                    if inputs['kernel'] == None:
+                        kernel = None
+                    elif inputs['kernel'] == 'DotProduct':
+                        kernel = DotProduct()
+                    elif inputs['kernel'] == 'WhiteKernel':
+                        kernel = WhiteKernel()
+                    else:
+                        kernel = DotProduct() + WhiteKernel()
+                    reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
+
+                    export_cross_val_results(reg, cv, "GPR_cv")
+
+                elif operator == 'leave one out':
+                    if inputs['kernel'] == None:
+                        kernel = None
+                    elif inputs['kernel'] == 'DotProduct':
+                        kernel = DotProduct()
+                    elif inputs['kernel'] == 'WhiteKernel':
+                        kernel = WhiteKernel()
+                    else:
+                        kernel = DotProduct() + WhiteKernel()
+                    reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
+                
+                    export_loo_results(reg, loo, "GPR_loo")
+
         if inputs['model'] == 'KNeighborsRegressor':
 
             with col2:
@@ -2926,7 +3007,6 @@ elif select_option == "代理优化":
                         tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-
     elif sub_option == "迁移学习-单目标代理优化":
         colored_header(label="迁移学习-单目标代理优化",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
@@ -3126,7 +3206,6 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                            
-
 elif select_option == "其他":
     with st.sidebar:
         sub_option = option_menu(None, [ "集成学习", "模型推理","可解释性机器学习"])
