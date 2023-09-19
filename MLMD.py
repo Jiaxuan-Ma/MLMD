@@ -116,7 +116,7 @@ st.markdown(sysmenu,unsafe_allow_html=True)
 # arrow-repeat
 with st.sidebar:
     st.write('''
-    #### 开发者：马家轩|Jiaxuan Ma
+    #### 技术支持：马家轩|Jiaxuan Ma
     #### 联系方式：jiaxuanma.shu@gmail.com
     ''')
     select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程", "回归预测", "分类预测", "主动学习","迁移学习", "代理优化", "其他"],
@@ -153,8 +153,24 @@ if select_option == "平台主页":
     st.write(
         '''*为了保证合金的各个元素的质量分数总和为100%, 因此使用**代理优化**模块时需要去掉基元素列*''')
     colored_header(label="致谢",description="",color_name="violet-90")
+
     st.markdown(
     '''
+    #### 贡献者
+    [University of Shanghai Material and Mechanics Informatics Lab (MMIL)](http://www.sshome.space/MMIL/PI/)
+
+    Prof. Sheng Sun
+
+    Dr. Yuan Tian
+
+    Dr. Jie Xiong
+
+    Bin Cao
+
+    Jiaxuan Ma
+
+
+    #### 资助
     国家科技部重点研发计划(No. 2022YFB3707803)
     
     ''')
