@@ -116,8 +116,9 @@ st.markdown(sysmenu,unsafe_allow_html=True)
 # arrow-repeat
 with st.sidebar:
     st.write('''
-    #### 技术支持：马家轩|Jiaxuan Ma
-    #### 联系方式：jiaxuanma.shu@gmail.com
+    技术支持：马家轩|Jiaxuan Ma
+             
+    联系方式：jiaxuanma.shu@gmail.com
     ''')
     select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程", "回归预测", "分类预测", "主动学习","迁移学习", "代理优化", "其他"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
