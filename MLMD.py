@@ -158,18 +158,12 @@ if select_option == "平台主页":
     st.markdown(
     '''
     #### 贡献者
-    [University of Shanghai Material and Mechanics Informatics Lab (MMIL)](http://www.sshome.space/MMIL/PI/)
-
-    Prof. Sheng Sun
-
-    Dr. Yuan Tian
-
-    Dr. Jie Xiong
-
-    Bin Cao
-
-    Jiaxuan Ma
-
+    课题组: [上海大学 材料信息学5万学信息学实验室(MMIL)](http://www.sshome.space/MMIL/PI/)
+    主要开发人：马家轩（博士在读）
+    指导教师：孙升（研究员） 
+    参与人：
+    熊杰 （讲师）
+    田原 （博士）
 
     #### 资助
     国家科技部重点研发计划(No. 2022YFB3707803)
