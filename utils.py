@@ -1649,3 +1649,12 @@ def inverse_normalize(data, scaler, normalize: Optional[str]=None):
         X = scaler.inverse_transform(data)
     X = pd.DataFrame(X, columns=columns)        
     return X
+
+
+def pca_inverse_normalize(data, scaler, normalize: Optional[str]=None):
+    # y = data.iloc[:,-target_number:]
+    if normalize == 'StandardScaler':
+        data = scaler.inverse_transform(data)
+    elif normalize == 'MinMaxScaler':
+        data = scaler.inverse_transform(data)       
+    return data

@@ -31,7 +31,7 @@ def show():
     # st.write("preprocessing")
     # inputs["Normalize"] = st.selectbox('normalize method', ['Z-Score Standardization','Min-Max Scale'])
     
-    st.info('To solve **feature importance rank**')
+    st.info('To solve **dimension reduction**')
     
     # st.write('training')
     col1, col2 = st.columns([2,2])
@@ -40,7 +40,8 @@ def show():
         with st.expander("Hyper Patameter"):
             
             inputs['ncomponents'] = st.number_input('number components', 2)
-    
+            inputs['normalize'] = st.selectbox('normalize', ['MinMaxScaler'])
+
     return inputs, col2
 
 

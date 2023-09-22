@@ -35,6 +35,8 @@ from sklearn.linear_model import Lasso
 from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPRegressor
 from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
+from sklearn.decomposition import PCA
+from sklearn.pipeline import Pipeline
 
 from sklearn.svm import SVR
 from sklearn.svm import SVC
@@ -52,6 +54,8 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import BaggingRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.manifold import TSNE
+
 
 import xgboost as xgb
 from catboost import CatBoostClassifier
@@ -120,8 +124,8 @@ with st.sidebar:
              
     联系方式：jiaxuanma.shu@gmail.com
     ''')
-    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程", "回归预测", "分类预测", "主动学习","迁移学习", "代理优化", "其他"],
-                    icons=['house', 'clipboard-data', 'menu-button-wide','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
+    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程","聚类降维", "回归预测", "分类预测", "主动学习","迁移学习", "代理优化", "其他"],
+                    icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
                     menu_icon="boxes", default_index=0)
 if select_option == "平台主页":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
@@ -1902,13 +1906,15 @@ elif select_option == "分类预测":
 
         st.write('---')
 
-elif select_option == "聚类":
+elif select_option == "聚类降维":
+    colored_header(label="聚类降维",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-
-
+    if file is None:
+        table = PrettyTable(['上传文件名称', '名称','数据说明'])
+        table.add_row(['file_1','dataset','数据集'])
+        st.write(table)
     if file is not None:
         df = pd.read_csv(file)
-        # 检测缺失值
         check_string_NaN(df)
         colored_header(label="数据信息", description=" ",color_name="violet-70")
         nrow = st.slider("rows", 1, len(df), 5)
@@ -1968,8 +1974,77 @@ elif select_option == "聚类":
                     
                     clustered_df.rename(columns={c_name:r_name},inplace=True)
                     st.write(clustered_df)
-            
+        if inputs['model'] == 'PCA':   
+            with col2:
+                pass
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:  
+                st.write(cluster.features.shape[1])
+                pca_all = PCA(n_components=cluster.features.shape[1])
+                pca_all.fit(cluster.features)
+                with plt.style.context(['nature','no-latex']):
+                    fig, ax = plt.subplots()
+                    ax = plt.plot(np.cumsum(pca_all.explained_variance_ratio_ * 100))
+                    plt.grid()
+                    plt.xlabel('Numbers of components')
+                    plt.ylabel('Explained variance')
+                    st.pyplot(fig)
+                def std_PCA(**argv):
+                    scaler = MinMaxScaler()
+                    pca = PCA(**argv)
+                    pipeline = Pipeline([('scaler',scaler),('pca',pca)])
+                    return pipeline
+                
+                PCA_model = std_PCA(n_components=inputs['ncomponents'])
+                PCA_transformed_data = PCA_model.fit_transform(cluster.features)
+                if inputs['ncomponents'] == 2:
+                    with plt.style.context(['nature','no-latex']):
+                        fig, ax = plt.subplots()
+                        ax = plt.scatter(PCA_transformed_data[:,0], PCA_transformed_data[:,1], c=[int(i) for i in cluster.targets.values], s=2, cmap='tab10')
+                        plt.xlabel('1st dimension')
+                        plt.ylabel('2st dimension')
+                        plt.tight_layout()
+                        # plt.legend()
+                        st.pyplot(fig)   
+                    # restult_data = PCA_model.inverse_transform(PCA_transformed_data)
+                    result_data =  PCA_transformed_data
+                    st.write(result_data)
+                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)                    
+                else:
+                    result_data =  PCA_transformed_data
+                    st.write(result_data)                    
+                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
+        if inputs['model'] == 'TSEN':   
+            with col2:
+                pass
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:  
+                
+                TSNE_model = TSNE(n_components=inputs['ncomponents'], perplexity=inputs['perplexity'], learning_rate='auto',n_iter=inputs['max iter'], init='pca', random_state=inputs['random state'])
+                TSNE_transformed_data = TSNE_model.fit_transform(cluster.features)
+                if inputs['ncomponents'] == 2:
+                    with plt.style.context(['nature','no-latex']):
+                        fig, ax = plt.subplots()
+                        ax = plt.scatter(PCA_transformed_data[:,0], PCA_transformed_data[:,1], c=[int(i) for i in cluster.targets.values], s=2, cmap='tab10')
+                        plt.xlabel('1st dimension')
+                        plt.ylabel('2st dimension')
+                        plt.tight_layout()
+                        st.pyplot(fig)   
+                    result_data =  TSNE_transformed_data
+                    st.write(result_data)
+                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)                    
+                else:
+                    result_data =  TSNE_transformed_data
+                    st.write(result_data)                    
+                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)           
         st.write('---')   
+
 
 elif select_option == "主动学习":
     with st.sidebar:
