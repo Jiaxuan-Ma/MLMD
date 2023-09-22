@@ -3295,7 +3295,7 @@ elif select_option == "代理优化":
                     loss_history = pd.DataFrame(loss_history)
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
-                           
+                    
 elif select_option == "其他":
     with st.sidebar:
         sub_option = option_menu(None, [ "集成学习", "模型推理","可解释性机器学习"])

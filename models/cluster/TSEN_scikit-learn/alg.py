@@ -57,27 +57,3 @@ def show():
 if __name__ == "__main__":
     show()
     
-    
-    
-
-
-
-
-
-    # elif inputs['model'] == 'PCA':
-    #     from sklearn.decomposition import PCA
-    #     from sklearn.preprocessing import StandardScaler
-    #     fs.normalize_features = StandardScaler().fit_transform(fs.features)
-    #     pca = PCA(n_components=inputs['ncomponents'])
-    #     with col2:
-    #         if st.button('train'):
-    #             principalComponents = pca.fit_transform(fs.normalize_features)
-    #             # principalDF = pd.DataFrame(data = principalComponents)
-    #             principalDf  = pd.DataFrame(principalComponents)
-    #             new_columns = ['PCA_{}'.format(i+1) for i in range(len(principalDf.columns))]
-    #             principalDf.columns = new_columns
-    #             st.write(principalDf)
-    #             explained_varianceDF = pd.DataFrame(pca.explained_variance_ratio_)
-    #             explained_varianceDF.index = new_columns
-    #             explained_varianceDF.columns = ['explained_variance']
-    #             st.write(explained_varianceDF)
