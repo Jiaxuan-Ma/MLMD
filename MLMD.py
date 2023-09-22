@@ -1981,7 +1981,7 @@ elif select_option == "聚类降维":
                 button_train = st.button('Train', use_container_width=True)
             if button_train:  
                 st.write(cluster.features.shape[1])
-                pca_all = PCA(n_components=cluster.features.shape[1])
+                pca_all = PCA(n_components=cluster.features[1])
                 pca_all.fit(cluster.features)
                 with plt.style.context(['nature','no-latex']):
                     fig, ax = plt.subplots()
