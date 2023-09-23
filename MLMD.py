@@ -1980,8 +1980,7 @@ elif select_option == "聚类降维":
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:  
-                st.write(cluster.features.shape[1])
-                pca_all = PCA(n_components=cluster.features[1])
+                pca_all = PCA(n_components=cluster.features.shape[1])
                 pca_all.fit(cluster.features)
                 with plt.style.context(['nature','no-latex']):
                     fig, ax = plt.subplots()
@@ -2029,7 +2028,7 @@ elif select_option == "聚类降维":
                 if inputs['ncomponents'] == 2:
                     with plt.style.context(['nature','no-latex']):
                         fig, ax = plt.subplots()
-                        ax = plt.scatter(PCA_transformed_data[:,0], PCA_transformed_data[:,1], c=[int(i) for i in cluster.targets.values], s=2, cmap='tab10')
+                        ax = plt.scatter(TSNE_transformed_data[:,0], TSNE_transformed_data[:,1], c=[int(i) for i in cluster.targets.values], s=2, cmap='tab10')
                         plt.xlabel('1st dimension')
                         plt.ylabel('2st dimension')
                         plt.tight_layout()
