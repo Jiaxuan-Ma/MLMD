@@ -2045,7 +2045,6 @@ elif select_option == "聚类降维":
                     st.markdown(tmp_download_link, unsafe_allow_html=True)           
         st.write('---')   
 
-
 elif select_option == "主动学习":
     with st.sidebar:
         sub_option = option_menu(None, ["单目标主动学习", "多目标主动学习"])
