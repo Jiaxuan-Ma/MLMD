@@ -41,7 +41,7 @@ def show():
             
             inputs['ncomponents'] = st.number_input('number components', 2)
             inputs['perplexity'] = st.number_input('perplexity', 2,1000,30)
-            inputs['max iter'] = st.number_input('max iter', 100,10000,1000)
+            inputs['max iter'] = st.number_input('max iter', 250,10000,1000)
             # inputs['perplexity'] = st.selectbox('normalize', ['MinMaxScaler'
             random_state = st.checkbox('random state 42',True)
             if random_state:

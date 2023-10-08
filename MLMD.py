@@ -1973,7 +1973,8 @@ elif select_option == "聚类降维":
                     c_name=clustered_df.columns[-1]
                     
                     clustered_df.rename(columns={c_name:r_name},inplace=True)
-                    st.write(clustered_df)
+                    with st.expander('降维结果'):
+                        st.write(clustered_df)
         if inputs['model'] == 'PCA':   
             with col2:
                 pass
@@ -2004,27 +2005,27 @@ elif select_option == "聚类降维":
                         plt.xlabel('1st dimension')
                         plt.ylabel('2st dimension')
                         plt.tight_layout()
-                        # plt.legend()
                         st.pyplot(fig)   
-                    # restult_data = PCA_model.inverse_transform(PCA_transformed_data)
                     result_data =  PCA_transformed_data
-                    st.write(result_data)
-                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)                    
+                    with st.expander('降维结果'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)                    
                 else:
                     result_data =  PCA_transformed_data
-                    st.write(result_data)                    
-                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)   
+                    with st.expander('降维结果'):
+                        st.write(result_data)                    
+                        tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)   
         if inputs['model'] == 'TSEN':   
             with col2:
                 pass
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:  
-                
                 TSNE_model = TSNE(n_components=inputs['ncomponents'], perplexity=inputs['perplexity'], learning_rate='auto',n_iter=inputs['max iter'], init='pca', random_state=inputs['random state'])
-                TSNE_transformed_data = TSNE_model.fit_transform(cluster.features)
+                TSNE_transformed_data  = TSNE_model.fit_transform(cluster.features)
+                
                 if inputs['ncomponents'] == 2:
                     with plt.style.context(['nature','no-latex']):
                         fig, ax = plt.subplots()
@@ -2034,14 +2035,16 @@ elif select_option == "聚类降维":
                         plt.tight_layout()
                         st.pyplot(fig)   
                     result_data =  TSNE_transformed_data
-                    st.write(result_data)
-                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)                    
+                    with st.expander('降维结果'):
+                        st.write(result_data)
+                        tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)                    
                 else:
                     result_data =  TSNE_transformed_data
-                    st.write(result_data)                    
-                    tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)           
+                    with st.expander('降维结果'):
+                        st.write(result_data)                    
+                        tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
+                        st.markdown(tmp_download_link, unsafe_allow_html=True)           
         st.write('---')   
 
 elif select_option == "主动学习":
