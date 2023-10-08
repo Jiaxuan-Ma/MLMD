@@ -1973,7 +1973,7 @@ elif select_option == "聚类降维":
                     c_name=clustered_df.columns[-1]
                     
                     clustered_df.rename(columns={c_name:r_name},inplace=True)
-                    with st.expander('降维结果'):
+                    with st.expander('聚类结果'):
                         st.write(clustered_df)
         if inputs['model'] == 'PCA':   
             with col2:

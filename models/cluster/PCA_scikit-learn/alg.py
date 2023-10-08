@@ -31,7 +31,7 @@ def show():
     # st.write("preprocessing")
     # inputs["Normalize"] = st.selectbox('normalize method', ['Z-Score Standardization','Min-Max Scale'])
     
-    st.info('To solve **dimension reduction**')
+    st.info('TO SOLVE **DIM REDUCTION**')
     
     # st.write('training')
     col1, col2 = st.columns([2,2])
