@@ -2196,7 +2196,7 @@ elif select_option == "分类预测":
                 with st.expander('Operator'):
                     preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
                     
-                    data_process = st.selectbox('data process', ('train test split','cross val score''leave one out'), label_visibility='collapsed')
+                    data_process = st.selectbox('data process', ('train test split','cross val score','leave one out'), label_visibility='collapsed')
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         if preprocess == 'StandardScaler':
@@ -2219,7 +2219,7 @@ elif select_option == "分类预测":
                             clf.features = StandardScaler().fit_transform(clf.features)
                         if preprocess == 'MinMaxScaler':
                             clf.features = MinMaxScaler().fit_transform(clf.features)
-                            loo = LeaveOneOut() 
+                        loo = LeaveOneOut() 
 
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
@@ -2268,12 +2268,12 @@ elif select_option == "分类预测":
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
                     export_cross_val_results_clf(clf, cv, "LRC_cv", col_name, unique_categories)      
-                elif data_process == 'cross val score': 
+
+                elif data_process == 'leave one out': 
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio']) 
  
-                    export_loo_results_clf(clf, loo, "LRC_loo", col_name, unique_categories)  
-        
+                    export_loo_results_clf(clf, loo, "LRC_loo", col_name, unique_categories)          
         if inputs['model'] == 'SupportVector':
             with col2:
                 with st.expander('Operator'):
@@ -2295,7 +2295,7 @@ elif select_option == "分类预测":
                             clf.features = MinMaxScaler().fit_transform(clf.features)
                         cv = st.number_input('cv',1,20,5)
 
-                    elif data_process == 'cross val score':
+                    elif data_process == 'leave one out':
                         if preprocess == 'StandardScaler':
                             clf.features = StandardScaler().fit_transform(clf.features)
                         if preprocess == 'MinMaxScaler':
@@ -2428,14 +2428,16 @@ elif select_option == "分类预测":
             with col2:
                 with st.expander('Operator'):
                     
-                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    data_process = st.selectbox('data process', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                         
                     elif data_process == 'cross val score':
                         cv = st.number_input('cv',1,20,5)
-        
+
+                    elif data_process == 'leave one out':
+                        loo = LeaveOneOut()        
             
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
@@ -2443,7 +2445,6 @@ elif select_option == "分类预测":
             if button_train:
                 if data_process == 'train test split':
                 
-          
                     clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
 
                     clf.AdaBoostClassifier()
@@ -2479,17 +2480,14 @@ elif select_option == "分类预测":
                             tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
                             
-
                 elif data_process == 'cross val score':
 
-                    clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
                     export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories) 
                 
                 elif data_process == 'leave one out':
-                    clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                     
                     export_loo_results_clf(clf, loo, "AdaBoostC_loo", col_name, unique_categories)  
 
@@ -2500,7 +2498,7 @@ elif select_option == "分类预测":
                     
                     preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
                     
-                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    data_process = st.selectbox('data process', ('train test split','cross val score','leave one out'), label_visibility='collapsed')
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         if preprocess == 'StandardScaler':
@@ -2516,7 +2514,14 @@ elif select_option == "分类预测":
                         if preprocess == 'MinMaxScaler':
                             clf.features = MinMaxScaler().fit_transform(clf.features)
                         cv = st.number_input('cv',1,20,5)
-        
+                    
+                    elif data_process == 'leave one out':
+
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        loo = LeaveOneOut()         
             
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
@@ -2560,38 +2565,33 @@ elif select_option == "分类预测":
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
                 elif data_process == 'cross val score':
-                        
-                        clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                            random_state=inputs['random state'])
+                    
+                    clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                                        random_state=inputs['random state'])
+                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+                    export_cross_val_results_clf(clf, cv, "GBC_cv", col_name, unique_categories)   
 
-                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                        st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
+                elif data_process == 'leave one out':
+                    
+                    clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                                        random_state=inputs['random state'])
+                    export_loo_results_clf(clf, loo, "GBC_loo", col_name, unique_categories)
 
         if inputs['model'] == 'XGBClassifier':
 
             with col2:
                 with st.expander('Operator'):
-                    
-                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-                    
-                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                                   
+                    data_process = st.selectbox('data process', ('train test split', 'leave one out'), label_visibility='collapsed')
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        if preprocess == 'StandardScaler':
-                            clf.features = StandardScaler().fit_transform(clf.features)
-                        if preprocess == 'MinMaxScaler':
-                            clf.features = MinMaxScaler().fit_transform(clf.features)
+
                         clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                         
-                    elif data_process == 'cross val score':
-
-                        if preprocess == 'StandardScaler':
-                            clf.features = StandardScaler().fit_transform(clf.features)
-                        if preprocess == 'MinMaxScaler':
-                            clf.features = MinMaxScaler().fit_transform(clf.features)
-                        cv = st.number_input('cv',1,20,5)
-        
+                    # elif data_process == 'cross val score':
+                    #     cv = st.number_input('cv',1,20,5)
+                    elif data_process == 'leave one out':
+                        loo = LeaveOneOut() 
             
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
@@ -2600,8 +2600,8 @@ elif select_option == "分类预测":
                 if data_process == 'train test split':
                 
                     clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                learning_rate=inputs['learning rate'])
+                                                subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                learning_rate=inputs['learning rate'], num_class=len(list(unique_categories)))
                     clf.XGBClassifier()
                         
                     if not check_string(targets):
@@ -2635,15 +2635,22 @@ elif select_option == "分类预测":
                             tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-                elif data_process == 'cross val score':
+                # elif data_process == 'cross val score':
+                        
+                #         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                #                                     subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                #                                     learning_rate=inputs['learning rate'], num_class=len(list(unique_categories)))
+                        
+                #         cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+                #         export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories)  
+                
+                elif data_process == 'leave one out':
                         
                         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'])
+                                                    subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'], num_class=len(list(unique_categories)))
 
-                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                        st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
+                        export_loo_results_clf(clf, loo, "XGBC_loo", col_name, unique_categories)
         
         if inputs['model'] == 'CatBoostClassifier':
 
@@ -2652,7 +2659,7 @@ elif select_option == "分类预测":
                     
                     preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
                     
-                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    data_process = st.selectbox('data process', ('train test split','cross val score','leave one out'), label_visibility='collapsed')
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         if preprocess == 'StandardScaler':
@@ -2668,7 +2675,15 @@ elif select_option == "分类预测":
                         if preprocess == 'MinMaxScaler':
                             clf.features = MinMaxScaler().fit_transform(clf.features)
                         cv = st.number_input('cv',1,20,5)
- 
+
+                    elif data_process == 'leave one out':
+
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        loo = LeaveOneOut() 
+
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             
@@ -2716,7 +2731,13 @@ elif select_option == "分类预测":
 
                         cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
-                        st.info('cv mean accuracy score: {}'.format(cvs.mean()))   
+                        export_cross_val_results_clf(clf, cv, "CatBoostC_cv", col_name, unique_categories)  
+                
+                elif data_process == 'leave one out':
+                        
+                        clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+
+                        export_loo_results_clf(clf, loo, "CatBoostC_loo", col_name, unique_categories)
 
         st.write('---')
 

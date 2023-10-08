@@ -40,11 +40,11 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
 
-            inputs['base estimator'] = st.selectbox('base estimator', ['gbtree', 'gblinear'])
+            inputs['base estimator'] = st.selectbox('base estimator', ['gbtree'])
 
             inputs['nestimators'] = st.number_input('number estimators',1, 10000, 100)
             inputs['learning rate'] = st.number_input('learning rate',0.01,0.5,0.3)
-            inputs['max depth'] = st.number_input('max depth',1, 10, 6)
+            # inputs['max depth'] = st.number_input('max depth',1, 10, 6)
             inputs['subsample'] = st.slider('subsample', 0.5,1.0,1.0)
             inputs['subfeature'] = st.slider('subfeature', 0.5,1.0,1.0)
             random_state = st.checkbox('random state 1024',True)
