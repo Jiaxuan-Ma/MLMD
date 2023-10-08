@@ -13,6 +13,7 @@ from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import confusion_matrix
 ######for GP
 
 from typing import Optional
@@ -1111,7 +1112,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+     
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1126,7 +1127,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1144,7 +1145,6 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        self.score = accuracy_score(self.Ypred ,self.Ytest)
 
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
@@ -1158,7 +1158,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
 
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
@@ -1174,7 +1174,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1189,7 +1189,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1204,7 +1204,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1219,7 +1219,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1234,7 +1234,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1249,7 +1249,7 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        self.score = self.model.score(self.Xtest, self.Ytest)
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
@@ -1529,6 +1529,37 @@ def export_cross_val_results(model, F, model_name):
         tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
+def export_cross_val_results_clf(model, F, model_name, col_name, unique_categories):
+    # 交叉验证的模型的选择？目前选择最后一个模型，不是很合理
+    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model) 
+    model.Ytest = pd.DataFrame(Y_test, columns=model.targets.columns)
+    model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns)
+    st.write('accuracy score: {}'.format(accuracy_score(y_true=Y_test, y_pred=Y_pred)))
+
+    model.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[model.Ytest[col_name[0]]].values
+    model.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[model.Ypred[col_name[0]]].values
+    conf_matrix = confusion_matrix(model.Ytest.values, model.Ypred.values, labels=np.unique(model.Ytest))
+    conf_df = pd.DataFrame(conf_matrix, index=np.unique(model.Ytest), columns=np.unique(model.Ytest))
+    with plt.style.context(['nature','no-latex']):
+        fig, ax = plt.subplots()
+        sns.heatmap(conf_df, annot=True, cmap='Blues',
+                    xticklabels=conf_df.columns, yticklabels=conf_df.index)
+        plt.xlabel('Actual')
+        plt.ylabel('Prediction')
+        plt.title('Confusion Matrix')
+        st.pyplot(fig)
+
+    with st.expander("模型下载"):
+        tmp_download_link = download_button(model.model, model_name+'.pickle', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+    result_data = pd.concat([model.Ytest, model.Ypred], axis=1)
+    result_data.columns = ['actual','prediction']
+    with st.expander('Actual vs Predict'):
+        st.write(result_data)
+        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
 def export_loo_results(model, loo, model_name):
     Y_pred  =[]
     Y_test = []
@@ -1554,6 +1585,52 @@ def export_loo_results(model, loo, model_name):
         st.write(result_data)
         tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+
+
+def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
+    Y_pred  =[]
+    Y_test = []
+    features = pd.DataFrame(model.features).values
+    targets = model.targets.values
+
+    for train,test in loo.split(features):
+        Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
+        
+        model.model.fit(Xtrain, Ytrain)
+        Ypred = model.model.predict(Xtest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
+    Y_pred = np.array(Y_pred).reshape(-1,1)
+    Y_test = np.array(Y_test).reshape(-1,1)
+    model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns) 
+    model.Ytest = pd.DataFrame(Y_test, columns=model.targets.columns)        
+    
+    st.write('accuracy score: {}'.format(accuracy_score(y_true=Y_test, y_pred=Y_pred)))
+
+    model.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[model.Ytest[col_name[0]]].values
+    model.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[model.Ypred[col_name[0]]].values
+    conf_matrix = confusion_matrix(model.Ytest.values, model.Ypred.values, labels=np.unique(model.Ytest))
+    conf_df = pd.DataFrame(conf_matrix, index=np.unique(model.Ytest), columns=np.unique(model.Ytest))
+    with plt.style.context(['nature','no-latex']):
+        fig, ax = plt.subplots()
+        sns.heatmap(conf_df, annot=True, cmap='Blues',
+                    xticklabels=conf_df.columns, yticklabels=conf_df.index)
+        plt.xlabel('Actual')
+        plt.ylabel('Prediction')
+        plt.title('Confusion Matrix')
+        st.pyplot(fig)
+
+    with st.expander("模型下载"):
+        tmp_download_link = download_button(model.model, model_name+'_model.pickle', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+    result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
+    result_data.columns = ['actual', 'prediction']
+    with st.expander('预测结果'):
+        st.write(result_data)
+        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+
 
 def get_column_min(matrix):
     num_cols = len(matrix[0])
