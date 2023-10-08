@@ -91,7 +91,6 @@ from sko.SA import SAFast
 # import sys
 from prettytable import PrettyTable
 
-import scienceplots
 
 from algorithm.TrAdaboostR2 import TrAdaboostR2
 from algorithm.mobo import Mobo4mat
@@ -549,6 +548,9 @@ elif select_option == "特征工程":
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('---')
     
+    elif sub_option == "特征变换":
+        pass
+
     elif sub_option == "特征唯一值处理":
         colored_header(label="特征唯一值处理",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
@@ -1596,8 +1598,343 @@ elif select_option == "回归预测":
                 
                     export_loo_results(reg, loo, "RidgeR_loo")
 
-        if inputs['model'] == 'MLPRegressor':
+        if inputs['model'] == 'BaggingRegressor':
+            with col2:
+                with st.expander('Operator'):
+                    # preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
 
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        # if preprocess == 'StandardScaler':
+                        #     reg.features = StandardScaler().fit_transform(reg.features)
+                        # if preprocess == 'MinMaxScaler':
+                        #     reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+
+                    elif operator == 'cross val score':
+                        # if preprocess == 'StandardScaler':
+                        #     reg.features = StandardScaler().fit_transform(reg.features)
+                        # if preprocess == 'MinMaxScaler':
+                        #     reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,20,5)
+
+                    elif operator == 'leave one out':
+                        # if preprocess == 'StandardScaler':
+                        #     reg.features = StandardScaler().fit_transform(reg.features)
+                        # if preprocess == 'MinMaxScaler':
+                        #     reg.features = MinMaxScaler().fit_transform(reg.features)
+                        reg.features = pd.DataFrame(reg.features)    
+                        loo = LeaveOneOut()
+
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+
+                if operator == 'train test split':
+
+                # if inputs['base estimator'] == "DecisionTree": 
+                    reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    
+                    reg.BaggingRegressor()
+    
+
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+
+                    plot_and_export_results(reg, "BaggingR")
+
+                    
+                    # elif inputs['base estimator'] == "SupportVector": 
+                    #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
+                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    #     reg.BaggingRegressor()
+
+                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    #     result_data.columns = ['actual','prediction']
+
+                    #     export_cross_val_results(reg, cv, "DTR_cv")
+                    
+                    # elif inputs['base estimator'] == "LinearRegression": 
+                    #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    #     reg.BaggingRegressor()
+        
+
+                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    #     result_data.columns = ['actual','prediction']
+
+                    #     plot_and_export_results(reg, "BaggingR")
+
+                elif operator == 'cross val score':
+                # if inputs['base estimator'] == "DecisionTree": 
+                    reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                    # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+
+                    # export_cross_val_results(cvs, "BaggingR_cv")   
+                    export_cross_val_results(reg, cv, "BaggingR_cv")
+
+                    # elif inputs['base estimator'] == "SupportVector": 
+
+                    #     reg.model = BaggingRegressor(estimator =  SVR(),n_estimators=inputs['nestimators'],
+                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                    #     export_cross_val_results(cvs, "BaggingR_cv")   
+
+                    # elif inputs['base estimator'] == "LinearRegression":
+                    #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                    #     export_cross_val_results(cvs, "BaggingR_cv")   
+
+                elif operator == 'leave one out':
+                # if inputs['base estimator'] == "DecisionTree": 
+                    reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                
+                    export_loo_results(reg, loo, "BaggingR_loo")
+
+                    # elif inputs['base estimator'] == "SupportVector": 
+
+                    #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
+                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        
+                    #     export_loo_results(reg, loo, "BaggingR_loo")
+
+                    # elif inputs['base estimator'] == "LinearRegression":
+                    #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+        
+                    #     export_loo_results(reg, loo, "BaggingR_loo")
+
+        if inputs['model'] == 'AdaBoostRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+                    operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
+                
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                    elif operator == 'cross val score':
+                        cv = st.number_input('cv',1,20,5)
+                    elif operator == 'leave one out':
+                        loo = LeaveOneOut()
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+
+                if operator == 'train test split':
+
+                    # if inputs['base estimator'] == "DecisionTree": 
+                    reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                    
+                    reg.AdaBoostRegressor()
+    
+                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    result_data.columns = ['actual','prediction']
+
+                    plot_and_export_results(reg, "AdaBoostR")
+                    
+                    # elif inputs['base estimator'] == "SupportVector": 
+
+                    #     reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        
+                    #     reg.AdaBoostRegressor()
+
+                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    #     result_data.columns = ['actual','prediction']
+
+                    #     plot_and_export_results(reg, "AdaBoostR")
+                    
+                    # elif inputs['base estimator'] == "LinearRegression": 
+                    #     reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                    #     reg.AdaBoostRegressor()
+
+                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                    #     result_data.columns = ['actual','prediction']
+                        
+                    #     plot_and_export_results(reg, "AdaBoostR")
+
+                elif operator == 'cross val score':
+                    # if inputs['base estimator'] == "DecisionTree": 
+                    reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                    # cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
+                    export_cross_val_results(reg, cv, "AdaBoostR_cv")
+                    #     st.write('mean cross val R2:', cvs.mean())
+                    # elif inputs['base estimator'] == "SupportVector": 
+
+                    #     reg.model =  AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+
+                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                    #     export_cross_val_results(cvs, "AdaBoostR_cv")  
+
+                    # elif inputs['base estimator'] == "LinearRegression":
+                    #     reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+
+                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                    #     export_cross_val_results(cvs, "AdaBoostR_cv")  
+
+                elif operator == 'leave one out':
+                    # if inputs['base estimator'] == "DecisionTree": 
+                    reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                
+                    export_loo_results(reg, loo, "AdaBoostR_loo")
+                    
+                    # elif inputs['base estimator'] == "SupportVector": 
+
+                    #     reg.model = reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                        
+                    #     export_loo_results(reg, loo, "AdaBoostR_loo")
+
+                    # elif inputs['base estimator'] == "LinearRegression":
+                    #     reg.model = reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                                            
+                    #     export_loo_results(reg, loo, "AdaBoostR_loo")
+                    
+        if inputs['model'] == 'GradientBoostingRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+                    operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
+                
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                    elif operator == 'cross val score':
+                        cv = st.number_input('cv',1,20,5)
+                    elif operator == 'leave one out':
+                        loo = LeaveOneOut()
+
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+
+                if operator == 'train test split':
+
+                        reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
+                                                            random_state=inputs['random state']) 
+                        
+                        reg.GradientBoostingRegressor()
+        
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "GradientBoostingR")
+
+                elif operator == 'cross val score':
+                        reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
+                                                            random_state=inputs['random state'])  
+                        # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                        # export_cross_val_results(cvs, "GradientBoostingR_cv")    
+                        export_cross_val_results(reg, cv, "GradientBoostingR_cv")
+                elif operator == 'leave one out':
+                        reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
+                                                            random_state=inputs['random state']) 
+                    
+                        export_loo_results(reg, loo, "GradientBoostingR_loo")
+
+        if inputs['model'] == 'XGBRegressor':
+
+            with col2:
+                with st.expander('Operator'):
+                    operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
+                
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                    elif operator == 'cross val score':
+                        cv = st.number_input('cv',1,20,5)
+                    elif operator == 'leave one out':
+                        loo = LeaveOneOut()
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+
+                if operator == 'train test split':
+
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'])
+                        reg.XGBRegressor()
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "XGBR")
+
+                elif operator == 'cross val score':
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'])
+                        
+                        # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                        # export_cross_val_results(cvs, "DTR_cv")    
+                        export_cross_val_results(reg, cv, "XGBR_cv")
+
+                elif operator == 'leave one out':
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'])
+                    
+                        export_loo_results(reg, loo, "XGBR_loo")
+
+        if inputs['model'] == 'CatBoostRegressor':
+            with col2:
+                with st.expander('Operator'):
+                    operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
+                
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                    elif operator == 'cross val score':
+                        cv = st.number_input('cv',1,20,5)
+                    elif operator == 'leave one out':
+                        loo = LeaveOneOut()
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+
+                if operator == 'train test split':
+
+                        reg.model =CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+
+                        reg.LGBMRegressor()
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "CatBoostR")
+
+                elif operator == 'cross val score':
+                        reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                        
+                        # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+                        # export_cross_val_results(cvs, "CatBoostR_cv")    
+                        export_cross_val_results(reg, cv, "CatBoostR_cv")
+
+                elif operator == 'leave one out':
+                        reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                        export_loo_results(reg, loo, "CatBoostR_loo")            
+        
+        if inputs['model'] == 'MLPRegressor':
             with col2:
                 with st.expander('Operator'):
 
@@ -1671,7 +2008,6 @@ elif select_option == "分类预测":
         st.write(table)
     if file is not None:
         df = pd.read_csv(file)
-        check_string_NaN(df)
         colored_header(label="数据信息", description=" ",color_name="violet-70")
         nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
@@ -1691,14 +2027,17 @@ elif select_option == "分类预测":
             st.write(features.head())
         with col_target:   
             st.write(targets.head())
-    
+
         clf = CLASSIFIER(features,targets)
 
         colored_header(label="Choose Target", description=" ", color_name="violet-30")
         target_selected_option = st.selectbox('target', list(clf.targets)[::-1])
 
-        clf.targets = targets[target_selected_option]
-
+        clf.targets = pd.DataFrame(targets[target_selected_option])
+        col_name = []
+        if check_string(clf.targets):
+            col_name = list(clf.targets)
+            clf.targets[col_name[0]], unique_categories = pd.factorize(clf.targets[col_name[0]])
         # st.write(fs.targets.head())
         colored_header(label="Classifier", description=" ",color_name="violet-30")
 
@@ -1730,14 +2069,36 @@ elif select_option == "分类预测":
                                                             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
                                                                
                     clf.DecisionTreeClassifier()
-                    plot = customPlot()
-                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                    plot.confusion_matrix(cm)
-                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+
+                    result_data = pd.concat([clf.Ytest, clf.Ypred], axis=1)
                     result_data.columns = ['actual','prediction']
                     with st.expander('Actual vs Predict'):
                         st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        tmp_download_link = download_button(result_data, f'actual vs prediciton.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
                     if inputs['tree graph']:
                         class_names = list(set(clf.targets.astype(str).tolist()))
@@ -1777,15 +2138,34 @@ elif select_option == "分类预测":
                     
                     clf.RandomForestClassifier()
                     
-                    plot = customPlot()
-                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                    plot.confusion_matrix(cm)
-
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
                     result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
                     with st.expander('Actual vs Predict'):
                         st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)        
                 elif data_process == 'cross val score':
 
@@ -1806,7 +2186,6 @@ elif select_option == "分类预测":
                     clf_res  = clf.model.fit(clf.features, clf.targets)
                     oob_score = clf_res.oob_score_
                     st.write(f'oob score : {oob_score}')              
-
 
         if inputs['model'] == 'LogisticRegression':
 
@@ -1841,14 +2220,35 @@ elif select_option == "分类预测":
                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
                     clf.LogisticRegreesion()
                     
-                    plot = customPlot()
-                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                    plot.confusion_matrix(cm)
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+
                     result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
                     with st.expander('Actual vs Predict'):
                         st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
                 elif data_process == 'cross val score':
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
@@ -1888,14 +2288,35 @@ elif select_option == "分类预测":
                                                                
                     clf.SupportVector()
                     
-                    plot = customPlot()
-                    cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                    plot.confusion_matrix(cm)
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+
                     result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
                     with st.expander('Actual vs Predict'):
                         st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
+                        tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
                 elif data_process == 'cross val score':
@@ -1903,6 +2324,373 @@ elif select_option == "分类预测":
                                                                                              
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
                     st.write('cv mean accuracy score: {}'.format(cvs.mean()))     
+
+        if inputs['model'] == 'BaggingClassifier':
+
+            with col2:
+                with st.expander('Operator'):
+                    
+                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    if data_process == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif data_process == 'cross val score':
+                        cv = st.number_input('cv',1,20,5)
+        
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            
+            if button_train:
+                if data_process == 'train test split':
+             
+                    clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                    clf.BaggingClassifier()
+                    
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                            
+                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('Actual vs Predict'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                elif data_process == 'cross val score':
+  
+                    clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+
+                    st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
+
+        
+        if inputs['model'] == 'AdaBoostClassifier':
+
+            with col2:
+                with st.expander('Operator'):
+                    
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    
+                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    if data_process == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif data_process == 'cross val score':
+
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        cv = st.number_input('cv',1,20,5)
+        
+            
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            
+            if button_train:
+                if data_process == 'train test split':
+                
+                    if inputs['base estimator'] == "DecisionTree":    
+                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+
+                        clf.AdaBoostClassifier()
+                        
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+
+                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('Actual vs Predict'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                            
+
+                elif data_process == 'cross val score':
+
+                    if inputs['base estimator'] == "DecisionTree":    
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+
+                        st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
+
+        
+        if inputs['model'] == 'GradientBoostingClassifier':
+
+            with col2:
+                with st.expander('Operator'):
+                    
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    
+                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    if data_process == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif data_process == 'cross val score':
+
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        cv = st.number_input('cv',1,20,5)
+        
+            
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            
+            if button_train:
+                if data_process == 'train test split':
+                
+                    clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                                        random_state=inputs['random state'])
+                    clf.GradientBoostingClassifier()
+                        
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+
+                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('Actual vs Predict'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                elif data_process == 'cross val score':
+                        
+                        clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                                            random_state=inputs['random state'])
+
+                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+
+                        st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
+
+        if inputs['model'] == 'XGBClassifier':
+
+            with col2:
+                with st.expander('Operator'):
+                    
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    
+                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    if data_process == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif data_process == 'cross val score':
+
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        cv = st.number_input('cv',1,20,5)
+        
+            
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            
+            if button_train:
+                if data_process == 'train test split':
+                
+                    clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                learning_rate=inputs['learning rate'])
+                    clf.XGBClassifier()
+                        
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+
+                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('Actual vs Predict'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                elif data_process == 'cross val score':
+                        
+                        clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'])
+
+                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+
+                        st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
+        
+        if inputs['model'] == 'CatBoostClassifier':
+
+            with col2:
+                with st.expander('Operator'):
+                    
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    
+                    data_process = st.selectbox('data process', ('train test split','cross val score'))
+                    if data_process == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        
+                    elif data_process == 'cross val score':
+
+                        if preprocess == 'StandardScaler':
+                            clf.features = StandardScaler().fit_transform(clf.features)
+                        if preprocess == 'MinMaxScaler':
+                            clf.features = MinMaxScaler().fit_transform(clf.features)
+                        cv = st.number_input('cv',1,20,5)
+ 
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            
+            if button_train:
+                if data_process == 'train test split':
+                
+                    clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+
+                    clf.CatBoostClassifier()
+                        
+                    if not check_string(targets):
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues')
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+                    else:
+                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
+                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
+                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
+                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
+                        with plt.style.context(['nature','no-latex']):
+                            fig, ax = plt.subplots()
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
+                            plt.xlabel('Actual')
+                            plt.ylabel('Prediction')
+                            plt.title('Confusion Matrix')
+                            st.pyplot(fig)
+
+                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        with st.expander('Actual vs Predict'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                elif data_process == 'cross val score':
+                        
+                        clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+
+                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+
+                        st.info('cv mean accuracy score: {}'.format(cvs.mean()))   
 
         st.write('---')
 
@@ -3299,7 +4087,7 @@ elif select_option == "代理优化":
                     
 elif select_option == "其他":
     with st.sidebar:
-        sub_option = option_menu(None, [ "集成学习", "模型推理","可解释性机器学习"])
+        sub_option = option_menu(None, ["模型推理","可解释性机器学习"])
     if sub_option == "可解释性机器学习":
         colored_header(label="可解释性机器学习",description=" ",color_name="violet-90")
 
@@ -3380,863 +4168,7 @@ elif select_option == "其他":
             feature = st.selectbox('feature',list_features)
             interact_feature = st.selectbox('interact feature', list_features)
             st_shap(shap.dependence_plot(feature, shap_values, fs.features, display_features=fs.features,interaction_index=interact_feature))
-    
-    elif sub_option == "集成学习":
-        colored_header(label="集成学习",description=" ",color_name="violet-90")
-        sub_sub_option = option_menu(None, ["回归", "分类"],
-                                icons=['house',  "list-task"],
-                                menu_icon="cast", default_index=0, orientation="horizontal")
-        
-        if sub_sub_option == "回归":
-            file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-            if file is None:
-                table = PrettyTable(['上传文件名称', '名称','数据说明'])
-                table.add_row(['file_1','data set','数据集'])
-                st.write(table)
-            if file is not None:
-                df = pd.read_csv(file)
-                # 检测缺失值
-                check_string_NaN(df)
 
-                colored_header(label="数据信息", description=" ",color_name="violet-70")
-                nrow = st.slider("rows", 1, len(df), 5)
-                df_nrow = df.head(nrow)
-                st.write(df_nrow)
-
-                colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
-
-                target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
-                
-                col_feature, col_target = st.columns(2)
-                    
-                # features
-                features = df.iloc[:,:-target_num]
-                # targets
-                targets = df.iloc[:,-target_num:]
-                with col_feature:    
-                    st.write(features.head())
-                with col_target:   
-                    st.write(targets.head())
-            # =================== model ====================================
-                reg = REGRESSOR(features,targets)
-
-                colored_header(label="选择目标变量", description=" ", color_name="violet-30")
-
-                target_selected_option = st.selectbox('target', list(reg.targets)[::-1])
-
-                reg.targets = targets[target_selected_option]
-
-                colored_header(label="Regressor", description=" ",color_name="violet-30")
-
-                model_path = './models/el regressors'
-
-                template_alg = model_platform(model_path)
-
-                inputs, col2 = template_alg.show()
-
-                if inputs['model'] == 'BaggingRegressor':
-                    with col2:
-                        with st.expander('Operator'):
-                            # preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-
-                            operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
-                            if operator == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                # if preprocess == 'StandardScaler':
-                                #     reg.features = StandardScaler().fit_transform(reg.features)
-                                # if preprocess == 'MinMaxScaler':
-                                #     reg.features = MinMaxScaler().fit_transform(reg.features)
-                                
-                                reg.features = pd.DataFrame(reg.features)    
-                                
-                                reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-
-                            elif operator == 'cross val score':
-                                # if preprocess == 'StandardScaler':
-                                #     reg.features = StandardScaler().fit_transform(reg.features)
-                                # if preprocess == 'MinMaxScaler':
-                                #     reg.features = MinMaxScaler().fit_transform(reg.features)
-                                cv = st.number_input('cv',1,20,5)
-
-                            elif operator == 'leave one out':
-                                # if preprocess == 'StandardScaler':
-                                #     reg.features = StandardScaler().fit_transform(reg.features)
-                                # if preprocess == 'MinMaxScaler':
-                                #     reg.features = MinMaxScaler().fit_transform(reg.features)
-                                reg.features = pd.DataFrame(reg.features)    
-                                loo = LeaveOneOut()
-
-                    colored_header(label="Training", description=" ",color_name="violet-30")
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    if button_train:
-
-                        if operator == 'train test split':
-
-                        # if inputs['base estimator'] == "DecisionTree": 
-                            reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                            
-                            reg.BaggingRegressor()
-            
-
-                            result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                            result_data.columns = ['actual','prediction']
-
-                            plot_and_export_results(reg, "BaggingR")
-
-                            
-                            # elif inputs['base estimator'] == "SupportVector": 
-                            #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
-                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                            #     reg.BaggingRegressor()
-
-                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                            #     result_data.columns = ['actual','prediction']
-
-                            #     export_cross_val_results(reg, cv, "DTR_cv")
-                            
-                            # elif inputs['base estimator'] == "LinearRegression": 
-                            #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                            #     reg.BaggingRegressor()
-                
-
-                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                            #     result_data.columns = ['actual','prediction']
-
-                            #     plot_and_export_results(reg, "BaggingR")
-
-                        elif operator == 'cross val score':
-                        # if inputs['base estimator'] == "DecisionTree": 
-                            reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-
-                            # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                            # export_cross_val_results(cvs, "BaggingR_cv")   
-                            export_cross_val_results(reg, cv, "BaggingR_cv")
-
-                            # elif inputs['base estimator'] == "SupportVector": 
-
-                            #     reg.model = BaggingRegressor(estimator =  SVR(),n_estimators=inputs['nestimators'],
-                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-
-                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    
-                            #     export_cross_val_results(cvs, "BaggingR_cv")   
-
-                            # elif inputs['base estimator'] == "LinearRegression":
-                            #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-
-                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    
-                            #     export_cross_val_results(cvs, "BaggingR_cv")   
-
-                        elif operator == 'leave one out':
-                        # if inputs['base estimator'] == "DecisionTree": 
-                            reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                        
-                            export_loo_results(reg, loo, "BaggingR_loo")
-
-                            # elif inputs['base estimator'] == "SupportVector": 
-
-                            #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
-                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                
-                            #     export_loo_results(reg, loo, "BaggingR_loo")
-
-                            # elif inputs['base estimator'] == "LinearRegression":
-                            #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                            #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                
-                            #     export_loo_results(reg, loo, "BaggingR_loo")
-
-                if inputs['model'] == 'AdaBoostRegressor':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                        
-                            if operator == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,20,5)
-                            elif operator == 'leave one out':
-                                loo = LeaveOneOut()
-                    colored_header(label="Training", description=" ",color_name="violet-30")
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    if button_train:
-
-                        if operator == 'train test split':
-
-                            # if inputs['base estimator'] == "DecisionTree": 
-                            reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                            
-                            reg.AdaBoostRegressor()
-            
-                            result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                            result_data.columns = ['actual','prediction']
-
-                            plot_and_export_results(reg, "AdaBoostR")
-                            
-                            # elif inputs['base estimator'] == "SupportVector": 
-
-                            #     reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                                
-                            #     reg.AdaBoostRegressor()
-
-                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                            #     result_data.columns = ['actual','prediction']
-
-                            #     plot_and_export_results(reg, "AdaBoostR")
-                            
-                            # elif inputs['base estimator'] == "LinearRegression": 
-                            #     reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                            #     reg.AdaBoostRegressor()
-
-                            #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                            #     result_data.columns = ['actual','prediction']
-                                
-                            #     plot_and_export_results(reg, "AdaBoostR")
-
-                        elif operator == 'cross val score':
-                            # if inputs['base estimator'] == "DecisionTree": 
-                            reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                            # cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
-                            export_cross_val_results(reg, cv, "AdaBoostR_cv")
-                            #     st.write('mean cross val R2:', cvs.mean())
-                            # elif inputs['base estimator'] == "SupportVector": 
-
-                            #     reg.model =  AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-
-                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    
-                            #     export_cross_val_results(cvs, "AdaBoostR_cv")  
-
-                            # elif inputs['base estimator'] == "LinearRegression":
-                            #     reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-
-                            #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                    
-                            #     export_cross_val_results(cvs, "AdaBoostR_cv")  
-
-                        elif operator == 'leave one out':
-                            # if inputs['base estimator'] == "DecisionTree": 
-                            reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                        
-                            export_loo_results(reg, loo, "AdaBoostR_loo")
-                            
-                            # elif inputs['base estimator'] == "SupportVector": 
-
-                            #     reg.model = reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                                
-                            #     export_loo_results(reg, loo, "AdaBoostR_loo")
-
-                            # elif inputs['base estimator'] == "LinearRegression":
-                            #     reg.model = reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                                                    
-                            #     export_loo_results(reg, loo, "AdaBoostR_loo")
-                            
-                if inputs['model'] == 'GradientBoostingRegressor':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                        
-                            if operator == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,20,5)
-                            elif operator == 'leave one out':
-                                loo = LeaveOneOut()
-
-                    colored_header(label="Training", description=" ",color_name="violet-30")
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    if button_train:
-
-                        if operator == 'train test split':
-
-                                reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
-                                                                    random_state=inputs['random state']) 
-                                
-                                reg.GradientBoostingRegressor()
-                
-
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                plot_and_export_results(reg, "GradientBoostingR")
-
-                        elif operator == 'cross val score':
-                                reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                                    random_state=inputs['random state'])  
-                                # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                # export_cross_val_results(cvs, "GradientBoostingR_cv")    
-                                export_cross_val_results(reg, cv, "GradientBoostingR_cv")
-                        elif operator == 'leave one out':
-                                reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                                    random_state=inputs['random state']) 
-                            
-                                export_loo_results(reg, loo, "GradientBoostingR_loo")
-
-                if inputs['model'] == 'XGBRegressor':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                        
-                            if operator == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,20,5)
-                            elif operator == 'leave one out':
-                                loo = LeaveOneOut()
-                    colored_header(label="Training", description=" ",color_name="violet-30")
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    if button_train:
-
-                        if operator == 'train test split':
-
-                                reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                            max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                            learning_rate=inputs['learning rate'])
-                                reg.XGBRegressor()
-
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-
-                                plot_and_export_results(reg, "XGBR")
-
-                        elif operator == 'cross val score':
-                                reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                            max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                            learning_rate=inputs['learning rate'])
-                                
-                                # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                # export_cross_val_results(cvs, "DTR_cv")    
-                                export_cross_val_results(reg, cv, "XGBR_cv")
-
-                        elif operator == 'leave one out':
-                                reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                            max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                            learning_rate=inputs['learning rate'])
-                            
-                                export_loo_results(reg, loo, "XGBR_loo")
-
-                if inputs['model'] == 'CatBoostRegressor':
-                    with col2:
-                        with st.expander('Operator'):
-                            operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                        
-                            if operator == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                            elif operator == 'cross val score':
-                                cv = st.number_input('cv',1,20,5)
-                            elif operator == 'leave one out':
-                                loo = LeaveOneOut()
-                    colored_header(label="Training", description=" ",color_name="violet-30")
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    if button_train:
-
-                        if operator == 'train test split':
-
-                                reg.model =CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
-
-                                reg.LGBMRegressor()
-
-                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-
-                                plot_and_export_results(reg, "CatBoostR")
-
-                        elif operator == 'cross val score':
-                                reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
-                                
-                                # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                                # export_cross_val_results(cvs, "CatBoostR_cv")    
-                                export_cross_val_results(reg, cv, "CatBoostR_cv")
-
-                        elif operator == 'leave one out':
-                                reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
-                                export_loo_results(reg, loo, "CatBoostR_loo")            
-                st.write('---')                
-
-        elif sub_sub_option == "分类":
-            file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-
-            if file is not None:
-                colored_header(label="Data Information", description=" ", color_name="violet-70")
-                with st.expander('Data Information'):
-                    df = pd.read_csv(file)
-                    check_string_NaN(df)
-                    
-                    colored_header(label="Data", description=" ",color_name="blue-70")
-                    nrow = st.slider("rows", 1, len(df), 5)
-                    df_nrow = df.head(nrow)
-                    st.write(df_nrow)
-
-                    colored_header(label="Features vs Targets",description=" ",color_name="blue-30")
-
-                    target_num = st.number_input('input target',  min_value=1, max_value=10, value=1)
-                    st.write('target number', target_num)
-                    
-                    col_feature, col_target = st.columns(2)
-                    
-                    # features
-                    features = df.iloc[:,:-target_num]
-                    # targets
-                    targets = df.iloc[:,-target_num:]
-                    with col_feature:    
-                        st.write(features.head())
-                    with col_target:   
-                        st.write(targets.head())
-            
-                clf = CLASSIFIER(features,targets)
-
-                colored_header(label="Choose Target", description=" ", color_name="violet-30")
-                target_selected_option = st.selectbox('target', list(clf.targets)[::-1])
-
-                clf.targets = targets[target_selected_option]
-
-                # st.write(fs.targets.head())
-                colored_header(label="Classifier", description=" ",color_name="violet-30")
-
-                model_path = './models/el classifiers'
-                
-                template_alg = model_platform(model_path)
-
-                colored_header(label="Training", description=" ",color_name="violet-30")
-
-                inputs, col2 = template_alg.show()
-            
-                if inputs['model'] == 'BaggingClassifier':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            
-                            preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-                            
-                            data_process = st.selectbox('data process', ('train test split','cross val score'))
-                            if data_process == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                                
-                            elif data_process == 'cross val score':
-
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,20,5)
-                
-                    
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    
-                    if button_train:
-                        if data_process == 'train test split':
-                        
-                            if inputs['base estimator'] == "DecisionTree":    
-                                clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-        
-                                clf.BaggingClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                                                    
-                            elif inputs['base estimator'] == "SupportVector": 
-                                clf.model = BaggingClassifier(estimator =SVC(), n_estimators=inputs['nestimators'], max_features=inputs['max features'])    
-
-                                clf.BaggingClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True) 
-                            
-                            elif inputs['base estimator'] == "LogisticRegression":    
-                                
-                                clf.model = BaggingClassifier(estimator = LR(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1)  
-                                clf.BaggingClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True) 
-
-                        elif data_process == 'cross val score':
-
-                            if inputs['base estimator'] == "DecisionTree":    
-                                clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-
-                            elif inputs['base estimator'] == "SupportVector": 
-                                clf.model = BaggingClassifier(estimator =SVC(), n_estimators=inputs['nestimators'], max_features=inputs['max features'])    
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-                                
-                            elif inputs['base estimator'] == "LogisticRegression": 
-                                clf.model = BaggingClassifier(estimator = LR(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1)                         
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-                
-                if inputs['model'] == 'AdaBoostClassifier':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            
-                            preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-                            
-                            data_process = st.selectbox('data process', ('train test split','cross val score'))
-                            if data_process == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                                
-                            elif data_process == 'cross val score':
-
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,20,5)
-                
-                    
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    
-                    if button_train:
-                        if data_process == 'train test split':
-                        
-                            if inputs['base estimator'] == "DecisionTree":    
-                                clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-        
-                                clf.AdaBoostClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                                                    
-                            elif inputs['base estimator'] == "SupportVector": 
-                                
-                                clf.model = AdaBoostClassifier(estimator=SVC(),algorithm='SAMME', n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-        
-                                clf.AdaBoostClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True) 
-                            
-                            elif inputs['base estimator'] == "LogisticRegression":    
-                                
-                                clf.model = AdaBoostClassifier(estimator=LR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-        
-                                clf.AdaBoostClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True) 
-
-                        elif data_process == 'cross val score':
-
-                            if inputs['base estimator'] == "DecisionTree":    
-                                clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-
-                            elif inputs['base estimator'] == "SupportVector": 
-                                clf.model = BaggingClassifier(estimator =SVC(), n_estimators=inputs['nestimators'], max_features=inputs['max features'])    
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-                                
-                            elif inputs['base estimator'] == "LogisticRegression": 
-                                clf.model = BaggingClassifier(estimator = LR(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1)                         
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-                
-                if inputs['model'] == 'GradientBoostingClassifier':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            
-                            preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-                            
-                            data_process = st.selectbox('data process', ('train test split','cross val score'))
-                            if data_process == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                                
-                            elif data_process == 'cross val score':
-
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,20,5)
-                
-                    
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    
-                    if button_train:
-                        if data_process == 'train test split':
-                        
-                                clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                                    random_state=inputs['random state'])
-                                clf.GradientBoostingClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                        elif data_process == 'cross val score':
-                                
-                                clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                                    random_state=inputs['random state'])
-        
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-
-                if inputs['model'] == 'XGBClassifier':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            
-                            preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-                            
-                            data_process = st.selectbox('data process', ('train test split','cross val score'))
-                            if data_process == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                                
-                            elif data_process == 'cross val score':
-
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,20,5)
-                
-                    
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    
-                    if button_train:
-                        if data_process == 'train test split':
-                        
-                                clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                            max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                            learning_rate=inputs['learning rate'])
-                                clf.XGBClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                        elif data_process == 'cross val score':
-                                
-                                clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                            max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                            learning_rate=inputs['learning rate'])
-        
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean())) 
-                
-                # if inputs['model'] == 'LGBMClassifier':
-
-                #     with col2:
-                #         with st.expander('Operator'):
-                            
-                #             preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-                            
-                #             data_process = st.selectbox('data process', ('train test split','cross val score'))
-                #             if data_process == 'train test split':
-                #                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                #                 if preprocess == 'StandardScaler':
-                #                     clf.features = StandardScaler().fit_transform(clf.features)
-                #                 if preprocess == 'MinMaxScaler':
-                #                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                #                 clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                                
-                #             elif data_process == 'cross val score':
-
-                #                 if preprocess == 'StandardScaler':
-                #                     clf.features = StandardScaler().fit_transform(clf.features)
-                #                 if preprocess == 'MinMaxScaler':
-                #                     clf.features = MinMaxScaler().fit_transform(clf.features)
-                #                 cv = st.number_input('cv',1,20,5)
-                
-                    
-                #     with st.container():
-                #         button_train = st.button('Train', use_container_width=True)
-                    
-                #     if button_train:
-                #         if data_process == 'train test split':
-                        
-                #             clf.model = lgb.LGBMClassifier(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
-                #                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
-
-                #             clf.LGBMClassifier()
-                            
-                #             plot = customPlot()
-                #             cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                #             plot.confusion_matrix(cm)
-                #             result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                #             result_data.columns = ['actual','prediction']
-                #             with st.expander('Actual vs Predict'):
-                #                 st.write(result_data)
-                #                 tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                #         elif data_process == 'cross val score':
-                                
-                #             clf.model = lgb.LGBMClassifier(niterations=inputs['niterations'],nestimators=inputs['nestimators'],learning_rate=inputs['learning rate'],
-                #                                             num_leaves=inputs['num_leaves'],max_depth=inputs['max depth'])
-
-                #             cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                #             st.info('cv mean accuracy score: {}'.format(cvs.mean()))        
-
-                if inputs['model'] == 'CatBoostClassifier':
-
-                    with col2:
-                        with st.expander('Operator'):
-                            
-                            preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
-                            
-                            data_process = st.selectbox('data process', ('train test split','cross val score'))
-                            if data_process == 'train test split':
-                                inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                                
-                            elif data_process == 'cross val score':
-
-                                if preprocess == 'StandardScaler':
-                                    clf.features = StandardScaler().fit_transform(clf.features)
-                                if preprocess == 'MinMaxScaler':
-                                    clf.features = MinMaxScaler().fit_transform(clf.features)
-                                cv = st.number_input('cv',1,20,5)
-                
-                    
-                    with st.container():
-                        button_train = st.button('Train', use_container_width=True)
-                    
-                    if button_train:
-                        if data_process == 'train test split':
-                        
-                                clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
-
-                                clf.CatBoostClassifier()
-                                
-                                plot = customPlot()
-                                cm = confusion_matrix(y_true=clf.Ytest, y_pred=clf.Ypred)
-                                plot.confusion_matrix(cm)
-                                result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                                result_data.columns = ['actual','prediction']
-                                with st.expander('Actual vs Predict'):
-                                    st.write(result_data)
-                                    tmp_download_link = download_button(result_data, f'prediction vs actual.csv', button_text='download')
-                                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                        elif data_process == 'cross val score':
-                                
-                                clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
-        
-                                cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                                st.info('cv mean accuracy score: {}'.format(cvs.mean()))                 
-    
     elif sub_option == "模型推理":
         
         colored_header(label="模型推理",description=" ",color_name="violet-90")

@@ -4,7 +4,7 @@ import streamlit as st
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "LGBMClassifier",
+    "model": "BaggingRegressor",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 
@@ -31,25 +31,28 @@ def show():
     # st.write("preprocessing")
     # inputs["Normalize"] = st.selectbox('normalize method', ['Z-Score Standardization','Min-Max Scale'])
     
-    st.info('TO SOLVE **CLASSIFICATION**')
+    st.info('TO SOLVE **REGRESSION**')
     
     # st.write('training')
+
+    # st.write("No additional parameters")
     col1, col2 = st.columns([2,2])
     with col1:
-        # st.write("No additional parameters")
-        with st.expander("Hyper Patameter"):
-            inputs['niterations'] = st.number_input('number iteraiton',1,100,5)
-            inputs['nestimators'] = st.number_input('number estimators',1, 1000,100)
-            inputs['num_leaves'] = st.number_input('leaves number',31) 
-            inputs['learning rate'] = st.number_input('learning rate',0.001,0.5,0.1)
-            inputs['max depth'] = st.number_input('max depth',0, 100, 0)
-            random_state = st.checkbox('random state 1024',True)
+        with st.expander("Hyper Parameter"):
+       
+            inputs['base estimator'] = st.selectbox('base estimator',['DecisionTree'])
+            inputs['nestimators'] = st.number_input('number estimators',1, 10000, 100)
+            # if inputs['base estimator'] != 'SupportVector':
+            inputs['max samples'] = st.number_input('max samples',1, 100, 1)
+            inputs['max features'] = st.number_input('max features',1,100, 1)
+
+            random_state = st.checkbox('random state 42',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 
-    return inputs, col2
+    return inputs,col2
 
 
 # To test the alg independent of the app or template, just run 

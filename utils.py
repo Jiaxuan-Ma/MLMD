@@ -108,6 +108,20 @@ def check_string_NaN(df):
     if len(string_contains_columns) > 0:
         st.error(f"Error: string in column {string_contains_columns} !")
         st.stop()
+
+def check_string(df):
+    # check string
+    flag = True
+    string_columns = df.select_dtypes(include=[object]).columns
+    string_contains_columns = []
+    for column in string_columns:
+        if df[column].astype(str).str.contains('').any():
+            string_contains_columns.append(column)
+    if len(string_contains_columns) > 0:
+        return flag
+    else: 
+        flag = False
+    return flag
 # =============== dwonload button =======================  
 def download_button(object_to_download, download_filename, button_text, pickle_it=False):
     if pickle_it:
@@ -743,7 +757,7 @@ class customPlot:
         
         cmap = sns.diverging_palette(220, 10, as_cmap=True)
         fig, ax = plt.subplots()  
-        ax = sns.heatmap(confusion_matrix, cmap=cmap, linewidths=0.5,square =True, annot=True)
+        ax = sns.heatmap(confusion_matrix, cmap=cmap, linewidths=0.5,square =True, annot=True, xticklabels=df['Category2'].unique())
         plt.ylabel("Actual")
         plt.xlabel("Predict")
         # plt.legend()
@@ -1090,6 +1104,7 @@ class CLASSIFIER:
         self.Ypred = None
         
     def DecisionTreeClassifier(self):
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1098,11 +1113,13 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
     
     def RandomForestClassifier(self):
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1111,6 +1128,7 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
@@ -1118,12 +1136,14 @@ class CLASSIFIER:
 
 
     def LogisticRegreesion(self):
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
         self.Ytrain = self.Ytrain.astype('float')
         self.Ytest = self.Ytest.astype('float')
      
         self.model.fit(self.Xtrain, self.Ytrain)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         self.score = accuracy_score(self.Ypred ,self.Ytest)
 
         st.info('train process is over')
@@ -1131,6 +1151,7 @@ class CLASSIFIER:
         st.write('accuracy score: {}'.format(self.score))
 
     def SupportVector(self):
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1139,12 +1160,14 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
 
     def BaggingClassifier(self):
-        
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1153,12 +1176,13 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))    
     
     def AdaBoostClassifier(self):
-        
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1167,12 +1191,13 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
 
     def GradientBoostingClassifier(self):
-        
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1181,11 +1206,13 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))   
     
     def XGBClassifier(self):
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1194,11 +1221,13 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
 
     def LGBMClassifier(self):
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1207,11 +1236,13 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
 
     def CatBoostClassifier(self):
+        columns = self.Ytest.columns
         self.Ytest = self.Ytest.reset_index(drop=True)
     
         self.Ytrain = self.Ytrain.astype('float')
@@ -1220,6 +1251,7 @@ class CLASSIFIER:
         self.model.fit(self.Xtrain, self.Ytrain)
         self.score = self.model.score(self.Xtest, self.Ytest)
         self.Ypred = self.model.predict(self.Xtest)
+        self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
         st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
