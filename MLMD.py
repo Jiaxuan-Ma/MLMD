@@ -13,6 +13,7 @@ from streamlit_extras.colored_header import colored_header
 from streamlit_option_menu import option_menu
 from streamlit_extras.badges import badge
 from streamlit_shap import st_shap
+from streamlit_card import card
 
 import numpy as np
 import pandas as pd
@@ -55,6 +56,7 @@ from sklearn.ensemble import BaggingRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.manifold import TSNE
+from PIL import Image
 
 
 import xgboost as xgb
@@ -96,7 +98,6 @@ from algorithm.TrAdaboostR2 import TrAdaboostR2
 from algorithm.mobo import Mobo4mat
 import scienceplots
 
-warnings.filterwarnings('ignore')
 
 streamlit_analytics.start_tracking()
 
@@ -178,135 +179,175 @@ if select_option == "平台主页":
     ''')
 
 elif select_option == "基础功能":
-
-    colored_header(label="数据可视化",description=" ",color_name="violet-90")
-    file = st.file_uploader("Upload `.csv` file", type=['csv'], label_visibility="collapsed")
-    if file is None:
-        table = PrettyTable(['上传文件名称', '名称','数据说明'])
-        table.add_row(['file_1','dataset','数据集'])
-        st.write(table)
-    if file is not None:
-        df = pd.read_csv(file)
-        # check NaN
-        check_string_NaN(df)
-        
-        colored_header(label="数据信息",description=" ",color_name="violet-70")
-
-        nrow = st.slider("rows", 1, len(df), 5)
-        df_nrow = df.head(nrow)
-        st.write(df_nrow)
-
-        colored_header(label="数据初步统计",description=" ",color_name="violet-30")
-
-        st.write(df.describe())
-
-        tmp_download_link = download_button(df.describe(), f'数据统计.csv', button_text='download')
-        
-        st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-        colored_header(label="特征变量和目标变量", description=" ",color_name="violet-70")
-        
-        target_num = st.number_input('目标变量数量', min_value=1, max_value=10, value=1)
-        col_feature, col_target = st.columns(2)
-        # features
-        features = df.iloc[:,:-target_num]
-        # targets
-        targets = df.iloc[:,-target_num:]
-        with col_feature:    
-            st.write(features.head())
-        with col_target:   
-            st.write(targets.head())
-
-        # colored_header(label="特征变量统计分布", description=" ",color_name="violet-30")
-
-        # feature_selected_name = st.selectbox('选择特征变量',list(features))
-    
-        # feature_selected_value = features[feature_selected_name]
-        # plot = customPlot()
-        # col1, col2 = st.columns([1,3])
-        # with col1:  
-        #     with st.expander("绘图参数"):
-        #         options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
-        #                     plot.set_tick_fontsize(3),plot.set_legend_fontsize(4),plot.set_color('line color',6,5),plot.set_color('bin color',0,6)]
-        # with col2:
-        #     plot.feature_hist_kde(options_selected,feature_selected_name,feature_selected_value)
-        colored_header(label="特征变量在数据集中的分布", description=" ",color_name="violet-30")
-        feature_selected_name = st.selectbox('选择特征变量', list(features),1)
-        feature_selected_value = features[feature_selected_name]
-        plot = customPlot()
-        col1, col2 = st.columns([1,3])
-        with col1:  
-            with st.expander("绘图参数"):
-                options_selected = [plot.set_title_fontsize(18),plot.set_label_fontsize(19),
-                            plot.set_tick_fontsize(20),plot.set_legend_fontsize(21), plot.set_color('bin color', 0, 22)]
+    with st.sidebar:
+        sub_option = option_menu(None, ["数据库建设", "数据可视化"])
+    if sub_option == "数据库建设":
+        colored_header(label="数据库建设",description=" ",color_name="violet-90")
+        col1, col2 = st.columns([2,2])
+        with col1:
+            df = pd.read_csv('./data/in.csv')
+            st.write("高熵合金数据库")
+            st.write(df.head())
+            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
         with col2:
-            plot.feature_distribution(options_selected,feature_selected_name,feature_selected_value)
+            df = pd.read_csv('./data/in.csv')
+            st.write("钢数据库")
+            st.write(df.head())
+            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+        col1, col2 = st.columns([2,2])
+        with col1:
+            df = pd.read_csv('./data/in.csv')
+            st.write("高熵合金数据库")
+            image = Image.open('./data/fig1.png')
+            st.image(image, width=280,caption='test size')
+            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+        with col2:
+            df = pd.read_csv('./data/in.csv')
+            st.write("钢数据库")
+            st.write(df.head())
+            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                # tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                # st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+
+
+
+    elif sub_option == "数据可视化":
+
+        colored_header(label="数据可视化",description=" ",color_name="violet-90")
+        file = st.file_uploader("Upload `.csv` file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['上传文件名称', '名称','数据说明'])
+            table.add_row(['file_1','dataset','数据集'])
+            st.write(table)
+        if file is not None:
+            df = pd.read_csv(file)
+            # check NaN
+            check_string_NaN(df)
+            
+            colored_header(label="数据信息",description=" ",color_name="violet-70")
+
+            nrow = st.slider("rows", 1, len(df), 5)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
+
+            colored_header(label="数据初步统计",description=" ",color_name="violet-30")
+
+            st.write(df.describe())
+
+            tmp_download_link = download_button(df.describe(), f'数据统计.csv', button_text='download')
+            
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+            colored_header(label="特征变量和目标变量", description=" ",color_name="violet-70")
+            
+            target_num = st.number_input('目标变量数量', min_value=1, max_value=10, value=1)
+            col_feature, col_target = st.columns(2)
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
+
+            # colored_header(label="特征变量统计分布", description=" ",color_name="violet-30")
+
+            # feature_selected_name = st.selectbox('选择特征变量',list(features))
         
-        with col1:  
-            with st.expander("绘图参数"):
-                options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
-                            plot.set_tick_fontsize(3),plot.set_legend_fontsize(4),plot.set_color('line color',6,5),plot.set_color('bin color',0,6)]
-        with col2:
-            plot.feature_hist_kde(options_selected,feature_selected_name,feature_selected_value)
+            # feature_selected_value = features[feature_selected_name]
+            # plot = customPlot()
+            # col1, col2 = st.columns([1,3])
+            # with col1:  
+            #     with st.expander("绘图参数"):
+            #         options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
+            #                     plot.set_tick_fontsize(3),plot.set_legend_fontsize(4),plot.set_color('line color',6,5),plot.set_color('bin color',0,6)]
+            # with col2:
+            #     plot.feature_hist_kde(options_selected,feature_selected_name,feature_selected_value)
+            colored_header(label="特征变量在数据集中的分布", description=" ",color_name="violet-30")
+            feature_selected_name = st.selectbox('选择特征变量', list(features),1)
+            feature_selected_value = features[feature_selected_name]
+            plot = customPlot()
+            col1, col2 = st.columns([1,3])
+            with col1:  
+                with st.expander("绘图参数"):
+                    options_selected = [plot.set_title_fontsize(18),plot.set_label_fontsize(19),
+                                plot.set_tick_fontsize(20),plot.set_legend_fontsize(21), plot.set_color('bin color', 0, 22)]
+            with col2:
+                plot.feature_distribution(options_selected,feature_selected_name,feature_selected_value)
+            
+            with col1:  
+                with st.expander("绘图参数"):
+                    options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
+                                plot.set_tick_fontsize(3),plot.set_legend_fontsize(4),plot.set_color('line color',6,5),plot.set_color('bin color',0,6)]
+            with col2:
+                plot.feature_hist_kde(options_selected,feature_selected_name,feature_selected_value)
 
-        #=========== Targets visulization ==================
+            #=========== Targets visulization ==================
 
-        colored_header(label="目标变量统计分布", description=" ",color_name="violet-30")
+            colored_header(label="目标变量统计分布", description=" ",color_name="violet-30")
 
-        target_selected_name = st.selectbox('选择目标变量',list(targets))
+            target_selected_name = st.selectbox('选择目标变量',list(targets))
 
-        target_selected_value = targets[target_selected_name]
-        plot = customPlot()
-        col1, col2 = st.columns([1,3])
-        with col1:  
-            with st.expander("绘图参数"):
-                options_selected = [plot.set_title_fontsize(7),plot.set_label_fontsize(8),
-                            plot.set_tick_fontsize(9),plot.set_legend_fontsize(10), plot.set_color('line color',6,11), plot.set_color('bin color',0,12)]
-        with col2:
-            plot.target_hist_kde(options_selected,target_selected_name,target_selected_value)
+            target_selected_value = targets[target_selected_name]
+            plot = customPlot()
+            col1, col2 = st.columns([1,3])
+            with col1:  
+                with st.expander("绘图参数"):
+                    options_selected = [plot.set_title_fontsize(7),plot.set_label_fontsize(8),
+                                plot.set_tick_fontsize(9),plot.set_legend_fontsize(10), plot.set_color('line color',6,11), plot.set_color('bin color',0,12)]
+            with col2:
+                plot.target_hist_kde(options_selected,target_selected_name,target_selected_value)
 
-        #=========== Features analysis ==================
+            #=========== Features analysis ==================
 
-        colored_header(label="特征变量配方（合金成分）", description=" ",color_name="violet-30")
+            colored_header(label="特征变量配方（合金成分）", description=" ",color_name="violet-30")
 
-        feature_range_selected_name = st.slider('选择特征变量个数',1,len(features.columns), (1,2))
-        min_feature_selected = feature_range_selected_name[0]-1
-        max_feature_selected = feature_range_selected_name[1]
-        feature_range_selected_value = features.iloc[:,min_feature_selected: max_feature_selected]
-        data_by_feature_type = df.groupby(list(feature_range_selected_value))
-        feature_type_data = create_data_with_group_and_counts(data_by_feature_type)
-        IDs = [str(id_) for id_ in feature_type_data['ID']]
-        Counts = feature_type_data['Count']
-        col1, col2 = st.columns([1,3])
-        with col1:  
-            with st.expander("绘图参数"):
-                options_selected = [plot.set_title_fontsize(13),plot.set_label_fontsize(14),
-                            plot.set_tick_fontsize(15),plot.set_legend_fontsize(16),plot.set_color('bin color',0, 17)]
-        with col2:
-            plot.featureSets_statistics_hist(options_selected,IDs, Counts)
+            feature_range_selected_name = st.slider('选择特征变量个数',1,len(features.columns), (1,2))
+            min_feature_selected = feature_range_selected_name[0]-1
+            max_feature_selected = feature_range_selected_name[1]
+            feature_range_selected_value = features.iloc[:,min_feature_selected: max_feature_selected]
+            data_by_feature_type = df.groupby(list(feature_range_selected_value))
+            feature_type_data = create_data_with_group_and_counts(data_by_feature_type)
+            IDs = [str(id_) for id_ in feature_type_data['ID']]
+            Counts = feature_type_data['Count']
+            col1, col2 = st.columns([1,3])
+            with col1:  
+                with st.expander("绘图参数"):
+                    options_selected = [plot.set_title_fontsize(13),plot.set_label_fontsize(14),
+                                plot.set_tick_fontsize(15),plot.set_legend_fontsize(16),plot.set_color('bin color',0, 17)]
+            with col2:
+                plot.featureSets_statistics_hist(options_selected,IDs, Counts)
 
 
 
-        # colored_header(label="特征变量和目标变量关系", description=" ",color_name="violet-30")
-        # col1, col2 = st.columns([1,3])
-        # with col1:  
-        #     with st.expander("绘图参数"):
-        #         options_selected = [plot.set_title_fontsize(23),plot.set_label_fontsize(24),
-        #                     plot.set_tick_fontsize(25),plot.set_legend_fontsize(26),plot.set_color('scatter color',0, 27),plot.set_color('line color',6,28)]
-        # with col2:
-        #     plot.features_and_targets(options_selected,df, list(features), list(targets))
-        
-        # # st.write("### Targets and Targets ")
-        # if targets.shape[1] != 1:
-        #     colored_header(label="目标变量和目标变量关系", description=" ",color_name="violet-30")
-        #     col1, col2 = st.columns([1,3])
-        #     with col1:  
-        #         with st.expander("绘图参数"):
-        #             options_selected = [plot.set_title_fontsize(29),plot.set_label_fontsize(30),
-        #                         plot.set_tick_fontsize(31),plot.set_legend_fontsize(32),plot.set_color('scatter color',0, 33),plot.set_color('line color',6,34)]
-        #     with col2:
-        #         plot.targets_and_targets(options_selected,df, list(targets))
-    st.write('---')
+            # colored_header(label="特征变量和目标变量关系", description=" ",color_name="violet-30")
+            # col1, col2 = st.columns([1,3])
+            # with col1:  
+            #     with st.expander("绘图参数"):
+            #         options_selected = [plot.set_title_fontsize(23),plot.set_label_fontsize(24),
+            #                     plot.set_tick_fontsize(25),plot.set_legend_fontsize(26),plot.set_color('scatter color',0, 27),plot.set_color('line color',6,28)]
+            # with col2:
+            #     plot.features_and_targets(options_selected,df, list(features), list(targets))
+            
+            # # st.write("### Targets and Targets ")
+            # if targets.shape[1] != 1:
+            #     colored_header(label="目标变量和目标变量关系", description=" ",color_name="violet-30")
+            #     col1, col2 = st.columns([1,3])
+            #     with col1:  
+            #         with st.expander("绘图参数"):
+            #             options_selected = [plot.set_title_fontsize(29),plot.set_label_fontsize(30),
+            #                         plot.set_tick_fontsize(31),plot.set_legend_fontsize(32),plot.set_color('scatter color',0, 33),plot.set_color('line color',6,34)]
+            #     with col2:
+            #         plot.targets_and_targets(options_selected,df, list(targets))
+        st.write('---')
 
 elif select_option == "特征工程":
     with st.sidebar:
@@ -548,9 +589,6 @@ elif select_option == "特征工程":
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('---')
     
-    elif sub_option == "特征变换":
-        pass
-
     elif sub_option == "特征唯一值处理":
         colored_header(label="特征唯一值处理",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
@@ -614,6 +652,35 @@ elif select_option == "特征工程":
                     plot.feature_nunique(options_selected, fs.record_single_unique,fs.unique_stats)     
                 
             st.write('---')
+
+    # elif sub_option == "特征变换":
+    #     colored_header(label="特征变换",description=" ",color_name="violet-90")
+    #     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+    #     if file is None:
+    #         table = PrettyTable(['Composition'])
+    #         table.add_row(['(Fe0.76B0.24)96Nb4'])
+    #         st.write(table)
+    #     if file is not None:
+    #         colored_header(label="数据信息",description=" ",color_name="violet-70")
+
+    #         df = pd.read_csv(file)
+
+    #         nrow = st.slider("rows", 1, len(df), 5)
+    #         df_nrow = df.head(nrow)
+    #         st.write(df_nrow)
+    #         col_name = list(df)
+    #         # if __name__ == '__main__':
+    #         #     freeze_support()
+    #         #     df = StrToComposition().featurize_dataframe(df, "Alloy")
+    #         #     df.head()
+                
+    #         # # st.write(df.head())
+    #         # with st.expander('原子特征'):
+    #         #     # st.write(df)
+    #         #     tmp_download_link = download_button(df, f'原子特征.csv', button_text='download')
+    #         #     st.markdown(tmp_download_link, unsafe_allow_html=True)                
+    #         # st.write('---')
+
 
     elif sub_option == "特征和特征相关性":
         colored_header(label="特征和特征相关性",description=" ",color_name="violet-90")
@@ -2343,8 +2410,7 @@ elif select_option == "分类预测":
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
                 elif data_process == 'cross val score':
-                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
-                                                                                             
+                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])                                                                                       
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
                     export_cross_val_results_clf(clf, cv, "SVC_cv", col_name, unique_categories)     
 
@@ -2411,7 +2477,6 @@ elif select_option == "分类预测":
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
                 elif data_process == 'cross val score':
-  
                     clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                 max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)

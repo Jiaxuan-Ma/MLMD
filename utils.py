@@ -14,7 +14,6 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import confusion_matrix
-######for GP
 
 from typing import Optional
 import seaborn as sns

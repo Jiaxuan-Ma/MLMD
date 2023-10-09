@@ -39,25 +39,25 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['mission'] = st.selectbox('mission',['Regression', 'Classification'])
-            if inputs['mission'] == 'Regression':
-                inputs['Regressor'] = st.selectbox('regressor',['GaussianProcess'])
-                inputs['noise std'] = st.selectbox('noise std',['0.001','0.0001','0.00001','0.000001'])
-                                
-                inputs['opt num'] = st.number_input('sample number',0, 10, 1)
-                inputs['min search'] = st.selectbox('min search',[False, True])
+            inputs['mission'] = st.selectbox('mission',['Regression'])
+            # if inputs['mission'] == 'Regression':
+            inputs['Regressor'] = st.selectbox('regressor',['GaussianProcess'])
+            inputs['noise std'] = st.selectbox('noise std',['0.001','0.0001','0.00001','0.000001'])
+                            
+            inputs['opt num'] = st.number_input('sample number',0, 10, 1)
+            inputs['min search'] = st.selectbox('min search',[False, True])
 
-                inputs['sample criterion'] = st.selectbox('sample criterion',['Expected Improvement algorith',
-                        'Expected improvement with "plugin"','Augmented Expected Improvement','Expected Quantile Improvement',
-                        'Reinterpolation Expected Improvement','Upper confidence bound','Probability of Improvement',
-                        'Predictive Entropy Search','Knowledge Gradient'])
+            inputs['sample criterion'] = st.selectbox('sample criterion',['Expected Improvement algorith',
+                    'Expected improvement with "plugin"','Augmented Expected Improvement','Expected Quantile Improvement',
+                    'Reinterpolation Expected Improvement','Upper confidence bound','Probability of Improvement',
+                    'Predictive Entropy Search','Knowledge Gradient'])
 
-            if inputs['mission'] == 'Classification':
-                inputs['Classifier'] = st.selectbox('classifier',['GaussianProcess','LogisticRegression','NativeBayes','SVM','RandomForest'])
-                inputs['noise std'] = st.selectbox('noise std',['0.001','0.0001','0.00001','0.000001'])
-                inputs['min search'] = False
-                inputs['opt num'] = st.number_input('sample number',0, 10, 1)
-                inputs['sample criterion'] = st.selectbox('sample criterion',['Least Confidence', 'Margin Sampling', 'Entropy-based approach'])
+            # if inputs['mission'] == 'Classification':
+            #     inputs['Classifier'] = st.selectbox('classifier',['GaussianProcess','LogisticRegression','NativeBayes','SVM','RandomForest'])
+            #     inputs['noise std'] = st.selectbox('noise std',['0.001','0.0001','0.00001','0.000001'])
+            #     inputs['min search'] = False
+            #     inputs['opt num'] = st.number_input('sample number',0, 10, 1)
+            #     inputs['sample criterion'] = st.selectbox('sample criterion',['Least Confidence', 'Margin Sampling', 'Entropy-based approach'])
 
 
 
