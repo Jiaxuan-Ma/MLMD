@@ -1778,7 +1778,7 @@ def feature_transform(df, option):
         HEA = WenAlloys()
         df = HEA.featurize_dataframe(df, col_id="composition", ignore_errors=False)  # input the "composition" column to the featurizer
     elif option == 'Polymers':
-        df = StrToComposition().featurize_dataframe(df, "Alloy")
+        df = StrToComposition().featurize_dataframe(df, "Polymers")
         EP = ElementProperty.from_preset(preset_name="magpie")
         df = EP.featurize_dataframe(df, col_id="composition", ignore_errors=False)         
     return df
