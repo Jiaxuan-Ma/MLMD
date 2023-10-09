@@ -3193,6 +3193,9 @@ elif select_option == "主动学习":
                 with st.container():
                     button_train = st.button('Opt', use_container_width=True)  
                 if button_train:      
+                    if reg.Xtrain.columns.tolist() != reg.Xtest.columns.tolist():
+                        st.error('the feature number in Visual sample file is wrong')
+                        st.stop()
                     HV_value, recommend_point = mobo.fit(X = reg.Xtrain, y = reg.Ytrain, visual_data=reg.Xtest, 
                                                     method=inputs['method'],number= inputs['num'], objective=inputs['objective'], ref_point=ref_point)
                     HV_value = pd.DataFrame(HV_value, columns=["HV value"]) 

@@ -31,7 +31,6 @@ class Mobo4mat:
     --------
     """
     def fit(self, X, y, visual_data, method, number, objective, ref_point):
-
         if objective == 'max':
             Xtrain = -X
             Ytrain = -y
@@ -51,7 +50,11 @@ class Mobo4mat:
         kernel = RBF(length_scale=1.0)
         gp_model = GaussianProcessRegressor(kernel=kernel)
         gp_model.fit(Xtrain, Ytrain)
+
+        st.write(Xtest.columns.tolist())
+
         Ypred, Ystd = gp_model.predict(Xtest, return_std=True)
+        
         Ypred = pd.DataFrame(Ypred, columns=Ytrain.columns.tolist())
 
         if method == 'HV':
