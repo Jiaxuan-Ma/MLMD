@@ -648,7 +648,7 @@ elif select_option == "特征工程":
             df = pd.read_csv(file)
             df_nrow = df.head()
             st.write(df_nrow)
-            option = st.selectbox('option',['Alloy', 'Polymer'])
+            option = st.selectbox('option',['Alloy', 'Inorganic'])
             button = st.button('Transform', use_container_width=True)
             if button:
                 df = feature_transform(df, option)
