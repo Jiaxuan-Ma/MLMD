@@ -15,6 +15,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import confusion_matrix
 
+from matminer.featurizers.conversions import StrToComposition
+from matminer.featurizers.composition.alloy import WenAlloys
+from matminer.featurizers.composition import ElementProperty
+
 from typing import Optional
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -1767,3 +1771,14 @@ def pca_inverse_normalize(data, scaler, normalize: Optional[str]=None):
     elif normalize == 'MinMaxScaler':
         data = scaler.inverse_transform(data)       
     return data
+
+def feature_transform(df, option):
+    if option == 'Alloy':
+        df = StrToComposition().featurize_dataframe(df, "Alloy")
+        HEA = WenAlloys()
+        df = HEA.featurize_dataframe(df, col_id="composition", ignore_errors=False)  # input the "composition" column to the featurizer
+    elif option == 'Polymers':
+        df = StrToComposition().featurize_dataframe(df, "Alloy")
+        EP = ElementProperty.from_preset(preset_name="magpie")
+        df = EP.featurize_dataframe(df, col_id="composition", ignore_errors=False)         
+    return df

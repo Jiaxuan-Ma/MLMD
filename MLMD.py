@@ -2,12 +2,13 @@
 Runs the streamlit app
 Call this file in the terminal via `streamlit run app.py`
 '''
+from multiprocessing import freeze_support
+import threading
 
 
 import shap
 
 import streamlit as st
-import streamlit_analytics
 
 from streamlit_extras.colored_header import colored_header
 from streamlit_option_menu import option_menu
@@ -98,9 +99,6 @@ from algorithm.TrAdaboostR2 import TrAdaboostR2
 from algorithm.mobo import Mobo4mat
 import scienceplots
 
-
-streamlit_analytics.start_tracking()
-
 st.set_page_config(
         page_title="MLMD",
         page_icon="🍁",
@@ -117,7 +115,7 @@ footer {visibility:hidden;}
 
 # https://icons.bootcss.com/
 st.markdown(sysmenu,unsafe_allow_html=True)
-# arrow-repeat
+
 with st.sidebar:
     st.write('''
     技术支持：马家轩|Jiaxuan Ma
@@ -130,22 +128,9 @@ with st.sidebar:
 if select_option == "平台主页":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
 
-# st.markdown("<br>", unsafe_allow_html=True)
-    # col1, col2, col3, col4 = st.columns([1,0.25,0.2,0.5])
-    # with col1:
-    #     pass
-    #     # st.write('''
-    #     #     Check out [help document](https://mlmd.netlify.app/) for more information
-    #     #     ''')
-    # with col2:
-    #     st.write('[![](https://img.shields.io/badge/MLMD-Github-yellowgreen)](https://github.com/Jiaxuan-Ma/Machine-Learning-for-Material-Design)')
-    # with col3:
-    #     badge(type="github", name="Jiaxuan-Ma/MLMD")
-    # with col4:
-    #     st.write("")
+
     colored_header(label="材料设计的机器学习平台",description="Machine Learning for Material Design",color_name="violet-90")
-    # st.write("## Machine Learning for Material Design")
-    # st.write("## 材料的机器学习平台")
+
     st.markdown(
     '''
     The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at utilizing general and frontier machine learning algrithm to accelerate the material design with no-programming. \n
@@ -211,11 +196,8 @@ elif select_option == "基础功能":
             st.write(df.head())
             tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                # tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-                # st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-
+            # tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+            # st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 
     elif sub_option == "数据可视化":
@@ -351,7 +333,7 @@ elif select_option == "基础功能":
 
 elif select_option == "特征工程":
     with st.sidebar:
-        sub_option = option_menu(None, ["空值处理", "特征唯一值处理", "特征和特征相关性", "特征和目标相关性", "One-hot编码", "特征重要性"])
+        sub_option = option_menu(None, ["空值处理","特征转换", "特征唯一值处理", "特征和特征相关性", "特征和目标相关性", "One-hot编码", "特征重要性"])
 
     if sub_option == "空值处理":
         colored_header(label="空值处理",description=" ",color_name="violet-90")
@@ -653,33 +635,26 @@ elif select_option == "特征工程":
                 
             st.write('---')
 
-    # elif sub_option == "特征变换":
-    #     colored_header(label="特征变换",description=" ",color_name="violet-90")
-    #     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-    #     if file is None:
-    #         table = PrettyTable(['Composition'])
-    #         table.add_row(['(Fe0.76B0.24)96Nb4'])
-    #         st.write(table)
-    #     if file is not None:
-    #         colored_header(label="数据信息",description=" ",color_name="violet-70")
+    elif sub_option == "特征转换":
+        colored_header(label="特征变换",description=" ",color_name="violet-90")
+        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['Composition'])
+            table.add_row(['(Fe0.76B0.24)96Nb4'])
+            st.write(table)
+        if file is not None:
+            colored_header(label="数据信息",description=" ",color_name="violet-70")
 
-    #         df = pd.read_csv(file)
-
-    #         nrow = st.slider("rows", 1, len(df), 5)
-    #         df_nrow = df.head(nrow)
-    #         st.write(df_nrow)
-    #         col_name = list(df)
-    #         # if __name__ == '__main__':
-    #         #     freeze_support()
-    #         #     df = StrToComposition().featurize_dataframe(df, "Alloy")
-    #         #     df.head()
-                
-    #         # # st.write(df.head())
-    #         # with st.expander('原子特征'):
-    #         #     # st.write(df)
-    #         #     tmp_download_link = download_button(df, f'原子特征.csv', button_text='download')
-    #         #     st.markdown(tmp_download_link, unsafe_allow_html=True)                
-    #         # st.write('---')
+            df = pd.read_csv(file)
+            df_nrow = df.head()
+            st.write(df_nrow)
+            option = st.selectbox('option',['Alloy', 'Polymer'])
+            button = st.button('Transform', use_container_width=True)
+            if button:
+                df = feature_transform(df, option)
+                st.write(df.head())
+                tmp_download_link = download_button(df, f'特征转换数据.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)      
 
 
     elif sub_option == "特征和特征相关性":
@@ -4344,5 +4319,3 @@ elif select_option == "其他":
 
     elif sub_option == "符号回归":
         st.write("sisso")
-
-streamlit_analytics.stop_tracking()
