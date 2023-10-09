@@ -2935,13 +2935,7 @@ elif select_option == "主动学习":
             table = PrettyTable(['上传文件名称', '名称','数据说明'])
             table.add_row(['file_1','dataset','数据集'])
             table.add_row(['file_2','visual data','虚拟采样点'])
-            st.write(table)
-            st.info("May uploaded two files, the first is the dataset, the second is the virtual sample point")
-        # if len(file) > 2:
-        #     st.error('May uploaded two files, the first is the dataset, the second is the the virtual space sample point. if only upload dataset, the virtual space can be adjusted by variable ratio')
-        #     st.stop()
-        # if len(file) == 2:
-        #     st.info('You have unpload two files, the first is the dataset, the second is the the vritual space sample point.')       
+            st.write(table)      
         if len(file) == 2:
             
             colored_header(label="数据信息",description=" ",color_name="violet-70")
@@ -2994,21 +2988,6 @@ elif select_option == "主动学习":
                     sp.vsfeatures = df_vs
                     st.info('You have upoaded the visual sample point file.')
                     feature_name = sp.features.columns.tolist()
-                    # else:
-                    #     feature_name = sp.features.columns.tolist()
-                    #     mm = MinMaxScaler()
-                    #     mm.fit(sp.features)
-                    #     data_min = mm.data_min_
-                    #     data_max = mm.data_max_
-                    #     sp.trans_features = mm.transform(sp.features)
-                    #     min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
-            
-                    #     sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
-                    #     feature_num = sp.trans_features.shape[1]
-
-                    #     vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
-
-                    #     sp.vsfeatures = pd.DataFrame(vs, columns=feature_name)
                 
                 with st.expander('visual samples'):
                     st.write(sp.vsfeatures)
@@ -3094,7 +3073,6 @@ elif select_option == "主动学习":
             table.add_row(['file_1','dataset','数据集'])
             table.add_row(['file_2','visual data','虚拟采样点'])
             st.write(table)
-            st.info("May upload two files, the first is the dataset, the second is the the virtual space sample point. ")
         elif len(file) == 2:    
             colored_header(label="数据信息",description=" ",color_name="violet-70")
             # with st.expander('Data Information'):
@@ -3375,7 +3353,6 @@ elif select_option == "代理优化":
             table.add_row(['file_2','boundary','设计变量上下界'])
             table.add_row(['file_3','model','模型'])
             st.write(table)
-            st.info('You need unpload three files, the first is the dataset, the second is the feature variable boundary, the other is the trained models.')       
         
         if len(file) >= 3:
             df = pd.read_csv(file[0])
@@ -3617,7 +3594,6 @@ elif select_option == "代理优化":
             table.add_row(['file_4','model_2','目标2 模型'])
             table.add_row(['file_5','...','...'])
             st.write(table)
-            st.info('You can unpload three or four files, the first is the feature variable boundary, the second and the others are the trained models.')  
         elif len(file) >= 4:        
             df = pd.read_csv(file[0])
             check_string_NaN(df)
@@ -3789,9 +3765,6 @@ elif select_option == "代理优化":
                         tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-        # elif len(file) >= 4:
-        #     st.write('hah')
-
     elif sub_option == "迁移学习-多目标代理优化":
         colored_header(label="迁移学习-多目标代理优化",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
@@ -3804,7 +3777,6 @@ elif select_option == "代理优化":
             table.add_row(['file_5','model_1','目标1 模型1'])
             table.add_row(['file_6','model_2','目标2 模型2'])
             st.write(table)
-            st.info('You need unpload multi files, the first is the feature variable boundary, the second and the three are the weight of models, the remains are models.')  
         if len(file) >= 6:
             df = pd.read_csv(file[0])
             check_string_NaN(df)
@@ -3982,7 +3954,6 @@ elif select_option == "代理优化":
             table.add_row(['file_2','weights','学习器权重'])
             table.add_row(['file_3','model','模型'])
             st.write(table)
-            st.info('You need unpload multi files, the first is the feature variable boundary, the second is the weight of models, the three is the model.')  
         elif len(file) >= 3:
 
             df_var = pd.read_csv(file[0])
@@ -4198,7 +4169,6 @@ elif select_option == "其他":
             
             col_feature, col_target = st.columns(2)
                 
-            # features
             features = df.iloc[:,:-target_num]
             # targets
             targets = df.iloc[:,-target_num:]
@@ -4268,7 +4238,7 @@ elif select_option == "其他":
         elif len(file) == 2:
             df = pd.read_csv(file[0])
             model_file = file[1]
-            # 检测缺失值
+     
             check_string_NaN(df)
 
             colored_header(label="数据信息", description=" ",color_name="violet-70")
@@ -4300,8 +4270,6 @@ elif select_option == "其他":
             elif preprocess == 'MinMaxScaler':
                 features = MinMaxScaler().fit_transform(features)
 
-            # model_file = st.file_uploader("Upload `.pickle`model",  label_visibility="collapsed")
-            # if model_file is not None:
             model = pickle.load(model_file)
             prediction = model.predict(features)
 
@@ -4317,5 +4285,3 @@ elif select_option == "其他":
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             st.write('---')
 
-    elif sub_option == "符号回归":
-        st.write("sisso")
