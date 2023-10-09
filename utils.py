@@ -1546,7 +1546,7 @@ def export_cross_val_results_clf(model, F, model_name, col_name, unique_categori
     conf_df = pd.DataFrame(conf_matrix, index=np.unique(model.Ytest), columns=np.unique(model.Ytest))
     with plt.style.context(['nature','no-latex']):
         fig, ax = plt.subplots()
-        sns.heatmap(conf_df, annot=True, cmap='Blues',
+        sns.heatmap(conf_df, annot=True, cmap='Blues',fmt="d",
                     xticklabels=conf_df.columns, yticklabels=conf_df.index)
         plt.xlabel('Actual')
         plt.ylabel('Prediction')
@@ -1618,7 +1618,7 @@ def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
     conf_df = pd.DataFrame(conf_matrix, index=np.unique(model.Ytest), columns=np.unique(model.Ytest))
     with plt.style.context(['nature','no-latex']):
         fig, ax = plt.subplots()
-        sns.heatmap(conf_df, annot=True, cmap='Blues',
+        sns.heatmap(conf_df, annot=True, cmap='Blues',fmt="d",
                     xticklabels=conf_df.columns, yticklabels=conf_df.index)
         plt.xlabel('Actual')
         plt.ylabel('Prediction')
