@@ -46,7 +46,7 @@ def show():
             inputs['max depth'] = None
             if max_depth:
                 inputs['max depth'] = st.number_input('max depth',1, 100, 3)
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
                 inputs['random state'] = 42
             else:
