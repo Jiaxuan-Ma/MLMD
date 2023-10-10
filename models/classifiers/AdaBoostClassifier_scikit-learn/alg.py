@@ -46,7 +46,7 @@ def show():
 
             random_state = st.checkbox('random state 1024',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 

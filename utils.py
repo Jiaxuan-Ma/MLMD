@@ -1517,9 +1517,9 @@ def plot_and_export_results(model, model_name):
             tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-def export_cross_val_results(model, F, model_name):
+def export_cross_val_results(model, F, model_name, random_state):
     # 交叉验证的模型的选择？目前选择最后一个模型，不是很合理
-    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model)    
+    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model, random_state)    
     st.write('R2: {}'.format(r2_score(y_true=Y_test, y_pred=Y_pred)))
     plot = customPlot()
     plot.pred_vs_actual(Y_test, Y_pred)                    
@@ -1533,18 +1533,18 @@ def export_cross_val_results(model, F, model_name):
         tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-def export_cross_val_results_clf(model, F, model_name, col_name, unique_categories):
+def export_cross_val_results_clf(model, F, model_name, col_name, unique_categories, random_state):
     
-    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model) 
+    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model, random_state) 
     model.Ytest = pd.DataFrame(Y_test, columns=model.targets.columns)
     model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns)
 
     st.write('accuracy score: {}'.format(accuracy_score(y_true=Y_test, y_pred=Y_pred)))
     
-    clf_scores = Ffold_cross_val_modify(model.features, model.targets, F, model.model,'clf') 
-    clf_scores = np.mean(np.array(clf_scores))
+    # clf_scores = Ffold_cross_val_modify(model.features, model.targets, F, model.model,'clf') 
+    # clf_scores = np.mean(np.array(clf_scores))
     
-    st.write('test accuracy score: {}'.format(clf_scores))
+    # st.write('test accuracy score: {}'.format(clf_scores))
 
     model.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[model.Ytest[col_name[0]]].values
     model.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[model.Ypred[col_name[0]]].values
@@ -1726,32 +1726,32 @@ def dominated_hypervolume(pareto_data, ref_point):
     return S
 
 
-def Ffold_cross_val_modify(Xtrain, Ytrain, F, estimator, func: Optional[str]):
-    Xtrain = np.array(Xtrain)
-    Ytrain = np.array(Ytrain)
-    row_Xtrain = Xtrain.shape[0]
-    kf = KFold(n_splits=F)
-    predict = np.zeros([row_Xtrain, 1])
-    real = np.zeros([row_Xtrain, 1])
-    results = []
-    for train_index, val_index in kf.split(Xtrain):
-        x_train, x_val = [Xtrain[i] for i in train_index], [Xtrain[i] for i in val_index]
-        y_train, y_val = [Ytrain[i] for i in train_index], [Ytrain[i] for i in val_index]
-        estimator.fit(x_train, y_train)
-        Ypred = estimator.predict(x_val).reshape(-1,1)
-        Ytest = np.array(y_val).reshape(-1,1)        
-        if func == 'reg':
-            res = r2_score(Ytest, Ypred)
-        elif func == 'clf':
-            res = accuracy_score(Ytest, Ypred)
-        results.append(res)    
-    return results
+# def Ffold_cross_val_modify(Xtrain, Ytrain, F, estimator, func: Optional[str]):
+#     Xtrain = np.array(Xtrain)
+#     Ytrain = np.array(Ytrain)
+#     row_Xtrain = Xtrain.shape[0]
+#     kf = KFold(n_splits=F,shuffle=True, random_state=input)
+#     predict = np.zeros([row_Xtrain, 1])
+#     real = np.zeros([row_Xtrain, 1])
+#     results = []
+#     for train_index, val_index in kf.split(Xtrain):
+#         x_train, x_val = [Xtrain[i] for i in train_index], [Xtrain[i] for i in val_index]
+#         y_train, y_val = [Ytrain[i] for i in train_index], [Ytrain[i] for i in val_index]
+#         estimator.fit(x_train, y_train)
+#         Ypred = estimator.predict(x_val).reshape(-1,1)
+#         Ytest = np.array(y_val).reshape(-1,1)        
+#         if func == 'reg':
+#             res = r2_score(Ytest, Ypred)`
+#         elif func == 'clf':
+#             res = accuracy_score(Ytest, Ypred)
+#         results.append(res)    
+#     return results
 
-def Ffold_cross_val(Xtrain, Ytrain, F, estimator):
+def Ffold_cross_val(Xtrain, Ytrain, F, estimator, random_state):
     Xtrain = np.array(Xtrain)
     Ytrain = np.array(Ytrain)
     row_Xtrain = Xtrain.shape[0]
-    kf = KFold(n_splits=F)
+    kf = KFold(n_splits=F, shuffle=True, random_state=random_state)
     predict = np.zeros([row_Xtrain, 1])
     real = np.zeros([row_Xtrain, 1])
     for train_index, val_index in kf.split(Xtrain):

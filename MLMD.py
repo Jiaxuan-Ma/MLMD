@@ -1186,7 +1186,7 @@ elif select_option == "回归预测":
                         max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
                         min_samples_split=inputs['min samples split']) 
 
-                    export_cross_val_results(reg, cv, "DTR_cv")
+                    export_cross_val_results(reg, cv, "DTR_cv", inputs['random state'])
         
                 elif operator == 'leave one out':
 
@@ -1237,7 +1237,7 @@ elif select_option == "回归预测":
                                                 min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
                                                 n_jobs=inputs['njobs'])
 
-                    export_cross_val_results(reg, cv, "RFR_cv")
+                    export_cross_val_results(reg, cv, "RFR_cv", inputs['random state'])
     
                 elif operator == 'oob score':
 
@@ -1307,7 +1307,7 @@ elif select_option == "回归预测":
 
                     reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
 
-                    export_cross_val_results(reg, cv, "SVR_cv")
+                    export_cross_val_results(reg, cv, "SVR_cv",inputs['random state'])
 
 
                 elif operator == 'leave one out':
@@ -1381,7 +1381,7 @@ elif select_option == "回归预测":
                         kernel = DotProduct() + WhiteKernel()
                     reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
 
-                    export_cross_val_results(reg, cv, "GPR_cv")
+                    export_cross_val_results(reg, cv, "GPR_cv",inputs['random state'])
 
                 elif operator == 'leave one out':
                     if inputs['kernel'] == None:
@@ -1448,7 +1448,7 @@ elif select_option == "回归预测":
 
                     reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
 
-                    export_cross_val_results(reg, cv, "KNR_cv")
+                    export_cross_val_results(reg, cv, "KNR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
 
@@ -1510,7 +1510,7 @@ elif select_option == "回归预测":
 
                     reg.model = LinearR()
 
-                    export_cross_val_results(reg, cv, "LinearR_cv")
+                    export_cross_val_results(reg, cv, "LinearR_cv" ,inputs['random state'])
 
 
                 elif operator == 'leave one out':
@@ -1571,7 +1571,7 @@ elif select_option == "回归预测":
 
                     reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
 
-                    export_cross_val_results(reg, cv, "LassoR_cv")
+                    export_cross_val_results(reg, cv, "LassoR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
 
@@ -1631,7 +1631,7 @@ elif select_option == "回归预测":
 
                     reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
 
-                    export_cross_val_results(reg, cv, "RidgeR_cv")
+                    export_cross_val_results(reg, cv, "RidgeR_cv", inputs['random state'])
 
 
                 elif operator == 'leave one out':
@@ -1721,7 +1721,7 @@ elif select_option == "回归预测":
                     # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
 
                     # export_cross_val_results(cvs, "BaggingR_cv")   
-                    export_cross_val_results(reg, cv, "BaggingR_cv")
+                    export_cross_val_results(reg, cv, "BaggingR_cv", inputs['random state'])
 
                     # elif inputs['base estimator'] == "SupportVector": 
 
@@ -1814,7 +1814,7 @@ elif select_option == "回归预测":
                     # if inputs['base estimator'] == "DecisionTree": 
                     reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                     # cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
-                    export_cross_val_results(reg, cv, "AdaBoostR_cv")
+                    export_cross_val_results(reg, cv, "AdaBoostR_cv", inputs['random state'])
                     #     st.write('mean cross val R2:', cvs.mean())
                     # elif inputs['base estimator'] == "SupportVector": 
 
@@ -1884,7 +1884,7 @@ elif select_option == "回归预测":
                                                             random_state=inputs['random state'])  
                         # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                         # export_cross_val_results(cvs, "GradientBoostingR_cv")    
-                        export_cross_val_results(reg, cv, "GradientBoostingR_cv")
+                        export_cross_val_results(reg, cv, "GradientBoostingR_cv", inputs['random state'])
                 elif operator == 'leave one out':
                         reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
                                                             random_state=inputs['random state']) 
@@ -1928,7 +1928,7 @@ elif select_option == "回归预测":
                         
                         # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                         # export_cross_val_results(cvs, "DTR_cv")    
-                        export_cross_val_results(reg, cv, "XGBR_cv")
+                        export_cross_val_results(reg, cv, "XGBR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
                         reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
@@ -1970,7 +1970,7 @@ elif select_option == "回归预测":
                         
                         # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                         # export_cross_val_results(cvs, "CatBoostR_cv")    
-                        export_cross_val_results(reg, cv, "CatBoostR_cv")
+                        export_cross_val_results(reg, cv, "CatBoostR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
                         reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
@@ -2028,7 +2028,7 @@ elif select_option == "回归预测":
                                             batch_size=inputs['batch size'], learning_rate= inputs['learning rate'], max_iter=inputs['max iter'],
                                             random_state=inputs['random state'])
                     
-                    export_cross_val_results(reg, cv, "MLP_cv")
+                    export_cross_val_results(reg, cv, "MLP_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
 
@@ -2155,7 +2155,7 @@ elif select_option == "分类预测":
                                                             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
                                                             
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "DTC_cv", col_name, unique_categories)
+                    export_cross_val_results_clf(clf, cv, "DTC_cv", col_name, unique_categories, inputs['random state'])
 
                 elif data_process == 'leave one out':
                     clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
@@ -2224,7 +2224,7 @@ elif select_option == "分类预测":
      
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
      
-                    export_cross_val_results_clf(clf, cv, "RFRC_cv", col_name, unique_categories)
+                    export_cross_val_results_clf(clf, cv, "RFRC_cv", col_name, unique_categories, inputs['random state'])
 
                 elif data_process == 'leave one out':
  
@@ -2310,7 +2310,7 @@ elif select_option == "分类预测":
                      
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
-                    export_cross_val_results_clf(clf, cv, "LRC_cv", col_name, unique_categories)      
+                    export_cross_val_results_clf(clf, cv, "LRC_cv", col_name, unique_categories, inputs['random state'])      
 
                 elif data_process == 'leave one out': 
                     clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
@@ -2388,7 +2388,7 @@ elif select_option == "分类预测":
                 elif data_process == 'cross val score':
                     clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])                                                                                       
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "SVC_cv", col_name, unique_categories)     
+                    export_cross_val_results_clf(clf, cv, "SVC_cv", col_name, unique_categories, inputs['random state'])     
 
                 elif data_process == 'leave one out':
                     clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
@@ -2456,7 +2456,7 @@ elif select_option == "分类预测":
                     clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                 max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories) 
+                    export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories, inputs['random state']) 
 
                 elif data_process == 'leave one out':
                     clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
@@ -2525,7 +2525,7 @@ elif select_option == "分类预测":
 
                     clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories) 
+                    export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories, inputs['random state']) 
                 
                 elif data_process == 'leave one out':
                     clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
@@ -2610,7 +2610,7 @@ elif select_option == "分类预测":
                     clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
                                                         random_state=inputs['random state'])
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "GBC_cv", col_name, unique_categories)   
+                    export_cross_val_results_clf(clf, cv, "GBC_cv", col_name, unique_categories, inputs['random state'])   
 
                 elif data_process == 'leave one out':
                     
@@ -2685,7 +2685,7 @@ elif select_option == "分类预测":
                                                     learning_rate=inputs['learning rate'])
                         
                         cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                        export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories)  
+                        export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories, inputs['random state'])  
                 
                 elif data_process == 'leave one out':
                         
@@ -2774,7 +2774,7 @@ elif select_option == "分类预测":
 
                         cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
-                        export_cross_val_results_clf(clf, cv, "CatBoostC_cv", col_name, unique_categories)  
+                        export_cross_val_results_clf(clf, cv, "CatBoostC_cv", col_name, unique_categories, inputs['random state'])  
                 
                 elif data_process == 'leave one out':
                         

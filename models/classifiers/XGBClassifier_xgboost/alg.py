@@ -49,7 +49,7 @@ def show():
             inputs['subfeature'] = st.slider('subfeature', 0.5,1.0,1.0)
             random_state = st.checkbox('random state 1024',True)
             if random_state:
-                inputs['random state'] = 1024
+                inputs['random state'] = 42
             else:
                 inputs['random state'] = None
 
