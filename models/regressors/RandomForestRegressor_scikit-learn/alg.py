@@ -47,8 +47,8 @@ def show():
             inputs['max depth'] = None
             if max_depth:
                 inputs['max depth'] = st.number_input('max depth',1, 1000, 3)
-            inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 1000, 1)
-            inputs['min samples split'] = st.number_input('min samples split', 2, 1000, 2)
+            inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 100, 1)
+            inputs['min samples split'] = st.number_input('min samples split', 2, 100, 2)
             inputs['oob score'] = False
             inputs['warm start'] = False
             inputs['njobs'] = None

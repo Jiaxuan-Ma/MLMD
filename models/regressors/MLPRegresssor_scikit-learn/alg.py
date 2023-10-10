@@ -40,7 +40,7 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
 
-            inputs['layer size'] = st.number_input('hidden layer size', 1, 20, 2)
+            inputs['layer size'] = st.number_input('hidden layer size', 1, 100, 2)
             inputs['neuron size'] = st.number_input('neuron size', 5, 100, 10)
             inputs['hidden layer size'] = tuple([inputs['neuron size']]*inputs['layer size'])
             inputs['activation'] = st.selectbox('relu',['relu', 'identity', 'logistic', 'tanh'])

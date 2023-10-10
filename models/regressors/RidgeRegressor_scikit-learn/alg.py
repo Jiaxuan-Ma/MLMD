@@ -39,7 +39,7 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['alpha'] = st.number_input('alpha',0, 100, 1)
+            inputs['alpha'] = st.number_input('alpha',0, 1000, 1)
             random_state = st.checkbox('random state 42',True)
             if random_state:
                 inputs['random state'] = 42

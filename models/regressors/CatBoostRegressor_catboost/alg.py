@@ -41,9 +41,9 @@ def show():
         with st.expander("Hyper Parameter"):
 
 
-            inputs['niteration'] = st.number_input('number iteration',1, 100, 5)
-            inputs['learning rate'] = st.number_input('learning rate',0.01,0.5,0.3)
-            inputs['max depth'] = st.number_input('depth',1, 10, 6)
+            inputs['niteration'] = st.number_input('number iteration',1, 1000, 5)
+            inputs['learning rate'] = st.number_input('learning rate',0.01,10,0.3)
+            inputs['max depth'] = st.number_input('depth',1, 100, 6)
     
             random_state = st.checkbox('random state 42',True)
             if random_state:
