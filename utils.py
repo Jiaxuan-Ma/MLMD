@@ -126,7 +126,6 @@ def check_string(df):
     if len(string_contains_columns) == 0:
         st.error(f"Error: need string in label column!")
         st.stop()
-    return flag
 # =============== dwonload button =======================  
 def download_button(object_to_download, download_filename, button_text, pickle_it=False):
     if pickle_it:
@@ -1541,6 +1540,11 @@ def export_cross_val_results_clf(model, F, model_name, col_name, unique_categori
     model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns)
 
     st.write('accuracy score: {}'.format(accuracy_score(y_true=Y_test, y_pred=Y_pred)))
+    
+    clf_scores = Ffold_cross_val_modify(model.features, model.targets, F, model.model,'clf') 
+    clf_scores = np.mean(np.array(clf_scores))
+    
+    st.write('test accuracy score: {}'.format(clf_scores))
 
     model.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[model.Ytest[col_name[0]]].values
     model.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[model.Ypred[col_name[0]]].values
@@ -1591,7 +1595,6 @@ def export_loo_results(model, loo, model_name):
         st.write(result_data)
         tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
-
 
 
 def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
@@ -1723,6 +1726,27 @@ def dominated_hypervolume(pareto_data, ref_point):
     return S
 
 
+def Ffold_cross_val_modify(Xtrain, Ytrain, F, estimator, func: Optional[str]):
+    Xtrain = np.array(Xtrain)
+    Ytrain = np.array(Ytrain)
+    row_Xtrain = Xtrain.shape[0]
+    kf = KFold(n_splits=F)
+    predict = np.zeros([row_Xtrain, 1])
+    real = np.zeros([row_Xtrain, 1])
+    results = []
+    for train_index, val_index in kf.split(Xtrain):
+        x_train, x_val = [Xtrain[i] for i in train_index], [Xtrain[i] for i in val_index]
+        y_train, y_val = [Ytrain[i] for i in train_index], [Ytrain[i] for i in val_index]
+        estimator.fit(x_train, y_train)
+        Ypred = estimator.predict(x_val).reshape(-1,1)
+        Ytest = np.array(y_val).reshape(-1,1)        
+        if func == 'reg':
+            res = r2_score(Ytest, Ypred)
+        elif func == 'clf':
+            res = accuracy_score(Ytest, Ypred)
+        results.append(res)    
+    return results
+
 def Ffold_cross_val(Xtrain, Ytrain, F, estimator):
     Xtrain = np.array(Xtrain)
     Ytrain = np.array(Ytrain)
@@ -1734,6 +1758,7 @@ def Ffold_cross_val(Xtrain, Ytrain, F, estimator):
         x_train, x_val = [Xtrain[i] for i in train_index], [Xtrain[i] for i in val_index]
         y_train, y_val = [Ytrain[i] for i in train_index], [Ytrain[i] for i in val_index]
         estimator.fit(x_train, y_train)
+
         predict[val_index] = estimator.predict(x_val).reshape(-1,1)
         real[val_index] = np.array(y_val).reshape(-1,1)
     return predict, real
