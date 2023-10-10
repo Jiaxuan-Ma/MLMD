@@ -1956,7 +1956,7 @@ elif select_option == "回归预测":
 
                 if operator == 'train test split':
 
-                        reg.model =CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                        reg.model =CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
                         reg.LGBMRegressor()
 
@@ -1966,14 +1966,14 @@ elif select_option == "回归预测":
                         plot_and_export_results(reg, "CatBoostR")
 
                 elif operator == 'cross val score':
-                        reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                        reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
                         
                         # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
                         # export_cross_val_results(cvs, "CatBoostR_cv")    
                         export_cross_val_results(reg, cv, "CatBoostR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
-                        reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                        reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
                         export_loo_results(reg, loo, "CatBoostR_loo")            
         
         if inputs['model'] == 'MLPRegressor':
@@ -2733,7 +2733,7 @@ elif select_option == "分类预测":
             if button_train:
                 if data_process == 'train test split':
                 
-                    clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                    clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
                     clf.CatBoostClassifier()
                         
@@ -2770,7 +2770,7 @@ elif select_option == "分类预测":
 
                 elif data_process == 'cross val score':
                         
-                        clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                        clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
                         cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
 
@@ -2778,7 +2778,7 @@ elif select_option == "分类预测":
                 
                 elif data_process == 'leave one out':
                         
-                        clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'])
+                        clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
                         export_loo_results_clf(clf, loo, "CatBoostC_loo", col_name, unique_categories)
 
