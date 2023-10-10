@@ -2622,14 +2622,14 @@ elif select_option == "分类预测":
             with col2:
                 with st.expander('Operator'):
                                    
-                    data_process = st.selectbox('data process', ('train test split', 'leave one out'), label_visibility='collapsed')
+                    data_process = st.selectbox('data process', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
 
                         clf.Xtrain, clf.Xtest, clf.Ytrain, clf.Ytest = TTS(clf.features,clf.targets,test_size=inputs['test size'],random_state=inputs['random state'])
                         
-                    # elif data_process == 'cross val score':
-                    #     cv = st.number_input('cv',1,20,5)
+                    elif data_process == 'cross val score':
+                        cv = st.number_input('cv',1,20,5)
                     elif data_process == 'leave one out':
                         loo = LeaveOneOut() 
             
@@ -2641,7 +2641,9 @@ elif select_option == "分类预测":
                 
                     clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                 subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                learning_rate=inputs['learning rate'], num_class=len(list(unique_categories)))
+                                                learning_rate=inputs['learning rate'])
+                    clf.Ytest = clf.Ytest.reset_index(drop=True)
+                
                     clf.XGBClassifier()
                         
                     if not check_string(targets):
@@ -2675,20 +2677,20 @@ elif select_option == "分类预测":
                             tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-                # elif data_process == 'cross val score':
+                elif data_process == 'cross val score':
                         
-                #         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                #                                     subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                #                                     learning_rate=inputs['learning rate'], num_class=len(list(unique_categories)))
+                        clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'])
                         
-                #         cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                #         export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories)  
+                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+                        export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories)  
                 
                 elif data_process == 'leave one out':
                         
                         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'], num_class=len(list(unique_categories)))
+                                                    learning_rate=inputs['learning rate'])
 
                         export_loo_results_clf(clf, loo, "XGBC_loo", col_name, unique_categories)
         

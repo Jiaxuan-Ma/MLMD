@@ -1221,6 +1221,7 @@ class CLASSIFIER:
         self.Ytrain = self.Ytrain.astype('float')
         self.Ytest = self.Ytest.astype('float')
 
+
         self.model.fit(self.Xtrain, self.Ytrain)
 
         self.Ypred = self.model.predict(self.Xtest)
