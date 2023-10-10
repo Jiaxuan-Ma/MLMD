@@ -114,17 +114,18 @@ def check_string_NaN(df):
         st.stop()
 
 def check_string(df):
-    # check string
-    flag = True
+    null_columns = df.columns[df.isnull().any()]
+    if len(null_columns) > 0:
+        st.error(f"Error: NaN in column {list(null_columns)} !")
+        st.stop()
     string_columns = df.select_dtypes(include=[object]).columns
     string_contains_columns = []
     for column in string_columns:
         if df[column].astype(str).str.contains('').any():
             string_contains_columns.append(column)
-    if len(string_contains_columns) > 0:
-        return flag
-    else: 
-        flag = False
+    if len(string_contains_columns) == 0:
+        st.error(f"Error: need string in label column!")
+        st.stop()
     return flag
 # =============== dwonload button =======================  
 def download_button(object_to_download, download_filename, button_text, pickle_it=False):

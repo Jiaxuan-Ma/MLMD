@@ -2050,6 +2050,7 @@ elif select_option == "分类预测":
         st.write(table)
     if file is not None:
         df = pd.read_csv(file)
+        check_string(df)
         colored_header(label="数据信息", description=" ",color_name="violet-70")
         nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
