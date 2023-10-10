@@ -1758,7 +1758,6 @@ def Ffold_cross_val(Xtrain, Ytrain, F, estimator, random_state):
         x_train, x_val = [Xtrain[i] for i in train_index], [Xtrain[i] for i in val_index]
         y_train, y_val = [Ytrain[i] for i in train_index], [Ytrain[i] for i in val_index]
         estimator.fit(x_train, y_train)
-
         predict[val_index] = estimator.predict(x_val).reshape(-1,1)
         real[val_index] = np.array(y_val).reshape(-1,1)
     return predict, real
