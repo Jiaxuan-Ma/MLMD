@@ -2203,7 +2203,7 @@ elif select_option == "分类预测":
                         conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
                         with plt.style.context(['nature','no-latex']):
                             fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                            sns.heatmap(conf_df, annot=True, cmap='Blues', fmt='d',
                                         xticklabels=conf_df.columns, yticklabels=conf_df.index)
                             plt.xlabel('Actual')
                             plt.ylabel('Prediction')
@@ -2290,7 +2290,7 @@ elif select_option == "分类预测":
                         conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
                         with plt.style.context(['nature','no-latex']):
                             fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
                                         xticklabels=conf_df.columns, yticklabels=conf_df.index)
                             plt.xlabel('Actual')
                             plt.ylabel('Prediction')
@@ -2370,7 +2370,7 @@ elif select_option == "分类预测":
                         conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
                         with plt.style.context(['nature','no-latex']):
                             fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
                                         xticklabels=conf_df.columns, yticklabels=conf_df.index)
                             plt.xlabel('Actual')
                             plt.ylabel('Prediction')
@@ -2437,7 +2437,7 @@ elif select_option == "分类预测":
                         conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
                         with plt.style.context(['nature','no-latex']):
                             fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
                                         xticklabels=conf_df.columns, yticklabels=conf_df.index)
                             plt.xlabel('Actual')
                             plt.ylabel('Prediction')
@@ -2506,7 +2506,7 @@ elif select_option == "分类预测":
                         conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
                         with plt.style.context(['nature','no-latex']):
                             fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
                                         xticklabels=conf_df.columns, yticklabels=conf_df.index)
                             plt.xlabel('Actual')
                             plt.ylabel('Prediction')
@@ -2590,7 +2590,7 @@ elif select_option == "分类预测":
                         conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
                         with plt.style.context(['nature','no-latex']):
                             fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
                                         xticklabels=conf_df.columns, yticklabels=conf_df.index)
                             plt.xlabel('Actual')
                             plt.ylabel('Prediction')
@@ -2661,7 +2661,7 @@ elif select_option == "分类预测":
                         conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
                         with plt.style.context(['nature','no-latex']):
                             fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',
+                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
                                         xticklabels=conf_df.columns, yticklabels=conf_df.index)
                             plt.xlabel('Actual')
                             plt.ylabel('Prediction')
