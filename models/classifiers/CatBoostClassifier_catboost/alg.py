@@ -42,7 +42,7 @@ def show():
 
 
             inputs['niteration'] = st.number_input('number iteration',1, 1000, 5)
-            inputs['learning rate'] = st.number_input('learning rate',0.01,1,0.3)
+            inputs['learning rate'] = st.number_input('learning rate',0.01,1.0,0.3)
             inputs['max depth'] = st.number_input('depth',1, 10, 6)
     
             random_state = st.checkbox('random state 42',True)
