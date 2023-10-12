@@ -3095,7 +3095,7 @@ elif select_option == "主动学习":
             st.write(df_nrow)
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=2, max_value=10, value=2)
+            target_num = st.number_input('目标变量数量',  min_value=2, max_value=2, value=2)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -3611,7 +3611,7 @@ elif select_option == "代理优化":
             check_string_NaN(df)
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=2, max_value=10, value=2)
+            target_num = st.number_input('目标变量数量',  min_value=2, max_value=2, value=2)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -3798,7 +3798,7 @@ elif select_option == "代理优化":
             check_string_NaN(df)
             colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=2, max_value=10, value=2)
+            target_num = st.number_input('目标变量数量',  min_value=2, max_value=2, value=2)
             
             col_feature, col_target = st.columns(2)
             # features
