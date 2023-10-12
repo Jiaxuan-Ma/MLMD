@@ -3774,6 +3774,7 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 with col2:
+                    iter_pareto_front.reset_index()
                     st.write(iter_pareto_front)
                     tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
@@ -3955,6 +3956,7 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 with col2:
+                    iter_pareto_front.reset_index()
                     st.write(iter_pareto_front)
                     tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
