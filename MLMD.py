@@ -3215,7 +3215,7 @@ elif select_option == "主动学习":
                         recommend_point  = inverse_normalize(recommend_point, scaler, "StandardScaler")
                     elif inputs['normalize'] == 'MinMaxScaler':
                         recommend_point  = inverse_normalize(recommend_point, scaler, "MinMaxScaler")
-                    st.write(Ypred_recommend)
+                    # st.write(Ypred_recommend)
                     st.write(recommend_point)
                     tmp_download_link = download_button(recommend_point, f'推荐试验样本.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True) 
@@ -3772,7 +3772,9 @@ elif select_option == "代理优化":
                     best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
                 col1, col2 = st.columns([3, 1])
                 with col1:
-                    st.write(best_x)         
+                    best_y = pd.DataFrame(best_y, columns = targets.columns.tolist())
+                    data = pd.concat([best_x, best_y], axis = 1)
+                    st.write(data)               
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 with col2:
@@ -3955,8 +3957,9 @@ elif select_option == "代理优化":
                 best_x = pd.DataFrame(best_x, columns = features_name)
                 col1, col2 = st.columns([3, 1])
                 with col1:
-                    st.write(best_x)         
-                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+                    best_y = pd.DataFrame(best_y, columns = targets.columns.tolist())
+                    data = pd.concat([best_x, best_y], axis = 1)
+                    tmp_download_link = download_button(data, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 with col2:
                     iter_pareto_front = iter_pareto_front.reset_index(drop=True)
