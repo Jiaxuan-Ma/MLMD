@@ -1,9 +1,9 @@
 
-
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.gaussian_process.kernels import RBF
 from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
 from tabulate import tabulate
 
 import pandas as pd
@@ -30,7 +30,7 @@ class Mobo4mat:
     Examples
     --------
     """
-    def fit(self, X, y, visual_data, method, number, objective, ref_point):
+    def fit(self, X, y, visual_data, method, kernel_option, number, objective, ref_point):
         if objective == 'max':
             Xtrain = -X
             Ytrain = -y
@@ -46,12 +46,12 @@ class Mobo4mat:
             target_name = Ytrain.columns.tolist()
             feature_name = Xtrain.columns.tolist()
             ref_point = np.array(ref_point)
-
-        kernel = RBF(length_scale=1.0)
+        if kernel_option == 'rbf':
+            kernel = RBF()
+        elif kernel_option == 'DotProduct + WhiteKernel':
+            kernel = DotProduct() + WhiteKernel()
         gp_model = GaussianProcessRegressor(kernel=kernel)
         gp_model.fit(Xtrain, Ytrain)
-
-        st.write(Xtest.columns.tolist())
 
         Ypred, Ystd = gp_model.predict(Xtest, return_std=True)
         
@@ -70,20 +70,23 @@ class Mobo4mat:
             HV_values.set_index(Xtest.index, inplace=True)
 
             max_idx = HV_values.nlargest(number, 'HV values').index
-
+            
+            Ypred_recommend = Ypred.iloc[max_idx]
             if objective == 'max':
+                Ypred_recommend = - Ypred_recommend
                 recommend_point = -Xtest.loc[max_idx]
-            elif objective == 'min':
+            elif objective == 'min':        
                 recommend_point = Xtest.loc[max_idx]
-            # Xtest = Xtest.drop(max_idx)
+
             print('The maximum value of HV: \n ', tabulate(HV_values.loc[max_idx].values))
+            print('The recommended value is : \n ', tabulate(Ypred_recommend))
             print('The recommended point is :\n', tabulate(recommend_point.values, headers = feature_name+target_name, tablefmt = 'pretty'))
 
         elif method == 'EHVI':
             pass
         elif method == 'EGO':
             pass
-        return HV_values.loc[max_idx].values, recommend_point
+        return HV_values.loc[max_idx].values, recommend_point, Ypred_recommend
 
     def non_dominated_sorting(self, fitness_values): # min
         num_solutions = fitness_values.shape[0]
@@ -136,11 +139,11 @@ class Mobo4mat:
             S += (pareto_data[i,0] - pareto_data[i+1,0]) * (pareto_data[0,1] - pareto_data[i+1,1])
         return S
     
-# df = pd.read_csv('./UTS-EC.csv')
-# vs = pd.read_csv('./visual samples.csv')
+# df = pd.read_csv('./RAFM-dataset.csv')
+# vs = pd.read_csv('./RAFM-Visual.csv')
 # Xtrain = df.iloc[:,:-2]
 # Ytrain = df.iloc[:,-2:]
 
 # mobo = Mobo4mat()
-
-# mobo.fit(X = Xtrain, y = Ytrain, visual_data=vs, method='HV',number= 1, objective='max', ref_point=[50, 50])
+# print('wait....')
+# mobo.fit(X = Xtrain, y = Ytrain, visual_data=vs, method='HV',number= 1,kernel_option='DotProduct + WhiteKernel', objective='max', ref_point=[50, 50])

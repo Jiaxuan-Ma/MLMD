@@ -38,7 +38,7 @@ def show():
             inputs['method'] = st.selectbox('method', ['HV', 'EHVI','EGO'])
             inputs['normalize'] = st.selectbox('normalize',[None, 'StandardScaler', 'MinMaxScaler'])
             inputs['num'] = st.number_input('number', 1, 10, 1)
-
+            inputs['kernel'] = st.selectbox('kernel', ['rbf', 'DotProduct + WhiteKernel'])
             # inputs['n dim'] = st.number_input('variable dim', 1, 20, 1)
             # inputs['size pop'] = st.number_input('size pop', 1, 500, 50)
             # inputs['max iter'] = st.number_input('max iter', 1, 10000, 200)

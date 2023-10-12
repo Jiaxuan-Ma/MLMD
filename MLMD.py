@@ -85,6 +85,11 @@ from pymoo.algorithms.moo.nsga2 import SBX as nsgaSBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.termination import get_termination
+from pymoo.algorithms.moo.sms import SMSEMOA
+from pymoo.algorithms.moo.age import AGEMOEA
+from pymoo.operators.crossover.pntx import TwoPointCrossover
+from pymoo.operators.mutation.bitflip import BitflipMutation
+from pymoo.operators.sampling.rnd import BinaryRandomSampling
 
 from sko.PSO import PSO
 from sko.DE import DE
@@ -3190,7 +3195,7 @@ elif select_option == "主动学习":
                 
                 ref_point = []
                 for i in range(len(target_selected_option)):
-                    ref_point_loc = st.number_input(target_selected_option[i] + ' ref location', 0, 100000, 50)
+                    ref_point_loc = st.number_input(target_selected_option[i] + ' ref location', 0, 10000, 0)
                     ref_point.append(ref_point_loc)
                 colored_header(label="Optimize", description=" ",color_name="violet-70")
                 with st.container():
@@ -3199,21 +3204,21 @@ elif select_option == "主动学习":
                     if reg.Xtrain.columns.tolist() != reg.Xtest.columns.tolist():
                         st.error('the feature number in Visual sample file is wrong')
                         st.stop()
-                    HV_value, recommend_point = mobo.fit(X = reg.Xtrain, y = reg.Ytrain, visual_data=reg.Xtest, 
-                                                    method=inputs['method'],number= inputs['num'], objective=inputs['objective'], ref_point=ref_point)
+                    HV_value, recommend_point, Ypred_recommend = mobo.fit(X = reg.Xtrain, y = reg.Ytrain, visual_data=reg.Xtest, 
+                                                    method=inputs['method'],kernel_option=inputs['kernel'],number= inputs['num'], objective=inputs['objective'], ref_point=ref_point)
                     HV_value = pd.DataFrame(HV_value, columns=["HV value"]) 
-                    st.write(HV_value)
+
                     recommend_point = pd.DataFrame(recommend_point, columns=feature_name)  
                     
                     if inputs['normalize'] == 'StandardScaler':
                         recommend_point  = inverse_normalize(recommend_point, scaler, "StandardScaler")
                     elif inputs['normalize'] == 'MinMaxScaler':
                         recommend_point  = inverse_normalize(recommend_point, scaler, "MinMaxScaler")
-                    
+                    st.write(Ypred_recommend)
                     st.write(recommend_point)
                     tmp_download_link = download_button(recommend_point, f'推荐试验样本.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True) 
-                
+
                 with st.expander('visual samples'):
                     if inputs['normalize'] == 'StandardScaler':
                         reg.Xtest  = inverse_normalize(reg.Xtest, scaler, "StandardScaler")
@@ -3687,89 +3692,91 @@ elif select_option == "代理优化":
 
             if button_train:               
                 plot = customPlot()  
-                if inputs['model'] == 'NSGA-II':
-                    alg = NSGA2(
-                        pop_size=inputs['size pop'],
-                        # n_offsprings=inputs['n_offsprings'],
-                        crossover=nsgaSBX(prob=0.9, eta=15),
-                        mutation=PM(eta=20),
-                        eliminate_duplicates=True
+                alg = NSGA2(
+                    pop_size=inputs['size pop'],
+                    # n_offsprings=inputs['n_offsprings'],
+                    crossover=nsgaSBX(prob=0.9, eta=15),
+                    mutation=PM(eta=20),
+                    eliminate_duplicates=True
                     )
-                    termination = get_termination("n_gen", inputs['max iter'])                    
-                    class MyProblem(ElementwiseProblem):
-                        def __init__(self):
-                            super().__init__(n_var=inputs['n dim'],
-                                            n_obj=2,
-                                            xl=np.array(inputs['lb']),
-                                            xu=np.array(inputs['ub']))
-                        def _evaluate(self, x, out, *args, **kwargs):
-                            x = x.reshape(1,-1)
-                            y1_pred = model_1.predict(x)
-                            if inputs['objective'] == 'max':
-                                y1_pred = -y1_pred
-                            y2_pred = model_2.predict(x)
-                            if inputs['objective'] == 'max':
-                                y2_pred = -y2_pred
-                            out["F"] = [y1_pred, y2_pred]
-    
-                    problem = MyProblem()                    
-                    res = minimize(problem,
-                                    alg,
-                                    termination,
-                                    seed=inputs['random state'],
-                                    save_history=True,
-                                    verbose=False)
-                    res.F[:, [0, 1]] = res.F[:, [1, 0]]
-                    if inputs['objective'] == 'max':
-                        best_y = res.F
-                        targets = - targets
-                        iter_data = np.concatenate([targets.values, best_y], axis = 0)
-                        iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
-                        iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
-                        iter_pareto_front = -iter_pareto_front       
-                        pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
-                        pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
-                        pareto_front = -pareto_front
-                        targets = - targets
-                        best_y = - res.F
+                if inputs['model'] == 'SMSEMOA':
+                    alg = SMSEMOA()
 
-                    else:
-                        best_y = res.F
-                        iter_data = np.concatenate([targets.values, best_y], axis = 0)
-                        iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
-                        iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
-                    
-                    with plt.style.context(['nature','no-latex']):
-                        fig, ax = plt.subplots()
-                        ax.plot(iter_pareto_front[target_selected_option[0]],iter_pareto_front[target_selected_option[1]], 'r--')
-                        ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
-                        ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
-                        ax.scatter(best_y[:, 0], best_y[:,1])
-                        ax.set_xlabel(target_selected_option[0])
-                        ax.set_ylabel(target_selected_option[1])
-                        ax.set_title('Pareto front of visual space')
-                        st.pyplot(fig)                    
-                    best_x = res.X
+                termination = get_termination("n_gen", inputs['max iter'])                    
+                class MyProblem(ElementwiseProblem):
+                    def __init__(self):
+                        super().__init__(n_var=inputs['n dim'],
+                                        n_obj=2,
+                                        xl=np.array(inputs['lb']),
+                                        xu=np.array(inputs['ub']))
+                    def _evaluate(self, x, out, *args, **kwargs):
+                        x = x.reshape(1,-1)
+                        y1_pred = model_1.predict(x)
+                        if inputs['objective'] == 'max':
+                            y1_pred = -y1_pred
+                        y2_pred = model_2.predict(x)
+                        if inputs['objective'] == 'max':
+                            y2_pred = -y2_pred
+                        out["F"] = [y1_pred, y2_pred]
 
-                    st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+                problem = MyProblem()                    
+                res = minimize(problem,
+                                alg,
+                                termination,
+                                seed=inputs['random state'],
+                                save_history=True,
+                                verbose=False)
+                res.F[:, [0, 1]] = res.F[:, [1, 0]]
+                if inputs['objective'] == 'max':
+                    best_y = res.F
+                    targets = - targets
+                    iter_data = np.concatenate([targets.values, best_y], axis = 0)
+                    iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
+                    iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
+                    iter_pareto_front = -iter_pareto_front       
+                    pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
+                    pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+                    pareto_front = -pareto_front
+                    targets = - targets
+                    best_y = - res.F
 
-                    best_x = truncate_func(best_x)
-                    
-                    best_x = pd.DataFrame(best_x, columns = features_name)
-                    if preprocess == 'StandardScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
-                    elif preprocess == 'MinMaxScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.write(best_x)         
-                        tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    with col2:
-                        st.write(iter_pareto_front)
-                        tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+                else:
+                    best_y = res.F
+                    iter_data = np.concatenate([targets.values, best_y], axis = 0)
+                    iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
+                    iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
+                
+                with plt.style.context(['nature','no-latex']):
+                    fig, ax = plt.subplots()
+                    ax.plot(iter_pareto_front[target_selected_option[0]],iter_pareto_front[target_selected_option[1]], 'r--')
+                    ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
+                    ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
+                    ax.scatter(best_y[:, 0], best_y[:,1])
+                    ax.set_xlabel(target_selected_option[0])
+                    ax.set_ylabel(target_selected_option[1])
+                    ax.set_title('Pareto front of visual space')
+                    st.pyplot(fig)                    
+                best_x = res.X
+
+                st.info('Recommmended Sample')
+                truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+
+                best_x = truncate_func(best_x)
+                
+                best_x = pd.DataFrame(best_x, columns = features_name)
+                if preprocess == 'StandardScaler':
+                    best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                elif preprocess == 'MinMaxScaler':
+                    best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(best_x)         
+                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                with col2:
+                    st.write(iter_pareto_front)
+                    tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     elif sub_option == "迁移学习-多目标代理优化":
         colored_header(label="迁移学习-多目标代理优化",description=" ",color_name="violet-90")
@@ -3863,94 +3870,95 @@ elif select_option == "代理优化":
 
             if button_train:               
                 plot = customPlot()  
-                if inputs['model'] == 'NSGA-II':
-                    alg = NSGA2(
-                        pop_size=inputs['size pop'],
-                        # n_offsprings=inputs['n_offsprings'],
-                        crossover=nsgaSBX(prob=0.9, eta=15),
-                        mutation=PM(eta=20),
-                        eliminate_duplicates=True
+                alg = NSGA2(
+                    pop_size=inputs['size pop'],
+                    # n_offsprings=inputs['n_offsprings'],
+                    crossover=nsgaSBX(prob=0.9, eta=15),
+                    mutation=PM(eta=20),
+                    eliminate_duplicates=True
                     )
-                    termination = get_termination("n_gen", inputs['max iter']) 
-                    TrAdaboostR2_1 = TrAdaboostR2()  
-                    TrAdaboostR2_1.estimator_weight = model_weight_1
-                    TrAdaboostR2_1.estimators = model_1
-                    TrAdaboostR2_1.N = len(model_1)   
-                    TrAdaboostR2_2 = TrAdaboostR2()  
-                    TrAdaboostR2_2.estimator_weight = model_weight_2
-                    TrAdaboostR2_2.estimators = model_2
-                    TrAdaboostR2_2.N = len(model_2)                    
-                    class MyProblem(ElementwiseProblem):
-                        def __init__(self):
-                            super().__init__(n_var=inputs['n dim'],
-                                            n_obj=2,
-                                            xl=np.array(inputs['lb']),
-                                            xu=np.array(inputs['ub']))
-                        def _evaluate(self, x, out, *args, **kwargs):
-                            x = x.reshape(1,-1)
-                            y1_pred = TrAdaboostR2_1.inference(x)
-                            if inputs['objective'] == 'max':
-                                y1_pred = -y1_pred
-                            y2_pred = TrAdaboostR2_2.inference(x)
-                            if inputs['objective'] == 'max':
-                                y2_pred = -y2_pred
-                            out["F"] = [y1_pred, y2_pred]
-    
-                    problem = MyProblem()                    
-                    res = minimize(problem,
-                                    alg,
-                                    termination,
-                                    seed=inputs['random state'],
-                                    save_history=True,
-                                    verbose=False)
-                    res.F[:, [0, 1]] = res.F[:, [1, 0]]
-                    if inputs['objective'] == 'max':
-                        best_y = res.F
-                        targets = - targets
-                        iter_data = np.concatenate([targets.values, best_y], axis = 0)
-                        iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
-                        iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
-                        iter_pareto_front = -iter_pareto_front       
-                        pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
-                        pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
-                        pareto_front = -pareto_front
-                        targets = - targets
-                        best_y = - res.F
+                if inputs['model'] == 'SMSEMOA':
+                    alg = SMSEMOA()
+                termination = get_termination("n_gen", inputs['max iter']) 
+                TrAdaboostR2_1 = TrAdaboostR2()  
+                TrAdaboostR2_1.estimator_weight = model_weight_1
+                TrAdaboostR2_1.estimators = model_1
+                TrAdaboostR2_1.N = len(model_1)   
+                TrAdaboostR2_2 = TrAdaboostR2()  
+                TrAdaboostR2_2.estimator_weight = model_weight_2
+                TrAdaboostR2_2.estimators = model_2
+                TrAdaboostR2_2.N = len(model_2)                    
+                class MyProblem(ElementwiseProblem):
+                    def __init__(self):
+                        super().__init__(n_var=inputs['n dim'],
+                                        n_obj=2,
+                                        xl=np.array(inputs['lb']),
+                                        xu=np.array(inputs['ub']))
+                    def _evaluate(self, x, out, *args, **kwargs):
+                        x = x.reshape(1,-1)
+                        y1_pred = TrAdaboostR2_1.inference(x)
+                        if inputs['objective'] == 'max':
+                            y1_pred = -y1_pred
+                        y2_pred = TrAdaboostR2_2.inference(x)
+                        if inputs['objective'] == 'max':
+                            y2_pred = -y2_pred
+                        out["F"] = [y1_pred, y2_pred]
 
-                    else:
-                        best_y = res.F
-                        iter_data = np.concatenate([targets.values, best_y], axis = 0)
-                        iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
-                        iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
-                    
-                    with plt.style.context(['nature','no-latex']):
-                        fig, ax = plt.subplots()
-                        ax.plot(iter_pareto_front[target_selected_option[0]],iter_pareto_front[target_selected_option[1]], 'r--')
-                        ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
-                        ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
-                        ax.scatter(best_y[:, 0], best_y[:,1])
-                        ax.set_xlabel(target_selected_option[0])
-                        ax.set_ylabel(target_selected_option[1])
-                        ax.set_title('Pareto front of visual space')
-                        st.pyplot(fig)                    
-                    best_x = res.X
+                problem = MyProblem()                    
+                res = minimize(problem,
+                                alg,
+                                termination,
+                                seed=inputs['random state'],
+                                save_history=True,
+                                verbose=False)
+                res.F[:, [0, 1]] = res.F[:, [1, 0]]
+                if inputs['objective'] == 'max':
+                    best_y = res.F
+                    targets = - targets
+                    iter_data = np.concatenate([targets.values, best_y], axis = 0)
+                    iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
+                    iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
+                    iter_pareto_front = -iter_pareto_front       
+                    pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
+                    pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+                    pareto_front = -pareto_front
+                    targets = - targets
+                    best_y = - res.F
 
-                    st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+                else:
+                    best_y = res.F
+                    iter_data = np.concatenate([targets.values, best_y], axis = 0)
+                    iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
+                    iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
+                
+                with plt.style.context(['nature','no-latex']):
+                    fig, ax = plt.subplots()
+                    ax.plot(iter_pareto_front[target_selected_option[0]],iter_pareto_front[target_selected_option[1]], 'r--')
+                    ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
+                    ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
+                    ax.scatter(best_y[:, 0], best_y[:,1])
+                    ax.set_xlabel(target_selected_option[0])
+                    ax.set_ylabel(target_selected_option[1])
+                    ax.set_title('Pareto front of visual space')
+                    st.pyplot(fig)                    
+                best_x = res.X
 
-                    best_x = truncate_func(best_x)
-                    
-                    best_x = pd.DataFrame(best_x, columns = features_name)
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.write(best_x)         
-                        tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    with col2:
-                        st.write(iter_pareto_front)
-                        tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+                st.info('Recommmended Sample')
+                truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
 
+                best_x = truncate_func(best_x)
+                
+                best_x = pd.DataFrame(best_x, columns = features_name)
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(best_x)         
+                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+                with col2:
+                    st.write(iter_pareto_front)
+                    tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
+                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+            
     elif sub_option == "迁移学习-单目标代理优化":
         colored_header(label="迁移学习-单目标代理优化",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
