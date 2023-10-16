@@ -127,7 +127,7 @@ with st.sidebar:
              
     联系方式：jiaxuanma.shu@gmail.com
     ''')
-    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程","聚类降维", "回归预测", "分类预测", "主动学习","迁移学习", "代理优化", "其他"],
+    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程","聚类降维", "回归预测", "分类预测", "迁移学习", "代理优化","主动学习","其他"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
                     menu_icon="boxes", default_index=0)
 if select_option == "平台主页":
