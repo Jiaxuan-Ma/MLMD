@@ -127,7 +127,7 @@ with st.sidebar:
              
     Contact: jiaxuanma.shu@gmail.com
     ''')
-    select_option = option_menu("MLMD", ["Home Page", "Data Basic", "Feature Engineering","Cluster&ReduceDim", "Regression", "Classification", "Transfer Learning", "Surrogate Optimization","Active Learning","Others"],
+    select_option = option_menu("MLMD", ["Home Page", "Data Basic", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Surrogate Optimization","Active Learning","Others"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
                     menu_icon="boxes", default_index=0)
 if select_option == "Home Page":
@@ -678,25 +678,25 @@ elif select_option == "Feature Engineering":
                     tmp_download_link = download_button(data, f'droppedcollinear.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-    elif sub_option == "特征和目标相关性":
-        colored_header(label="特征和目标相关性",description=" ",color_name="violet-90")
+    elif sub_option == "Feature & Target Correlation":
+        colored_header(label="Feature & Target Correlation",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)
         if file is not None:
             df = pd.read_csv(file)
             # 检测缺失值
             check_string_NaN(df)
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             
@@ -709,19 +709,19 @@ elif select_option == "Feature Engineering":
             with col_target:   
                 st.write(targets.head())
         
-            colored_header(label="丢弃与目标的低相关性特征",description=" ",color_name="violet-70")
+            colored_header(label="Drop low correlation feature",description=" ",color_name="violet-70")
             fs = FeatureSelector(features, targets)
             plot = customPlot() 
-            target_selected_option = st.selectbox('选择特征', list(fs.targets))
+            target_selected_option = st.selectbox('feature', list(fs.targets))
             col1, col2 = st.columns([1,3])
             
             with col1:  
-                corr_method = st.selectbox("相关性分析方法",["pearson","spearman","kendall","MIR"], key=15)  
+                corr_method = st.selectbox("correlation analysis method",["pearson","spearman","kendall","MIR"], key=15)  
                 if corr_method != "MIR":
-                    option_dropped_threshold = st.slider('相关性阈值',0.0, 1.0,0.0)
+                    option_dropped_threshold = st.slider('correlation threshold',0.0, 1.0,0.0)
                 if corr_method == 'MIR':
                     options_seed = st.checkbox('random state 1024',True)
-                with st.expander('绘图参数'):
+                with st.expander('plot parameters'):
                     options_selected = [plot.set_title_fontsize(11),plot.set_label_fontsize(12),
                         plot.set_tick_fontsize(13),plot.set_legend_fontsize(14),plot.set_color('bin color',19,16)]
                 
@@ -736,10 +736,10 @@ elif select_option == "Feature Engineering":
                     corr_f_t = pd.concat([fs.features_dropped_f_t, target_selected], axis=1).corr(corr_method)[target_selected_option][:-1]
 
                     plot.corr_feature_target(options_selected, corr_f_t)
-                    with st.expander('处理之后的数据'):
+                    with st.expander('dropped data'):
                         data = pd.concat([fs.features_dropped_f_t, targets], axis=1)
                         st.write(data)
-                        tmp_download_link = download_button(data, f'丢弃与目标的低相关性特征数据.csv', button_text='download')
+                        tmp_download_link = download_button(data, f'droplowcorr.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)
                 else:
                     if options_seed:
@@ -751,25 +751,24 @@ elif select_option == "Feature Engineering":
                     plot.corr_feature_target_mir(options_selected, corr_mir)
             st.write('---')
 
-    elif sub_option == "One-hot编码":
-        colored_header(label="One-hot编码",description=" ",color_name="violet-90")
+    elif sub_option == "One-hot Coding":
+        colored_header(label="One-hot Coding",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)
         if file is not None:
             df = pd.read_csv(file)
-            # 检测缺失值
             check_string_NaN(df)
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and Target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             
@@ -781,10 +780,7 @@ elif select_option == "Feature Engineering":
                 st.write(features.head())
             with col_target:   
                 st.write(targets.head())
-        
-        #=============== drop major missing features ================
     
-            colored_header(label="特征变量one-hot编码",description=" ",color_name="violet-70")
             fs = FeatureSelector(features, targets)
             plot = customPlot() 
             str_col_list = fs.features.select_dtypes(include=['object']).columns.tolist()
@@ -793,29 +789,29 @@ elif select_option == "Feature Engineering":
             # delete origin string columns
             data = data.drop(str_col_list, axis=1)
             st.write(data)
-            tmp_download_link = download_button(data, f'特征变量one-hot编码数据.csv', button_text='download')
+            tmp_download_link = download_button(data, f'one-hotcoding.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
             st.write('---')
     
-    elif sub_option == "特征重要性":
-        colored_header(label="特征重要性",description=" ",color_name="violet-90")
+    elif sub_option == "Feature Importance Rank":
+        colored_header(label="Feature Importance Rank",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)
         if file is not None:
             df = pd.read_csv(file)
             # 检测缺失值
             check_string_NaN(df)
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)        
             # features
@@ -829,9 +825,9 @@ elif select_option == "Feature Engineering":
     
             fs = FeatureSelector(features,targets)
 
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            colored_header(label="target", description=" ", color_name="violet-70")
 
-            target_selected_name = st.selectbox('目标变量', list(fs.targets)[::-1])
+            target_selected_name = st.selectbox('target', list(fs.targets)[::-1])
 
             fs.targets = targets[target_selected_name]
             
@@ -844,14 +840,13 @@ elif select_option == "Feature Engineering":
             colored_header(label="Training", description=" ",color_name="violet-70")
 
             inputs, col2 = template_alg.show()
-            # st.write(inputs)
 
             if inputs['model'] == 'LinearRegressor':
                 
                 fs.model = LinearR()
 
                 with col2:
-                    option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
+                    option_cumulative_importance = st.slider('cumulative importance threshold',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
                         cv = st.number_input('cv',1,20,5)
@@ -889,7 +884,7 @@ elif select_option == "Feature Engineering":
                 fs.model = Lasso(random_state=inputs['random state'])
 
                 with col2:
-                    option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
+                    option_cumulative_importance = st.slider('cumulative importance threshold',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
                         cv = st.number_input('cv',1,20,5)
@@ -932,7 +927,7 @@ elif select_option == "Feature Engineering":
                 fs.model = Ridge(random_state=inputs['random state'])
 
                 with col2:
-                    option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
+                    option_cumulative_importance = st.slider('cumulative importance threshold',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
                         cv = st.number_input('cv',1,20,5)
@@ -971,7 +966,7 @@ elif select_option == "Feature Engineering":
                 fs.model = Lasso(random_state=inputs['random state'])
 
                 with col2:
-                    option_cumulative_importance = st.slider('累计重要性阈值',0.0, 1.0, 0.95)
+                    option_cumulative_importance = st.slider('cumulative importance threshold',0.0, 1.0, 0.95)
                     Embedded_method = st.checkbox('Embedded method',False)
                     if Embedded_method:
                         cv = st.number_input('cv',1,20,5)
@@ -1014,7 +1009,7 @@ elif select_option == "Feature Engineering":
                                                         min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
                                                         n_jobs=inputs['njobs'])
                         with col2:
-                            option_cumulative_importance = st.slider('累计重要性阈值',0.5, 1.0, 0.95)
+                            option_cumulative_importance = st.slider('cumulative importance threshold',0.5, 1.0, 0.95)
                             Embedded_method = st.checkbox('Embedded method',False)
                             if Embedded_method:
                                 cv = st.number_input('cv',1,20,5)
@@ -1055,27 +1050,27 @@ elif select_option == "Feature Engineering":
 
             st.write('---')
 
-elif select_option == "回归预测":
+elif select_option == "Regression":
 
-    colored_header(label="回归预测",description=" ",color_name="violet-90")
+    colored_header(label="Regression",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
     if file is None:
-        table = PrettyTable(['上传文件名称', '名称','数据说明'])
-        table.add_row(['file_1','dataset','数据集'])
+        table = PrettyTable(['file name', 'class','description'])
+        table.add_row(['file_1','dataset','data file'])
         st.write(table)
     if file is not None:
         df = pd.read_csv(file)
         # 检测缺失值
         check_string_NaN(df)
 
-        colored_header(label="数据信息", description=" ",color_name="violet-70")
+        colored_header(label="Data information", description=" ",color_name="violet-70")
         nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
-        colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+        colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-        target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+        target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
         
         col_feature, col_target = st.columns(2)
         # features
@@ -1089,7 +1084,7 @@ elif select_option == "回归预测":
 # =================== model ====================================
         reg = REGRESSOR(features,targets)
 
-        colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+        colored_header(label="target", description=" ", color_name="violet-70")
 
         target_selected_option = st.selectbox('target', list(reg.targets)[::-1])
 
@@ -1458,8 +1453,6 @@ elif select_option == "回归预测":
                     reg.model = LinearR()
                     
                     reg.LinearRegressor()
-                    # plot = customPlot()
-                    # plot.pred_vs_actual(reg.Ytest, reg.Ypred)
 
                     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
@@ -1603,32 +1596,21 @@ elif select_option == "回归预测":
         if inputs['model'] == 'BaggingRegressor':
             with col2:
                 with st.expander('Operator'):
-                    # preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
 
                     operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if operator == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        # if preprocess == 'StandardScaler':
-                        #     reg.features = StandardScaler().fit_transform(reg.features)
-                        # if preprocess == 'MinMaxScaler':
-                        #     reg.features = MinMaxScaler().fit_transform(reg.features)
                         
                         reg.features = pd.DataFrame(reg.features)    
                         
                         reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
 
                     elif operator == 'cross val score':
-                        # if preprocess == 'StandardScaler':
-                        #     reg.features = StandardScaler().fit_transform(reg.features)
-                        # if preprocess == 'MinMaxScaler':
-                        #     reg.features = MinMaxScaler().fit_transform(reg.features)
+
                         cv = st.number_input('cv',1,20,5)
 
                     elif operator == 'leave one out':
-                        # if preprocess == 'StandardScaler':
-                        #     reg.features = StandardScaler().fit_transform(reg.features)
-                        # if preprocess == 'MinMaxScaler':
-                        #     reg.features = MinMaxScaler().fit_transform(reg.features)
+
                         reg.features = pd.DataFrame(reg.features)    
                         loo = LeaveOneOut()
 
@@ -1639,7 +1621,6 @@ elif select_option == "回归预测":
 
                 if operator == 'train test split':
 
-                # if inputs['base estimator'] == "DecisionTree": 
                     reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                     
@@ -1651,54 +1632,11 @@ elif select_option == "回归预测":
 
                     plot_and_export_results(reg, "BaggingR")
 
-                    
-                    # elif inputs['base estimator'] == "SupportVector": 
-                    #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
-                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                    #     reg.BaggingRegressor()
-
-                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    #     result_data.columns = ['actual','prediction']
-
-                    #     export_cross_val_results(reg, cv, "DTR_cv")
-                    
-                    # elif inputs['base estimator'] == "LinearRegression": 
-                    #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                    #     reg.BaggingRegressor()
-        
-
-                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    #     result_data.columns = ['actual','prediction']
-
-                    #     plot_and_export_results(reg, "BaggingR")
-
                 elif operator == 'cross val score':
-                # if inputs['base estimator'] == "DecisionTree": 
+
                     reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-
-                    # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-
-                    # export_cross_val_results(cvs, "BaggingR_cv")   
                     export_cross_val_results(reg, cv, "BaggingR_cv", inputs['random state'])
-
-                    # elif inputs['base estimator'] == "SupportVector": 
-
-                    #     reg.model = BaggingRegressor(estimator =  SVR(),n_estimators=inputs['nestimators'],
-                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-
-                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-            
-                    #     export_cross_val_results(cvs, "BaggingR_cv")   
-
-                    # elif inputs['base estimator'] == "LinearRegression":
-                    #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-
-                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-            
-                    #     export_cross_val_results(cvs, "BaggingR_cv")   
 
                 elif operator == 'leave one out':
                 # if inputs['base estimator'] == "DecisionTree": 
@@ -1706,19 +1644,6 @@ elif select_option == "回归预测":
                             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                 
                     export_loo_results(reg, loo, "BaggingR_loo")
-
-                    # elif inputs['base estimator'] == "SupportVector": 
-
-                    #     reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
-                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                        
-                    #     export_loo_results(reg, loo, "BaggingR_loo")
-
-                    # elif inputs['base estimator'] == "LinearRegression":
-                    #     reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
-                    #             max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-        
-                    #     export_loo_results(reg, loo, "BaggingR_loo")
 
         if inputs['model'] == 'AdaBoostRegressor':
 
@@ -1740,7 +1665,6 @@ elif select_option == "回归预测":
 
                 if operator == 'train test split':
 
-                    # if inputs['base estimator'] == "DecisionTree": 
                     reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                     
                     reg.AdaBoostRegressor()
@@ -1750,63 +1674,16 @@ elif select_option == "回归预测":
 
                     plot_and_export_results(reg, "AdaBoostR")
                     
-                    # elif inputs['base estimator'] == "SupportVector": 
-
-                    #     reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                        
-                    #     reg.AdaBoostRegressor()
-
-                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    #     result_data.columns = ['actual','prediction']
-
-                    #     plot_and_export_results(reg, "AdaBoostR")
-                    
-                    # elif inputs['base estimator'] == "LinearRegression": 
-                    #     reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                    #     reg.AdaBoostRegressor()
-
-                    #     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    #     result_data.columns = ['actual','prediction']
-                        
-                    #     plot_and_export_results(reg, "AdaBoostR")
-
                 elif operator == 'cross val score':
-                    # if inputs['base estimator'] == "DecisionTree": 
+
                     reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                    # cvs = CVS(reg.model, reg.features, reg.targets, cv = cv)
+
                     export_cross_val_results(reg, cv, "AdaBoostR_cv", inputs['random state'])
-                    #     st.write('mean cross val R2:', cvs.mean())
-                    # elif inputs['base estimator'] == "SupportVector": 
-
-                    #     reg.model =  AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-
-                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-            
-                    #     export_cross_val_results(cvs, "AdaBoostR_cv")  
-
-                    # elif inputs['base estimator'] == "LinearRegression":
-                    #     reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-
-                    #     cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-            
-                    #     export_cross_val_results(cvs, "AdaBoostR_cv")  
 
                 elif operator == 'leave one out':
-                    # if inputs['base estimator'] == "DecisionTree": 
                     reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
                 
                     export_loo_results(reg, loo, "AdaBoostR_loo")
-                    
-                    # elif inputs['base estimator'] == "SupportVector": 
-
-                    #     reg.model = reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                        
-                    #     export_loo_results(reg, loo, "AdaBoostR_loo")
-
-                    # elif inputs['base estimator'] == "LinearRegression":
-                    #     reg.model = reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                                            
-                    #     export_loo_results(reg, loo, "AdaBoostR_loo")
                     
         if inputs['model'] == 'GradientBoostingRegressor':
 
@@ -1834,7 +1711,6 @@ elif select_option == "回归预测":
                         
                         reg.GradientBoostingRegressor()
         
-
                         result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                         result_data.columns = ['actual','prediction']
                         plot_and_export_results(reg, "GradientBoostingR")
@@ -1842,8 +1718,7 @@ elif select_option == "回归预测":
                 elif operator == 'cross val score':
                         reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
                                                             random_state=inputs['random state'])  
-                        # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                        # export_cross_val_results(cvs, "GradientBoostingR_cv")    
+
                         export_cross_val_results(reg, cv, "GradientBoostingR_cv", inputs['random state'])
                 elif operator == 'leave one out':
                         reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
@@ -1885,9 +1760,7 @@ elif select_option == "回归预测":
                         reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                     learning_rate=inputs['learning rate'])
-                        
-                        # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                        # export_cross_val_results(cvs, "DTR_cv")    
+ 
                         export_cross_val_results(reg, cv, "XGBR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
@@ -1928,8 +1801,6 @@ elif select_option == "回归预测":
                 elif operator == 'cross val score':
                         reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
                         
-                        # cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
-                        # export_cross_val_results(cvs, "CatBoostR_cv")    
                         export_cross_val_results(reg, cv, "CatBoostR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
@@ -2000,25 +1871,25 @@ elif select_option == "回归预测":
 
             st.write('---')
                             
-elif select_option == "分类预测":
+elif select_option == "Classification":
 
-    colored_header(label="分类预测",description=" ",color_name="violet-90")
+    colored_header(label="Classification",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
     if file is None:
-        table = PrettyTable(['上传文件名称', '名称','数据说明'])
-        table.add_row(['file_1','dataset','数据集'])
+        table = PrettyTable(['file name', 'class','description'])
+        table.add_row(['file_1','dataset','data file'])
         st.write(table)
     if file is not None:
         df = pd.read_csv(file)
         check_string(df)
-        colored_header(label="数据信息", description=" ",color_name="violet-70")
+        colored_header(label="Data information", description=" ",color_name="violet-70")
         nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
-        colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+        colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-        target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+        target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
         
         col_feature, col_target = st.columns(2)
             
@@ -2037,11 +1908,10 @@ elif select_option == "分类预测":
         target_selected_option = st.selectbox('target', list(clf.targets)[::-1])
 
         clf.targets = pd.DataFrame(targets[target_selected_option])
-        # col_name = []
-        # if check_string(clf.targets):
+
         col_name = list(clf.targets)
         clf.targets[col_name[0]], unique_categories = pd.factorize(clf.targets[col_name[0]])
-        # st.write(fs.targets.head())
+
         colored_header(label="Classifier", description=" ",color_name="violet-30")
 
         model_path = './models/classifiers'
@@ -2072,7 +1942,7 @@ elif select_option == "分类预测":
                             
                     clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
                                                             max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
-                                                               
+
                     clf.DecisionTreeClassifier()
 
                     if not check_string(targets):
@@ -2124,7 +1994,7 @@ elif select_option == "分类预测":
                     export_loo_results_clf(clf, loo, "DTC_loo", col_name, unique_categories)
 
         if inputs['model'] == 'RandomForestClassifier':
-      
+
             with col2:
                 with st.expander('Operator'):
                     data_process = st.selectbox('data process', ('train test split','cross val score','leave one out'), label_visibility='collapsed')
@@ -2181,13 +2051,12 @@ elif select_option == "分类预测":
                     clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
                                                 min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                 
-     
                     cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-     
+
                     export_cross_val_results_clf(clf, cv, "RFRC_cv", col_name, unique_categories, inputs['random state'])
 
                 elif data_process == 'leave one out':
- 
+
                     clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
                                                 min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
                 
@@ -2375,7 +2244,7 @@ elif select_option == "分类预测":
             
             if button_train:
                 if data_process == 'train test split':
-             
+        
                     clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
                                                 max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
@@ -2582,7 +2451,7 @@ elif select_option == "分类预测":
 
             with col2:
                 with st.expander('Operator'):
-                                   
+
                     data_process = st.selectbox('data process', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if data_process == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
@@ -2744,24 +2613,24 @@ elif select_option == "分类预测":
 
         st.write('---')
 
-elif select_option == "聚类降维":
-    colored_header(label="聚类降维",description=" ",color_name="violet-90")
+elif select_option == "Cluster & ReduceDim":
+    colored_header(label="Cluster & ReduceDim",description=" ",color_name="violet-90")
     file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
     if file is None:
-        table = PrettyTable(['上传文件名称', '名称','数据说明'])
-        table.add_row(['file_1','dataset','数据集'])
+        table = PrettyTable(['file name', 'class','description'])
+        table.add_row(['file_1','dataset','data file'])
         st.write(table)
     if file is not None:
         df = pd.read_csv(file)
         check_string_NaN(df)
-        colored_header(label="数据信息", description=" ",color_name="violet-70")
+        colored_header(label="Data information", description=" ",color_name="violet-70")
         nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
         st.write(df_nrow)
 
-        colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+        colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-        target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+        target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
         
         col_feature, col_target = st.columns(2)
             
@@ -2776,7 +2645,7 @@ elif select_option == "聚类降维":
         
        #=============== cluster ================
 
-        colored_header(label="Cluster",description=" ",color_name="violet-70")
+        colored_header(label="Cluster & ReduceDim",description=" ",color_name="violet-70")
         cluster = CLUSTER(features, targets)
 
         # colored_header(label="Choose Target", description=" ", color_name="violet-30")
@@ -2811,7 +2680,7 @@ elif select_option == "聚类降维":
                     c_name=clustered_df.columns[-1]
                     
                     clustered_df.rename(columns={c_name:r_name},inplace=True)
-                    with st.expander('聚类结果'):
+                    with st.expander('cluster'):
                         st.write(clustered_df)
         if inputs['model'] == 'PCA':   
             with col2:
@@ -2845,13 +2714,13 @@ elif select_option == "聚类降维":
                         plt.tight_layout()
                         st.pyplot(fig)   
                     result_data =  PCA_transformed_data
-                    with st.expander('降维结果'):
+                    with st.expander('reduce dim'):
                         st.write(result_data)
                         tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)                    
                 else:
                     result_data =  PCA_transformed_data
-                    with st.expander('降维结果'):
+                    with st.expander('reduce dim'):
                         st.write(result_data)                    
                         tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)   
@@ -2873,39 +2742,37 @@ elif select_option == "聚类降维":
                         plt.tight_layout()
                         st.pyplot(fig)   
                     result_data =  TSNE_transformed_data
-                    with st.expander('降维结果'):
+                    with st.expander('reduce dim'):
                         st.write(result_data)
                         tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)                    
                 else:
                     result_data =  TSNE_transformed_data
-                    with st.expander('降维结果'):
+                    with st.expander('reduce dim'):
                         st.write(result_data)                    
                         tmp_download_link = download_button(result_data, f'dim reduction data.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)           
         st.write('---')   
 
-elif select_option == "主动学习":
+elif select_option == "Active Learning":
     with st.sidebar:
-        sub_option = option_menu(None, ["单目标主动学习", "多目标主动学习"])
+        sub_option = option_menu(None, ["Single-objective Active Learning", "Multi-objective Active Learning"])
     
-    if sub_option == "单目标主动学习":
+    if sub_option == "Single-objective Active Learning":
 
-        colored_header(label="单目标主动学习",description=" ",color_name="violet-90")
+        colored_header(label="Single-objective Active Learning",description=" ",color_name="violet-90")
 
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
         if len(file) != 2:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
-            table.add_row(['file_2','visual data','虚拟采样点'])
+            table = PrettyTable(['file name', 'class','descriptor'])
+            table.add_row(['file_1','dataset','data file'])
+            table.add_row(['file_2','visual data','design space'])
             st.write(table)      
         if len(file) == 2:
             
-            colored_header(label="数据信息",description=" ",color_name="violet-70")
+            colored_header(label="Data information",description=" ",color_name="violet-70")
 
-            # with st.expander('Data Information'):
             df = pd.read_csv(file[0])
-            # if len(file) == 2:
             df_vs = pd.read_csv(file[1])
             check_string_NaN(df)
 
@@ -2913,9 +2780,9 @@ elif select_option == "主动学习":
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             
@@ -2930,7 +2797,7 @@ elif select_option == "主动学习":
 
             sp = SAMPLING(features, targets)
 
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            colored_header(label="target", description=" ", color_name="violet-70")
 
             target_selected_option = st.selectbox('target', list(sp.targets))
             
@@ -2947,7 +2814,7 @@ elif select_option == "主动学习":
             if inputs['model'] == 'BayeSampling':
 
                 with col2:
-                    # if len(file) == 2:
+
                     sp.vsfeatures = df_vs
                     st.info('You have upoaded the visual sample point file.')
                     feature_name = sp.features.columns.tolist()
@@ -3027,17 +2894,17 @@ elif select_option == "主动学习":
                     tmp_download_link = download_button(sp.sample_point, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-    elif sub_option == "多目标主动学习":
+    elif sub_option == "Multi-objective Active Learning":
 
-        colored_header(label="多目标主动学习",description=" ",color_name="violet-90")
+        colored_header(label="Multi-objective Active Learning",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
         if len(file) != 2:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
-            table.add_row(['file_2','visual data','虚拟采样点'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
+            table.add_row(['file_2','visual data','design space'])
             st.write(table)
         elif len(file) == 2:    
-            colored_header(label="数据信息",description=" ",color_name="violet-70")
+            colored_header(label="Data information",description=" ",color_name="violet-70")
             # with st.expander('Data Information'):
             df = pd.read_csv(file[0])
         
@@ -3048,9 +2915,9 @@ elif select_option == "主动学习":
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=2, max_value=2, value=2)
+            target_num = st.number_input('target number',  min_value=2, max_value=2, value=2)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -3067,7 +2934,7 @@ elif select_option == "主动学习":
     # =================== model ====================================
             reg = REGRESSOR(features,targets)
 
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            colored_header(label="target", description=" ", color_name="violet-70")
             target_selected_option = st.multiselect('target', list(reg.targets)[::-1], default=targets.columns.tolist())
             
             reg.targets = targets[target_selected_option]
@@ -3085,29 +2952,11 @@ elif select_option == "主动学习":
                 mobo = Mobo4mat()
 
                 with col2:
-                    # if len(file) == 2:
-                    # features
-                    # vs_features = df_vs.iloc[:,:-target_num]
+
                     vs_features = df_vs
-                    # targets
-                    # vs_targets = df_vs.iloc[:,-target_num:]
+
                     reg.Xtest = vs_features
                     st.info('You have upoaded the visual sample point file.')
-                    # else:
-                    #     feature_name = features.columns.tolist()
-                    #     mm = MinMaxScaler()
-                    #     mm.fit(features)
-                    #     data_min = mm.data_min_
-                    #     data_max = mm.data_max_
-                    #     trans_features = mm.transform(features)
-                    #     min_ratio, max_ratio = st.slider('sample space ratio', 0.8, 1.2, (1.0, 1.0))
-            
-                    #     sample_num = st.selectbox('sample number', ['10','20','50','80','100'])
-                    #     feature_num = trans_features.shape[1]
-
-                    #     vs = np.linspace(min_ratio * data_min, max_ratio *data_max, int(sample_num))  
-                    #     reg.Xtest = pd.DataFrame(vs, columns=feature_name)
-
 
                     if inputs['normalize'] == 'StandardScaler':
                         reg.X = pd.concat([reg.Xtrain, reg.Xtest])
@@ -3126,7 +2975,7 @@ elif select_option == "主动学习":
                 pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
 
                 if inputs['objective'] == 'max':  
-                    # st.write(type(reg.targets.values))  
+
                     reg.targets = - reg.targets
                     pareto_front = find_non_dominated_solutions(reg.targets.values, target_selected_option)
                     pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
@@ -3170,9 +3019,9 @@ elif select_option == "主动学习":
                         recommend_point  = inverse_normalize(recommend_point, scaler, "StandardScaler")
                     elif inputs['normalize'] == 'MinMaxScaler':
                         recommend_point  = inverse_normalize(recommend_point, scaler, "MinMaxScaler")
-                    # st.write(Ypred_recommend)
+
                     st.write(recommend_point)
-                    tmp_download_link = download_button(recommend_point, f'推荐试验样本.csv', button_text='download')
+                    tmp_download_link = download_button(recommend_point, f'recommended.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True) 
 
                 with st.expander('visual samples'):
@@ -3184,28 +3033,22 @@ elif select_option == "主动学习":
                     tmp_download_link = download_button(reg.Xtest, f'visual samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)                   
 
-elif select_option == "迁移学习":
+elif select_option == "Transfer Learning":
     with st.sidebar:
-        # sub_option = option_menu(None, ["Boosting", "Neural Network"])
         sub_option = option_menu(None, ["Boosting"])
     if sub_option == "Boosting":
-        colored_header(label="基于boosting迁移学习",description=" ",color_name="violet-90")
-        # sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
-        #                         icons=['list-task',  "list-task","list-task"],
-        #                         menu_icon="cast", default_index=0, orientation="horizontal")
+        colored_header(label="Sample-based Transfer Learning ",description=" ",color_name="violet-90")
+
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 3:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','test_data','无标签目标域数据'])
-            table.add_row(['file_2','target_data','有标签目标域数据'])
-            table.add_row(['file_3','source_data_1','1 源域数据'])
+            table = PrettyTable(['file name', 'class','descirption'])
+            table.add_row(['file_1','test_data','target domain with no-label'])
+            table.add_row(['file_2','target_data','target domain with label'])
+            table.add_row(['file_3','source_data_1','1 source domain'])
             table.add_row(['...','...','...'])
-            table.add_row(['file_n','source_data_n','n 源域数据'])
+            table.add_row(['file_n','source_data_n','n source domain'])
             st.write(table)
-        # elif len(file) == 3:
-        #     df_test = pd.read_csv(file[0])
-        #     df_target = pd.read_csv(file[1])
-        #     df_source = pd.read_csv(file[2])
+
         elif len(file) >= 3:
             df_test = pd.read_csv(file[0])
             df_target = pd.read_csv(file[1])
@@ -3213,15 +3056,14 @@ elif select_option == "迁移学习":
             df = [pd.read_csv(f) for f in source_files]
             df_source = pd.concat(df, axis=0)
 
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
 
-            # show target data
             nrow = st.slider("rows", 1, len(df_target), 5)
             df_nrow = df_target.head(nrow)
             st.write(df_nrow)
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -3236,11 +3078,9 @@ elif select_option == "迁移学习":
             with col_target:   
                 st.write(target_targets.head())
     # =================== model ====================================
-            # features = pd.concat([source_features, target_features], axis=0)
-            # targets = pd.concat([source_targets,target_targets], axis=0)
             reg = REGRESSOR(target_features, target_targets)
 
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            colored_header(label="target", description=" ", color_name="violet-70")
 
             target_selected_option = st.selectbox('target', list(reg.targets)[::-1])
 
@@ -3253,7 +3093,7 @@ elif select_option == "迁移学习":
             template_alg = model_platform(model_path)
 
             inputs, col2 = template_alg.show()
-            # TrAdaBoostR2 = template_alg.TrAdaBoostR2(reg.)
+ 
             with col2:
                 if inputs['max iter'] > source_features.shape[0]:
                     st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
@@ -3276,17 +3116,15 @@ elif select_option == "迁移学习":
                         st.write('R2: {}'.format(r2))
                         result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
                         result_data.columns = ['actual','prediction']
-                        with st.expander('预测结果'):
+                        with st.expander('prediction'):
                             st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                            tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
                     except KeyError:
                         st.write(prediction)
-                        tmp_download_link = download_button(prediction, f'预测结果.csv', button_text='download')
+                        tmp_download_link = download_button(prediction, f'prediction.csv', button_text='download')
                         st.markdown(tmp_download_link, unsafe_allow_html=True)         
-                    with st.expander("基学习器及权重下载"):
-                        # with open('estimator_wetesrt.pickle', 'wb') as file:
-                        #     pickle.dump(TrAdaboostR2.estimator_weight, file)
+                    with st.expander("weak estimators"):
                         st.write(TrAdaboostR2.estimator_weight)
                         model_name = 'estimators'
                         tmp_download_link = download_button(TrAdaboostR2.estimators, model_name+f'.pickle', button_text='download')
@@ -3299,35 +3137,29 @@ elif select_option == "迁移学习":
                 st.write('Please wait...')
             elif inputs['model'] == 'TwoStageTrAdaboostR2-revised':
                 st.write('Please wait...')
-                st.write('---')
+                st.write('---')   
 
-    # elif sub_option == "Neural Network":
-    #     colored_header(label="基于Neural Network迁移学习",description=" ",color_name="violet-90")
-    #     sub_sub_option = option_menu(None, ["样本迁移","特征迁移","参数迁移"],
-    #                             icons=['list-task',  "list-task","list-task"],
-    #                             menu_icon="cast", default_index=0, orientation="horizontal")      
-
-elif select_option == "代理优化":
+elif select_option == "Surrogate Optimization":
     with st.sidebar:
-        sub_option = option_menu(None, ["单目标代理优化", "多目标代理优化","迁移学习-单目标代理优化","迁移学习-多目标代理优化"])
-    if sub_option == "单目标代理优化":
+        sub_option = option_menu(None, ["Single-objective Surrogate Optimization", "Multi-objective Surrogate Optimization","Single-objective Surrogate Optimization (TL)","Multi-objective Surrogate Optimization (TL)"])
+    if sub_option == "Single-objective Surrogate Optimization":
 
-        colored_header(label="单目标代理优化（成分/工艺）",description=" ",color_name="violet-90")
+        colored_header(label="Single-objective Surrogate Optimization",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 3:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
-            table.add_row(['file_2','boundary','设计变量上下界'])
-            table.add_row(['file_3','model','模型'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
+            table.add_row(['file_2','boundary','feature design constraint'])
+            table.add_row(['file_3','model','model'])
             st.write(table)
         
         if len(file) >= 3:
             df = pd.read_csv(file[0])
             check_string_NaN(df)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -3347,7 +3179,7 @@ elif select_option == "代理优化":
             array_vars_min = np.array(vars_min).reshape(1,-1)
             array_vars_max = np.array(vars_max).reshape(1,-1)
             vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
-            colored_header(label="特征变量范围", description=" ", color_name="violet-70")
+            colored_header(label="feature design constriant", description=" ", color_name="violet-70")
             vars_bound = pd.DataFrame(vars_bound, columns=features_name)
             st.write(vars_bound)
         
@@ -3362,7 +3194,7 @@ elif select_option == "代理优化":
             with col2:
                 preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
                 data = pd.concat([features,vars_bound])
-                # st.write(data)
+               
                 if preprocess == 'StandardScaler':
                     features, scaler = normalize(data, 'StandardScaler')
                     vars_bound = features.tail(2)
@@ -3454,7 +3286,7 @@ elif select_option == "代理优化":
                     best_x = res.X
                     hist = res.history
                     hist_F = []              # the objective space values in each generation
-                    # st.write("Best solution found: \nX = %s\nF = %s" % (best_x, y_pred))
+            
                     for algo in hist:
                         # retrieve the optimum from the algorithm
                         opt = algo.opt
@@ -3549,24 +3381,24 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 
-    elif sub_option == "多目标代理优化":
+    elif sub_option == "Multi-objective surrogate OPtimization":
 
-        colored_header(label="多目标代理优化（成分/工艺）",description=" ",color_name="violet-90")
+        colored_header(label="Multi-objective surrogate OPtimization",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 4:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
-            table.add_row(['file_2','boundary','设计变量上下界'])
-            table.add_row(['file_3','model_1','目标1 模型'])
-            table.add_row(['file_4','model_2','目标2 模型'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
+            table.add_row(['file_2','boundary','design feature constraint'])
+            table.add_row(['file_3','model_1','obj1 model'])
+            table.add_row(['file_4','model_2','obj2 model'])
             table.add_row(['file_5','...','...'])
             st.write(table)
         elif len(file) >= 4:        
             df = pd.read_csv(file[0])
             check_string_NaN(df)
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=2, max_value=2, value=2)
+            target_num = st.number_input('target number',  min_value=2, max_value=2, value=2)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -3577,7 +3409,7 @@ elif select_option == "代理优化":
                 st.write(features.head())
             with col_target:   
                 st.write(targets.head())
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            colored_header(label="target", description=" ", color_name="violet-70")
             target_selected_option = st.multiselect('target', list(targets)[::-1], default=targets.columns.tolist())
             df_var = pd.read_csv(file[1])
             features_name = df_var.columns.tolist()
@@ -3587,7 +3419,7 @@ elif select_option == "代理优化":
             array_vars_min = np.array(vars_min).reshape(1,-1)
             array_vars_max = np.array(vars_max).reshape(1,-1)
             vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
-            colored_header(label="特征变量范围", description=" ", color_name="violet-70")
+            colored_header(label="Feature design constraint", description=" ", color_name="violet-70")
             vars_bound = pd.DataFrame(vars_bound, columns=features_name)
             st.write(vars_bound)
 
@@ -3615,7 +3447,6 @@ elif select_option == "代理优化":
                 st.warning('the variable number should be %d' % vars_bound.shape[1])
             else:
                 st.info("the variable number is correct")
-
 
                 pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
                 pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
@@ -3651,7 +3482,6 @@ elif select_option == "代理优化":
                 plot = customPlot()  
                 alg = NSGA2(
                     pop_size=inputs['size pop'],
-                    # n_offsprings=inputs['n_offsprings'],
                     crossover=nsgaSBX(prob=0.9, eta=15),
                     mutation=PM(eta=20),
                     eliminate_duplicates=True
@@ -3738,24 +3568,24 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-    elif sub_option == "迁移学习-多目标代理优化":
-        colored_header(label="迁移学习-多目标代理优化",description=" ",color_name="violet-90")
+    elif sub_option == "Multi-objective Surrogate Optimization (TL)":
+        colored_header(label="Multi-objective Surrogate Optimization (TL)",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 6:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
-            table.add_row(['file_2','boundary','设计变量上下界'])
-            table.add_row(['file_3','weights_1','目标1 学习器权重'])
-            table.add_row(['file_4','weights_2','目标2 学习器权重'])
-            table.add_row(['file_5','model_1','目标1 模型1'])
-            table.add_row(['file_6','model_2','目标2 模型2'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
+            table.add_row(['file_2','boundary','feature design constraint'])
+            table.add_row(['file_3','weights_1','obj1 estimator weight'])
+            table.add_row(['file_4','weights_2','obj2 estimator weight'])
+            table.add_row(['file_5','model_1','obj1 model1'])
+            table.add_row(['file_6','model_2','obj2 model2'])
             st.write(table)
         if len(file) >= 6:
             df = pd.read_csv(file[0])
             check_string_NaN(df)
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=2, max_value=2, value=2)
+            target_num = st.number_input('target number',  min_value=2, max_value=2, value=2)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -3766,7 +3596,7 @@ elif select_option == "代理优化":
                 st.write(features.head())
             with col_target:   
                 st.write(targets.head())
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            colored_header(label="target", description=" ", color_name="violet-70")
             target_selected_option = st.multiselect('target', list(targets)[::-1], default=targets.columns.tolist())
             df_var = pd.read_csv(file[1])
             features_name = df_var.columns.tolist()
@@ -3776,7 +3606,7 @@ elif select_option == "代理优化":
             array_vars_min = np.array(vars_min).reshape(1,-1)
             array_vars_max = np.array(vars_max).reshape(1,-1)
             vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
-            colored_header(label="特征变量范围", description=" ", color_name="violet-70")
+            colored_header(label="Feature design constraint", description=" ", color_name="violet-70")
             vars_bound = pd.DataFrame(vars_bound, columns=features_name)
             st.write(vars_bound)
 
@@ -3833,7 +3663,6 @@ elif select_option == "代理优化":
                 plot = customPlot()  
                 alg = NSGA2(
                     pop_size=inputs['size pop'],
-                    # n_offsprings=inputs['n_offsprings'],
                     crossover=nsgaSBX(prob=0.9, eta=15),
                     mutation=PM(eta=20),
                     eliminate_duplicates=True
@@ -3922,14 +3751,14 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
             
-    elif sub_option == "迁移学习-单目标代理优化":
-        colored_header(label="迁移学习-单目标代理优化",description=" ",color_name="violet-90")
+    elif sub_option == "Single-objective Surrogate Optimization (TL)":
+        colored_header(label="Single-objective Surrogate Optimization (TL)",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 3:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','boundary','设计变量上下界'])
-            table.add_row(['file_2','weights','学习器权重'])
-            table.add_row(['file_3','model','模型'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','boundary','feature design constraint'])
+            table.add_row(['file_2','weights','estimator weight'])
+            table.add_row(['file_3','model','model'])
             st.write(table)
         elif len(file) >= 3:
 
@@ -3941,7 +3770,7 @@ elif select_option == "代理优化":
             array_vars_min = np.array(vars_min).reshape(1,-1)
             array_vars_max = np.array(vars_max).reshape(1,-1)
             vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
-            colored_header(label="特征变量范围", description=" ", color_name="violet-70")
+            colored_header(label="Feature design constraint", description=" ", color_name="violet-70")
             vars_bound = pd.DataFrame(vars_bound, columns=features_name)
             st.write(vars_bound)
         
@@ -4120,29 +3949,28 @@ elif select_option == "代理优化":
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                     
-elif select_option == "其他":
+elif select_option == "Others":
     with st.sidebar:
-        sub_option = option_menu(None, ["模型推理","可解释性机器学习"])
-    if sub_option == "可解释性机器学习":
-        colored_header(label="可解释性机器学习",description=" ",color_name="violet-90")
+        sub_option = option_menu(None, ["Model Inference","Interpretable Machine Learning"])
+    if sub_option == "Interpretable Machine Learning":
+        colored_header(label="Interpretable Machine Learning",description=" ",color_name="violet-90")
 
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)        
         if file is not None:
             df = pd.read_csv(file)
-            # 检测缺失值
             check_string_NaN(df)
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
                 
@@ -4203,14 +4031,14 @@ elif select_option == "其他":
             interact_feature = st.selectbox('interact feature', list_features)
             st_shap(shap.dependence_plot(feature, shap_values, fs.features, display_features=fs.features,interaction_index=interact_feature))
 
-    elif sub_option == "模型推理":
+    elif sub_option == "Model Inference":
         
-        colored_header(label="模型推理",description=" ",color_name="violet-90")
+        colored_header(label="Model Inference",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 2:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','data set','数据集'])
-            table.add_row(['file_2','model','模型'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','data set','data file'])
+            table.add_row(['file_2','model','model'])
             st.write(table)
         elif len(file) == 2:
             df = pd.read_csv(file[0])
@@ -4218,14 +4046,14 @@ elif select_option == "其他":
      
             check_string_NaN(df)
 
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
 
             col_feature, col_target = st.columns(2)
             # features
@@ -4236,7 +4064,7 @@ elif select_option == "其他":
                 st.write(features.head())
             with col_target:   
                 st.write(targets.head())    
-            colored_header(label="选择目标变量", description=" ", color_name="violet-70")
+            colored_header(label="target", description=" ", color_name="violet-70")
 
             target_selected_option = st.selectbox('target', list(targets)[::-1])
 
@@ -4256,9 +4084,9 @@ elif select_option == "其他":
             st.write('R2: {}'.format(r2))
             result_data = pd.concat([targets, pd.DataFrame(prediction)], axis=1)
             result_data.columns = ['actual','prediction']
-            with st.expander('预测结果'):
+            with st.expander('prediction'):
                 st.write(result_data)
-                tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+                tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             st.write('---')
 
