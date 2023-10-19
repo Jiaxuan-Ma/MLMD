@@ -515,7 +515,6 @@ class customPlot:
         return options_selected
     
     def set_color(self, name, num, key):
-        # name: bin or line
         options = self.color_option
         options_selected = st.selectbox(name, options,num,key=key)
         return options_selected
@@ -541,8 +540,7 @@ class customPlot:
                             hist_kws={"color": color[1],"alpha":1})
         plt.title(target_name + " Statistics ")
         plt.legend()
-        # img_path = os.path.join(target_dir, target_name+' Statistics.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
 
     def feature_hist_kde(self, options_selected, feature_name, feature_value):
@@ -554,8 +552,7 @@ class customPlot:
                             hist_kws={"color": color[1],"alpha":1})
         plt.title(feature_name + " Statistics ")
         plt.legend()
-        # img_path = os.path.join(target_dir, feature_name+' Statistics.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
 
     def featureSets_statistics_hist(self, options_selected, IDs, Counts):
@@ -570,8 +567,7 @@ class customPlot:
         plt.ylabel("Frequency")
         plt.tight_layout()
         plt.legend()
-        # img_path = os.path.join(target_dir, 'Recipes Statistics.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
 
     def feature_distribution(self,options_selected,feature_name, feature_value):
@@ -588,8 +584,7 @@ class customPlot:
         plt.ylabel("Frequency")
         plt.xlabel("Atomic Percentage (at.%)")
         plt.legend()
-        # img_path = os.path.join(target_dir, feature_name +'Data Distribution.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
 
     def features_and_targets(self,options_selected, data, features, targets):
@@ -598,8 +593,7 @@ class customPlot:
         color = self.map_color_options(options_selected)
         fig = sns.PairGrid(data, x_vars=features, y_vars=targets).map(sns.regplot,ci=None,scatter_kws={"color": color[0]}, line_kws={"color": color[1]})
         plt.legend()
-        # img_path = os.path.join(target_dir, 'Features and Targets.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
 
     def targets_and_targets(self,options_selected, data, targets):
@@ -611,10 +605,8 @@ class customPlot:
             fig.axes[i, j].set_visible(False)
         for i in range(len(targets)): 
             fig.axes[i, i].set_visible(False)
-        # plt.title(" Targets and Targets ")
         plt.legend()
-        # img_path = os.path.join(target_dir, 'Targets and Targets.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
 
     def corr_feature_target(self, options_selected, corr):
@@ -626,8 +618,7 @@ class customPlot:
         plt.xlabel('Correlation')
         plt.title('Feature Correlations')
         plt.legend()
-        # img_path = os.path.join(target_dir, 'Feature Correlations.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
     def corr_feature_target_mir(self, options_selected, corr_mir):
         assert len(options_selected) >= 4, "options insufficient !"
@@ -641,7 +632,6 @@ class customPlot:
         st.pyplot(fig)
 
     def corr_cofficient(self, options_selected, is_mask, corr_matrix):
-        # assert len(options_selected) >= 4, "options insufficient !"
         options = np.array([self.fontsize_dict[x] for x in options_selected[:4]])
         plt.rc('xtick', labelsize=options[0])  
         plt.rc('ytick', labelsize=options[0])    
@@ -653,14 +643,12 @@ class customPlot:
             mask[np.triu_indices_from(mask)] = True
             ax = sns.heatmap(corr_matrix, mask=mask, cmap=cmap, linewidths=0.5,square = True, annot=True, annot_kws=annot_kws)
             plt.legend()
-            # img_path = os.path.join(target_dir, 'Correlation Matrix.png')
-            # fig.savefig(img_path)
+
             st.pyplot(fig)
         else:
             ax = sns.heatmap(corr_matrix,cmap = cmap, linewidths=0.5,square = True, annot=True, annot_kws=annot_kws)
             plt.legend()
-            # img_path = os.path.join(target_dir, 'Correlation Cofficient.png')
-            # fig.savefig(img_path)
+
             st.pyplot(fig)
 
     def feature_missing(self,options_selected, record_missing, missing_stats):
@@ -677,12 +665,10 @@ class customPlot:
         plt.ylabel("Count of Features")
         plt.tight_layout()
         plt.legend()
-        # img_path = os.path.join(target_dir, 'Fraction of Missing Values Histogram.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)    
 
     def feature_nunique(self, options_selected, record_single_unique, unique_stats):
-        # Histogram of number of unique values in each feature
         if record_single_unique is None:
             raise NotImplementedError("Unique values have not been calculated.")
         assert len(options_selected) >= 4, "options insufficient !"
@@ -695,47 +681,30 @@ class customPlot:
         plt.ylabel('Frequency')
         plt.tight_layout()
         plt.legend()
-        # img_path = os.path.join(target_dir, 'Number of Unique Values Histogram.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)    
 
     def feature_importance(self,record_zero_importance, feature_importances, plot_n = 15):
-      
-        # Plots `plot_n` most important features and the cumulative importance of features.
-        # If `threshold` is provided, prints the number of features needed to reach `threshold`
-        # cumulative importance.
-        # Parameters
-        # ------
-        # plot_n: int, default = 15
-        #     Number of moset important features to plot. Default to 15 or the maximum number of features 
-        #     whichever is smller
-        # threshold: float, between 0 and 1 default = None
-        #     Threshold for printing information about cumulative importances
+
         if record_zero_importance is None:
             raise NotImplementedError("Unique values have not been calculated.")
-        # Need to adjust number of features if greater than the features in the data
+
         if plot_n > feature_importances.shape[0]:
-            # plot_n = feature_importances.shape[0] - 1
             plot_n = feature_importances.shape[0] 
-        # assert len(options_selected) >= 4, "options insufficient !"
-        # self.map_fontsize_options(options_selected)
-        # color = self.map_color_options(options_selected)
+
         with plt.style.context(['nature','no-latex']):
             fig, ax = plt.subplots()
-            # Need to reverse the index to plot most importance on top
-            # There might be a more efficient mothod to accomplish this
             ax.barh(list(reversed(list(feature_importances.index[:plot_n]))), 
                 feature_importances['normalized_importance'][:plot_n], 
                 align = 'center', edgecolor = 'k')
-            # Set the yticks and labels
+
             ax.set_yticks(list(reversed(list(feature_importances.index[:plot_n]))))
             ax.set_yticklabels(feature_importances['feature'][:plot_n])
             
             plt.xlabel('Normalized Importance'); 
             plt.title('Feature Importances')
             plt.legend()
-        # img_path = os.path.join(target_dir, 'Number of Unique Values Histogram.png')
-        # fig.savefig(img_path)
+
             st.pyplot(fig)   
 
     def pred_vs_actual(self,actual,pred):
@@ -753,8 +722,6 @@ class customPlot:
             ax.set_ylim(lims)
             plt.xlabel("Actual")
             plt.ylabel("Prediction")
-            # img_path = os.path.join(target_dir, 'prediction vs label.png')
-            # fig.savefig(img_path)
             st.pyplot(fig)
 
     def confusion_matrix(self,confusion_matrix):
@@ -764,9 +731,7 @@ class customPlot:
         ax = sns.heatmap(confusion_matrix, cmap=cmap, linewidths=0.5,square =True, annot=True, xticklabels=df['Category2'].unique())
         plt.ylabel("Actual")
         plt.xlabel("Predict")
-        # plt.legend()
-        # img_path = os.path.join(target_dir, 'prediction vs label.png')
-        # fig.savefig(img_path)
+
         st.pyplot(fig)
     def evolutionary_history(self, fitness_history, algName):
         fig, ax = plt.subplots()
@@ -797,10 +762,6 @@ class FeatureSelector:
         # one-hot features name
         self.one_hot_features = None
 
-        # features_dropped_single + one-hot_features
-        # self.feature_all = None 
-        
-        # Dataframes recording information about features to remove
         self.record_missing = None
         self.record_single_unique = None
         self.record_collinear = None
@@ -828,17 +789,14 @@ class FeatureSelector:
         
     
     def identify_missing(self, missing_threshold):
-        # Find the features with a fraction of missing values above `missing_threshold`
+
         self.missing_threshold = missing_threshold
 
-        # Calaulate the fraction of missing in each column
         missing_series = self.features.isnull().sum() / self.features.shape[0]
         self.missing_stats = pd.DataFrame(missing_series).rename(columns={'index': 'feature', 0: 'missing_fraction'})
 
-        # Sort with highest number of missing values on top
         self.missing_stats = self.missing_stats.sort_values('missing_fraction', ascending = False)
 
-        # Find the columns with a missing percentage above the threshold
         record_missing = pd.DataFrame(missing_series[missing_series > missing_threshold]).reset_index().rename(
             columns={'index':'feature', 0: 'missing_fraction'})
         to_drop = list(record_missing['feature'])
@@ -846,15 +804,12 @@ class FeatureSelector:
         self.ops['missing'] = to_drop
     
     def identify_nunique(self, counts=1):
-        # Find features with only a single unique value. NaN do not count as a unique value.
-        # Calculate the unique counts in each column
-        # unique value statistic times
+
         self.counts = counts
         unique_counts = self.features.nunique()
         self.unique_stats = pd.DataFrame(unique_counts).rename(columns = {'index': 'feature', 0: 'nunique'})
         self.unique_stats = self.unique_stats.sort_values('nunique', ascending = True)
-        
-        # Find the columns with only one unique count
+
         record_single_unique = pd.DataFrame(unique_counts[unique_counts <= self.counts]).reset_index().rename(
             columns = {'index':'feature', 0: 'nunique'})
         
@@ -864,10 +819,7 @@ class FeatureSelector:
         self.ops['single_unique'] = to_drop
         
     def one_hot_feature_encoder(self,one_hot=False):
-        # Whether to one-hot encode the features before calculating the correlation coefficients
-        # if use, need ensure the nuerial features have been processed by drop_single
 
-        # Calculate the correlation between every column
         if one_hot:
             # One hot encoding
             self.dummy_features = pd.get_dummies(self.features)
@@ -877,46 +829,32 @@ class FeatureSelector:
     
 
     def identify_collinear(self, corr_matrix, correlation_threshold):
-        # Finds collinear features based on the correlation coefficient between features. 
-        # For each pair of features with a correlation coefficient greather than `correlation_threshold`,
-        # only one of the pair is identified for removal. 
-        # Parameters
-        # --------
-        # correlation_threshold : float between 0 and 1
-        # Value of the Pearson correlation cofficient for identifying correlation features
+
         self.correlation_threshold = correlation_threshold
-        # Extract the upper triangle of the correlation matrix
+
         upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-        # Select the features withc correlations above the threshold
-        # Need to use the absolute value
+
         to_drop = [column for column in upper.columns if any(upper[column].abs() > correlation_threshold)]
 
-        # Dataframe to hold correlated pairs
         record_collinear = pd.DataFrame(columns = ['drop_feature', 'corr_feature','corr_value'])
 
-        # Iterate through the colummns to drop to record pairs of correlated features
         for column in to_drop:
 
-            # Find the correlated features
             corr_features = list(upper.index[upper[column].abs() > correlation_threshold])
 
-            # Find the correlated values
             corr_values = list(upper[column][upper[column].abs() > correlation_threshold])
             drop_features = [column for _ in range(len(corr_features))]
 
-            # Record the information (needa temp df for now)
             temp_df = pd.DataFrame.from_dict({'drop_feature': drop_features,
                                               'corr_feature': corr_features,
                                               'corr_value':corr_values})
-            # Add to dataframe
             record_collinear = record_collinear.append(temp_df, ignore_index=True)
         self.record_collinear = record_collinear
 
     def judge_drop_f_t_after_f_f(self, target_selected, corr_matrix):
-        # final judge the drop feature by the correlation with target
-        # check the selected target number 
+
         assert len(target_selected) == 1, 'please choose only one feature !' 
-        # st.write(self.record_collinear.shape[0])
+
         for row in range(self.record_collinear.shape[0]):
             need_judge_feature_idx = list(self.record_collinear[['drop_feature','corr_feature']].iloc[row,:])
             need_judge_feature_value = corr_matrix.loc[need_judge_feature_idx, target_selected]   
@@ -936,16 +874,12 @@ class FeatureSelector:
         self.ops['f_t_low_corr'] = cols_with_less_than_thresh[cols_with_less_than_thresh == True].index.tolist()    
 
     def identify_zero_low_importance(self, cumulative_importance=0.95):
-        # Sort features according to importance
+   
         feature_importances = self.feature_importances.sort_values('importance', ascending=False).reset_index(drop = True)
-        # st.write(feature_importances)
-        # Normalize the feature importance to add up to one
+
         feature_importances['normalized_importance'] = feature_importances['importance'] / feature_importances['importance'].sum()
         feature_importances['cumulative_importance'] = np.cumsum(feature_importances['normalized_importance'])
-        # st.write(feature_importances)
-        # st.write('---')
 
-        # Extract the features with zero importance
         record_zero_importance = feature_importances[feature_importances['importance'] == 0.0]
         to_drop = list(record_zero_importance['feature'])
         self.feature_importances = feature_importances
@@ -955,50 +889,43 @@ class FeatureSelector:
 
         self.cumulative_importance = cumulative_importance
 
-        # Make sure most importance features are on top
-
-        # self.feature_importances = self.feature_importances.sort_values('cumulative_importance')
-
-        # Identify the features not needed to reach the cumulative_importance
         record_low_importance = self.feature_importances[self.feature_importances['cumulative_importance'] > cumulative_importance]
         to_drop = list(record_low_importance['feature'])
         self.record_low_importance = record_low_importance
         self.ops['low_importance'] = to_drop
         st.write('%d features required for cumulative importance of %0.2f .' % (len(self.feature_importances) -
-                                                                        len(self.record_low_importance), self.cumulative_importance))
-        # st.write('%d features do not contribute to cumulative importance of %0.2f.\n' % (len(self.ops['low_importance']),
-        #                                                                                     self.cumulative_importance))
+                                                                        len(self.record_low_importance), self.cumulative_importance))                                                                             self.cumulative_importance))
         
     def feature_importance_select_show(self):
         st.write('---')
         st.write(self.feature_importances)
-        tmp_download_link = download_button(self.feature_importances, f'特征重要性数据.csv', button_text='download')
+        tmp_download_link = download_button(self.feature_importances, f'importance rank.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
         plot = customPlot()
         plot.feature_importance(self.record_zero_importance, self.feature_importances, plot_n = 15)
         self.features_dropped_zero_importance = self.features.drop(columns=self.ops['zero_importance'])
         self.features_dropped_low_importance = self.features.drop(columns=self.ops['low_importance'])
-        with st.expander('处理之后的数据'):
+        with st.expander('dropped data'):
             col1, col2 = st.columns([1,1])
             with col1:
                 st.write('dropped zero importance')
                 st.write(self.features_dropped_zero_importance)
-                tmp_download_link = download_button(self.features_dropped_zero_importance, f'特征重要性-丢弃0贡献特征.csv', button_text='download')
+                tmp_download_link = download_button(self.features_dropped_zero_importance, f'featureImportance_drop_0.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             with col2:
                 st.write('dropped low importance')
                 st.write(self.features_dropped_low_importance)
-                tmp_download_link = download_button(self.features_dropped_low_importance, f'特征重要性-丢弃低贡献特征.csv', button_text='download')
+                tmp_download_link = download_button(self.features_dropped_low_importance, f'featureImportance_drop_low.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     def LinearRegressor(self):
-        # One hot encoding
+
         features = pd.get_dummies(self.features)
-        # Extract feature names
+
         feature_names = list(features.columns)
-        # Conbert to np array
+
         features = np.array(self.features)
-        # Empty array for feature importances
+ 
         feature_importance_values = np.zeros(len(feature_names))
 
         self.model.fit(self.features, self.targets)
@@ -1007,14 +934,13 @@ class FeatureSelector:
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
     
     def RidgeRegressor(self):
-        # One hot encoding
+
         features = pd.get_dummies(self.features)
-        # Extract feature names
+    
         feature_names = list(features.columns)
-        # Conbert to np array
+
         features = np.array(self.features)
 
-        # Empty array for feature importances
         feature_importance_values = np.zeros(len(feature_names))
 
         self.model.fit(self.features, self.targets)
@@ -1023,13 +949,13 @@ class FeatureSelector:
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
 
     def LassoRegressor(self):
-        # One hot encoding
+
         features = pd.get_dummies(self.features)
-        # Extract feature names
+
         feature_names = list(features.columns)
-        # Conbert to np array
+
         features = np.array(self.features)
-        # Empty array for feature importances
+
         feature_importance_values = np.zeros(len(feature_names))
 
         self.model.fit(self.features, self.targets)
@@ -1038,19 +964,18 @@ class FeatureSelector:
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})
     
     def XGBR(self):
-        # One hot encoding
+
         features = pd.get_dummies(self.features)
-        # Extract feature names
+
         feature_names = list(features.columns)
-        # Conbert to np array
+
         features = np.array(self.features)
         targets = np.array(self.targets).reshape((-1,))
 
-        # Empty array for feature importances
         feature_importance_values = np.zeros(len(feature_names))
 
         progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
+
         self.model.fit(self.features, self.targets)
 
         st.info('train process is over')
@@ -1058,19 +983,17 @@ class FeatureSelector:
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})     
           
     def RandomForestClassifier(self):
-        # One hot encoding
+
         features = pd.get_dummies(self.features)
-        # Extract feature names
+
         feature_names = list(features.columns)
-        # Conbert to np array
+
         features = np.array(self.features)
-        # targets = np.array(self.targets).reshape((-1,))
-        
-        # Empty array for feature importances
+
         feature_importance_values = np.zeros(len(feature_names))
 
         progress_text = "Operation in progress. Please wait."
-        # my_bar = st.progress(0, text=progress_text)
+
         self.model.fit(self.features, self.targets.astype('int'))
 
         st.info('train process is over')
@@ -1078,15 +1001,12 @@ class FeatureSelector:
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
     
     def RandomForestRegressor(self):
-        # One hot encoding
         features = pd.get_dummies(self.features)
-        # Extract feature names
+
         feature_names = list(features.columns)
-        # Conbert to np array
+
         features = np.array(self.features)
-        # targets = np.array(self.targets).reshape((-1,))
-        
-        # Empty array for feature importances
+
         feature_importance_values = np.zeros(len(feature_names))
 
         self.model.fit(self.features, self.targets.astype('int'))
@@ -1097,7 +1017,7 @@ class FeatureSelector:
 
 class CLASSIFIER:
     def __init__(self, features, targets) -> None:
-        # origin features and targets
+
         self.features = features
         self.targets = targets   
 
@@ -1457,7 +1377,7 @@ class REGRESSOR:
         st.write('R2: {}'.format(self.score))
            
     def GPRegressor(self):
-        # kernel = RBF(length_scale=1.0)
+     
         self.Ytest = self.Ytest.reset_index(drop=True)
         self.Xtest = self.Xtest.reset_index(drop=True)
         self.Ytrain = self.Ytrain.astype('float')
@@ -1473,7 +1393,7 @@ class REGRESSOR:
 class CLUSTER():
 
     def __init__(self, features, targets) -> None:
-        # origin features and targets
+ 
         self.features = features
         self.targets = targets   
 
@@ -1485,11 +1405,11 @@ class CLUSTER():
     def K_means(self):
 
         self.model.fit(self.features)
-        # self.score = self.model.score(self.Xtest, self.Ytest)
+    
         self.score = silhouette_score(self.features, self.model.labels_)
         st.info('train process is over')
         st.write('silhouette score: {}'.format(self.score))
-        # st.write('cluster centers: {}'.format(self.model.cluster_centers_))
+ 
 
 class SAMPLING:
     def __init__(self, features, targets) -> None:
@@ -1509,28 +1429,28 @@ def plot_and_export_results(model, model_name):
         plot.pred_vs_actual(model.Ytest, model.Ypred)
         result_data = pd.concat([model.Ytest, pd.DataFrame(model.Ypred)], axis=1)
         result_data.columns = ['actual', 'prediction']
-        with st.expander("模型下载"):
+        with st.expander("model"):
             tmp_download_link = download_button(model.model, model_name+'.pickle', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
-        with st.expander('预测结果'):
+        with st.expander('prediciton'):
             st.write(result_data)
-            tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+            tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 def export_cross_val_results(model, F, model_name, random_state):
-    # 交叉验证的模型的选择？目前选择最后一个模型，不是很合理
+    # chose the last mode in CV
     Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model, random_state)    
     st.write('R2: {}'.format(r2_score(y_true=Y_test, y_pred=Y_pred)))
     plot = customPlot()
     plot.pred_vs_actual(Y_test, Y_pred)                    
-    with st.expander("模型下载"):
+    with st.expander("model"):
         tmp_download_link = download_button(model.model, model_name+'.pickle', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
     result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
     result_data.columns = ['actual', 'prediction']
-    with st.expander('预测结果'):
+    with st.expander('prediction'):
         st.write(result_data)
-        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 def export_cross_val_results_clf(model, F, model_name, col_name, unique_categories, random_state):
@@ -1540,11 +1460,6 @@ def export_cross_val_results_clf(model, F, model_name, col_name, unique_categori
     model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns)
 
     st.write('accuracy score: {}'.format(accuracy_score(y_true=Y_test, y_pred=Y_pred)))
-    
-    # clf_scores = Ffold_cross_val_modify(model.features, model.targets, F, model.model,'clf') 
-    # clf_scores = np.mean(np.array(clf_scores))
-    
-    # st.write('test accuracy score: {}'.format(clf_scores))
 
     model.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[model.Ytest[col_name[0]]].values
     model.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[model.Ypred[col_name[0]]].values
@@ -1559,7 +1474,7 @@ def export_cross_val_results_clf(model, F, model_name, col_name, unique_categori
         plt.title('Confusion Matrix')
         st.pyplot(fig)
 
-    with st.expander("模型下载"):
+    with st.expander("model"):
         tmp_download_link = download_button(model.model, model_name+'.pickle', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
@@ -1567,7 +1482,7 @@ def export_cross_val_results_clf(model, F, model_name, col_name, unique_categori
     result_data.columns = ['actual','prediction']
     with st.expander('Actual vs Predict'):
         st.write(result_data)
-        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 def export_loo_results(model, loo, model_name):
@@ -1586,14 +1501,14 @@ def export_loo_results(model, loo, model_name):
     st.write('R2: {}'.format(r2_score(y_true=Y_test, y_pred=Y_pred)))
     plot = customPlot()
     plot.pred_vs_actual(Y_test, Y_pred)
-    with st.expander("模型下载"):
+    with st.expander("model"):
         tmp_download_link = download_button(model.model, model_name+'_model.pickle', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
     result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
     result_data.columns = ['actual', 'prediction']
-    with st.expander('预测结果'):
+    with st.expander('prediciton'):
         st.write(result_data)
-        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 
@@ -1630,14 +1545,14 @@ def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
         plt.title('Confusion Matrix')
         st.pyplot(fig)
 
-    with st.expander("模型下载"):
+    with st.expander("model"):
         tmp_download_link = download_button(model.model, model_name+'_model.pickle', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
     result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
     result_data.columns = ['actual', 'prediction']
-    with st.expander('预测结果'):
+    with st.expander('prediciton'):
         st.write(result_data)
-        tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
+        tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 
@@ -1726,27 +1641,6 @@ def dominated_hypervolume(pareto_data, ref_point):
     return S
 
 
-# def Ffold_cross_val_modify(Xtrain, Ytrain, F, estimator, func: Optional[str]):
-#     Xtrain = np.array(Xtrain)
-#     Ytrain = np.array(Ytrain)
-#     row_Xtrain = Xtrain.shape[0]
-#     kf = KFold(n_splits=F,shuffle=True, random_state=input)
-#     predict = np.zeros([row_Xtrain, 1])
-#     real = np.zeros([row_Xtrain, 1])
-#     results = []
-#     for train_index, val_index in kf.split(Xtrain):
-#         x_train, x_val = [Xtrain[i] for i in train_index], [Xtrain[i] for i in val_index]
-#         y_train, y_val = [Ytrain[i] for i in train_index], [Ytrain[i] for i in val_index]
-#         estimator.fit(x_train, y_train)
-#         Ypred = estimator.predict(x_val).reshape(-1,1)
-#         Ytest = np.array(y_val).reshape(-1,1)        
-#         if func == 'reg':
-#             res = r2_score(Ytest, Ypred)`
-#         elif func == 'clf':
-#             res = accuracy_score(Ytest, Ypred)
-#         results.append(res)    
-#     return results
-
 def Ffold_cross_val(Xtrain, Ytrain, F, estimator, random_state):
     Xtrain = np.array(Xtrain)
     Ytrain = np.array(Ytrain)
@@ -1780,7 +1674,6 @@ def normalize(data, normalize: Optional[str]=None):
 def inverse_normalize(data, scaler, normalize: Optional[str]=None):
     columns = data.columns
     X = data.values
-    # y = data.iloc[:,-target_number:]
     if normalize == 'StandardScaler':
         X = scaler.inverse_transform(data)
 
@@ -1791,7 +1684,7 @@ def inverse_normalize(data, scaler, normalize: Optional[str]=None):
 
 
 def pca_inverse_normalize(data, scaler, normalize: Optional[str]=None):
-    # y = data.iloc[:,-target_number:]
+
     if normalize == 'StandardScaler':
         data = scaler.inverse_transform(data)
     elif normalize == 'MinMaxScaler':

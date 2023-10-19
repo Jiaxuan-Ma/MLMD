@@ -4043,7 +4043,7 @@ elif select_option == "Others":
         elif len(file) == 2:
             df = pd.read_csv(file[0])
             model_file = file[1]
-     
+            
             check_string_NaN(df)
 
             colored_header(label="Data information", description=" ",color_name="violet-70")
