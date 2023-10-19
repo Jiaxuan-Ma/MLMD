@@ -11,6 +11,7 @@ from typing import Optional
 import numpy as np
 import warnings
 
+from scipy.stats import norm
 import streamlit as st
 
 warnings.filterwarnings('ignore')
@@ -82,11 +83,50 @@ class Mobo4mat:
             print('The recommended value is : \n ', tabulate(Ypred_recommend))
             print('The recommended point is :\n', tabulate(recommend_point.values, headers = feature_name+target_name, tablefmt = 'pretty'))
 
-        elif method == 'EHVI':
-            pass
-        elif method == 'EGO':
-            pass
+        # elif method == 'EHVI':
+        #     HV_values = []
+        #     Ypred_std = pd.concat([Ypred, Ystd])
+        #     for i in range(Ypred_std.shape[0]):
+        #         i_Ypred_std = Ypred_std.iloc[i]
+        #         i_Ypred = i_Ypred.iloc[i]
+        #         Ytrain_i_Ypred = Ytrain.append(i_Ypred)
+        #         i_pareto_front = self.find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
+        #         i_EHVI_value = self.cal_EHVI(ref_point,i_pareto_front,i_Ypred_std, i_Ypred)
+
+        # elif method == 'EGO':
+        #     mean_1 = Ytrain[target_name[0]]
+        #     mean_2 = Ytrain[target_name[1]]
+        #     std_1 = Ystd['std1']
+        #     std_2 = Ystd['std2']
+
+
+
         return HV_values.loc[max_idx].values, recommend_point, Ypred_recommend
+
+    def func_psi(self, a, b, mean, std):
+        norm_value = (b - mean) / std
+        z = norm_value
+        psi_ab = std * norm.pdf(z) + (a - mean) * norm.cdf(z)
+        return psi_ab
+
+    def cal_EHVI(self, ref_point, pareto_data, Ypred_std, target_name):
+        y_0 = pd.DataFrame([ref_point[0], -np.inf], columns=target_name)
+        y_inf = pd.DataFrame([-np.inf, ref_point[1]], columns=target_name)
+        pareto_data = pd.concat([y_0, pareto_data, y_inf], ignore_index=True)
+        
+        row_size= pareto_data.shape[0]-1
+        EHVI = np.zeros(row_size)
+        for i in range(row_size):
+            z = (pareto_data.iloc[i+1][target_name[0]] - Ypred_std[target_name[0]]) / Ypred_std['sd1']
+            value_1 = (pareto_data.iloc[i][target_name[0]] - pareto_data.iloc[i+1][target_name[0]]) * norm.cdf(z) * \
+                    self.func_psi(pareto_data.iloc[i+1][target_name[1]], pareto_data.iloc[i+1][target_name[1]], Ypred_std[target_name[1]], Ypred_std['sd2'])
+            value_2 = (self.func_psi(pareto_data.iloc[i][target_name[0]], pareto_data.iloc[i][target_name[0]], Ypred_std[target_name[0]], Ypred_std[target_name[0]])\
+                        - self.func_psi(pareto_data.iloc[i][target_name[0]], pareto_data.iloc[i+1][target_name[0]], Ypred_std[target_name[0]], Ypred_std['sd1'])) * \
+                            self.func_psi(pareto_data.iloc[i+1][target_name[1]], pareto_data.iloc[i+1][target_name[1]], Ypred_std[target_name[1]], Ypred_std['sd2'])
+            EHVI[i] = value_1 + value_2
+        EHVI = EHVI[~np.isnan(EHVI)]
+        EHVI_sum = np.sum(EHVI)
+        return EHVI_sum
 
     def non_dominated_sorting(self, fitness_values): # min
         num_solutions = fitness_values.shape[0]
@@ -139,6 +179,23 @@ class Mobo4mat:
             S += (pareto_data[i,0] - pareto_data[i+1,0]) * (pareto_data[0,1] - pareto_data[i+1,1])
         return S
     
+    def func_selector(selector, Ytrain, Ypred, Ystd):
+        if selector == 'EGO':
+            z = (np.min(Ytrain) -  Ypred) / Ystd
+            ego = Ystd * z * norm.cdf(z) + Ystd * norm.pdf(z)
+            value = pd.DataFrame(ego, columns=['EGO'])
+        elif selector == 'PI':
+            z = (np.min(Ytrain) -  Ypred) / Ystd
+            pi = z * norm.cdf(z) + norm.pdf(z)
+            value = pd.DataFrame(pi, columns=['PI'])
+        elif selector == 'UCB':
+            para = 0.5
+            ucb = Ypred - Ystd*para
+            value = pd.DataFrame(ucb, columns=['UCB'])
+        
+        value = round(value, 5)
+        return value
+
 # df = pd.read_csv('./RAFM-dataset.csv')
 # vs = pd.read_csv('./RAFM-Visual.csv')
 # Xtrain = df.iloc[:,:-2]
