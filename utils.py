@@ -894,8 +894,7 @@ class FeatureSelector:
         self.record_low_importance = record_low_importance
         self.ops['low_importance'] = to_drop
         st.write('%d features required for cumulative importance of %0.2f .' % (len(self.feature_importances) -
-                                                                        len(self.record_low_importance), self.cumulative_importance))                                                                             self.cumulative_importance))
-        
+                                                                        len(self.record_low_importance), self.cumulative_importance))
     def feature_importance_select_show(self):
         st.write('---')
         st.write(self.feature_importances)
@@ -1684,7 +1683,6 @@ def inverse_normalize(data, scaler, normalize: Optional[str]=None):
 
 
 def pca_inverse_normalize(data, scaler, normalize: Optional[str]=None):
-
     if normalize == 'StandardScaler':
         data = scaler.inverse_transform(data)
     elif normalize == 'MinMaxScaler':
