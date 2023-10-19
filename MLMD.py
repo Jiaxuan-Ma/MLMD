@@ -146,7 +146,7 @@ if select_option == "Home Page":
     st.markdown(
     '''
     #### Contributors
-    **Research Group**: [上海大学 材料信息学与力学信息学实验室(MMIL)](http://www.sshome.space/MMIL/PI/)
+    **Research Group**: [Materials and mechanics informatics lab (MMIL), Shanghai Unversity](http://www.sshome.space/MMIL/PI/)
 
     **Developers**: Jiaxuan Ma (Phd candidate), Jie xiong (Lecturer), Yuan Tian (Doctor), Bin Cao (Phd candidate)
 
@@ -165,34 +165,55 @@ elif select_option == "Data Basic":
         colored_header(label="Databases",description=" ",color_name="violet-90")
         col1, col2 = st.columns([2,2])
         with col1:
-            df = pd.read_csv('./data/in.csv')
-            st.write("High entropy database")
+            df = pd.read_csv('./data/Case 1.csv')
+            st.write("Polycrystalline ceramic")
             st.write(df.head())
             tmp_download_link = download_button(df , f'prediction.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
         with col2:
-            df = pd.read_csv('./data/in.csv')
-            st.write("Steel database")
+            df = pd.read_csv('./data/Case 2.csv')
+            st.write("High entropy alloy")
             st.write(df.head())
             tmp_download_link = download_button(df , f'prediction.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
         col1, col2 = st.columns([2,2])
         with col1:
-            df = pd.read_csv('./data/in.csv')
-            st.write("高熵合金数据库")
-            image = Image.open('./data/fig1.png')
+            df = pd.read_csv('./data/Case 1_R.csv')
+            st.write("low alloy steel")
+            image = Image.open('./data/fig1.jpg')
             st.image(image, width=280,caption='test size')
-            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
         with col2:
-            df = pd.read_csv('./data/in.csv')
-            st.write("钢数据库")
+            df = pd.read_csv('./data/Case 2_R.csv')
+            st.write("Ferroelectric perovskites")
             st.write(df.head())
-            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
-            # tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
-            # st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+        col1, col2 = st.columns([2,2])
+        with col1:
+            df = pd.read_csv('./data/Case 3_R.csv')
+            st.write("FGH98 superalloy")
+            image = Image.open('./data/fig1.jpg')
+            st.image(image, width=280,caption='test size')
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+        with col2:
+            df = pd.read_csv('./data/RAFM-dataset.csv')
+            st.write("Ferriticmartensitic steel")
+            st.write(df.head())
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+        col1, col2 = st.columns([2,2])
+        with col1:
+            df = pd.read_csv('./data/HEA-Dataset.csv')
+            st.write("High entropy alloy")
+            image = Image.open('./data/fig1.jpg')
+            st.image(image, width=280,caption='test size')
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     elif sub_option == "Data Visualization":
 
