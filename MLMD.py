@@ -134,38 +134,28 @@ if select_option == "Home Page":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
 
 
-    colored_header(label="材料设计的机器学习平台",description="Machine Learning for Material Design",color_name="violet-90")
+    colored_header(label="Machine Learning for Material Design",description="MLMD is dedicated to the integration of material experiment and material design, and accelerate the new material discovery with desired one or more properties.",color_name="violet-90")
 
-    st.markdown(
-    '''
-    The **MLMD** platform (**M**achine **L**earning for **M**aterial **D**esign) for Material or Engineering aims at utilizing general and frontier machine learning algrithm to accelerate the material design with no-programming. \n
-    材料基因组工程理念的发展将会大幅度提高新材料的研发效率、缩短研发周期、降低研发成本、全面加速材料从设计到工程化应用的进程。
-    因此**MLMD**旨在为材料试验科研人员提供快速上手，无编程的机器学习算法平台，致力于材料试验到材料设计的一体化。
-    ''')
-    colored_header(label="数据布局",description="only support `.csv` file",color_name="violet-90")
+    colored_header(label="Data Layout",description="only support `.csv` file",color_name="violet-90")
 
     st.write('''![](https://github.com/Jiaxuan-Ma/Jiaxuan-Ma/assets/61132191/470e2fc4-0e99-4a28-afc3-1c93c44758da?raw=true)''')
     st.write(
-        '''*为了保证合金的各个元素的质量分数总和为100%, 因此使用**代理优化**模块时需要去掉基元素列*''')
-    colored_header(label="致谢",description="",color_name="violet-90")
+        '''In order to ensure the sum of mass fraction of all compositions satisfa 100 \% in optimization, the base element column needs to be removed when using the **surrogate optimization module**.''')
+    colored_header(label="Acknowledgements",description="",color_name="violet-90")
 
     st.markdown(
     '''
-    #### 贡献者
-    **课题组**: [上海大学 材料信息学与力学信息学实验室(MMIL)](http://www.sshome.space/MMIL/PI/)
+    #### Contributors
+    **Research Group**: [上海大学 材料信息学与力学信息学实验室(MMIL)](http://www.sshome.space/MMIL/PI/)
 
-    **主要开发人**：马家轩（博士在读）
+    **Developers**: Jiaxuan Ma (Phd candidate), Jie xiong (Lecturer), Yuan Tian (Doctor), Bin Cao (Phd candidate)
 
-    **指导教师**：孙升（研究员） 
+    **Adviser**: Prof Sheng Sun
 
-    **参与人**：
-    
-    熊杰 （讲师）
-    田原 （博士）
-
-    #### 资助
-    国家科技部重点研发计划(No. 2022YFB3707803)
-    
+    #### Funding
+    This work was financially supported by the National Key Research and Development Program of China 
+    (No. 2022YFB3707803), the National Natural Science Foundation of China Project (No. 12072179 and 11672168), 
+    the Key Research Project of Zhejiang Lab (No. 2021PE0AC02), and Shanghai Engineering Research Center for Integrated Circuits and Advanced Display Materials.
     ''')
 
 elif select_option == "Data Basic":
@@ -4043,7 +4033,7 @@ elif select_option == "Others":
         elif len(file) == 2:
             df = pd.read_csv(file[0])
             model_file = file[1]
-            
+
             check_string_NaN(df)
 
             colored_header(label="Data information", description=" ",color_name="violet-70")
