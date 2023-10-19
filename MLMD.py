@@ -123,14 +123,14 @@ st.markdown(sysmenu,unsafe_allow_html=True)
 
 with st.sidebar:
     st.write('''
-    技术支持：马家轩|Jiaxuan Ma
+    Support: Jiaxuan Ma
              
-    联系方式：jiaxuanma.shu@gmail.com
+    Contact: jiaxuanma.shu@gmail.com
     ''')
-    select_option = option_menu("MLMD", ["平台主页", "基础功能", "特征工程","聚类降维", "回归预测", "分类预测", "迁移学习", "代理优化","主动学习","其他"],
+    select_option = option_menu("MLMD", ["Home Page", "Data Basic", "Feature Engineering","Cluster&ReduceDim", "Regression", "Classification", "Transfer Learning", "Surrogate Optimization","Active Learning","Others"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
                     menu_icon="boxes", default_index=0)
-if select_option == "平台主页":
+if select_option == "Home Page":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
 
 
@@ -168,23 +168,23 @@ if select_option == "平台主页":
     
     ''')
 
-elif select_option == "基础功能":
+elif select_option == "Data Basic":
     with st.sidebar:
-        sub_option = option_menu(None, ["数据库建设", "数据可视化"])
-    if sub_option == "数据库建设":
-        colored_header(label="数据库建设",description=" ",color_name="violet-90")
+        sub_option = option_menu(None, ["Databases", "Data visualization"])
+    if sub_option == "Databases":
+        colored_header(label="Databases",description=" ",color_name="violet-90")
         col1, col2 = st.columns([2,2])
         with col1:
             df = pd.read_csv('./data/in.csv')
-            st.write("高熵合金数据库")
+            st.write("High entropy database")
             st.write(df.head())
-            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            tmp_download_link = download_button(df , f'prediction.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
         with col2:
             df = pd.read_csv('./data/in.csv')
-            st.write("钢数据库")
+            st.write("Steel database")
             st.write(df.head())
-            tmp_download_link = download_button(df , f'预测结果.csv', button_text='download')
+            tmp_download_link = download_button(df , f'prediction.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
         col1, col2 = st.columns([2,2])
@@ -204,37 +204,35 @@ elif select_option == "基础功能":
             # tmp_download_link = download_button(result_data, f'预测结果.csv', button_text='download')
             # st.markdown(tmp_download_link, unsafe_allow_html=True)
 
+    elif sub_option == "Data Visualization":
 
-    elif sub_option == "数据可视化":
-
-        colored_header(label="数据可视化",description=" ",color_name="violet-90")
+        colored_header(label="Data Visualization",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv` file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)
         if file is not None:
             df = pd.read_csv(file)
-            # check NaN
             check_string_NaN(df)
             
-            colored_header(label="数据信息",description=" ",color_name="violet-70")
+            colored_header(label="Data information",description=" ",color_name="violet-70")
 
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="数据初步统计",description=" ",color_name="violet-30")
+            colored_header(label="Data statistics",description=" ",color_name="violet-30")
 
             st.write(df.describe())
 
-            tmp_download_link = download_button(df.describe(), f'数据统计.csv', button_text='download')
+            tmp_download_link = download_button(df.describe(), f'statistics.csv', button_text='download')
             
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-            colored_header(label="特征变量和目标变量", description=" ",color_name="violet-70")
+            colored_header(label="Feature and target", description=" ",color_name="violet-70")
             
-            target_num = st.number_input('目标变量数量', min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number', min_value=1, max_value=10, value=1)
             col_feature, col_target = st.columns(2)
             # features
             features = df.iloc[:,:-target_num]
@@ -245,33 +243,20 @@ elif select_option == "基础功能":
             with col_target:   
                 st.write(targets.head())
 
-            # colored_header(label="特征变量统计分布", description=" ",color_name="violet-30")
-
-            # feature_selected_name = st.selectbox('选择特征变量',list(features))
-        
-            # feature_selected_value = features[feature_selected_name]
-            # plot = customPlot()
-            # col1, col2 = st.columns([1,3])
-            # with col1:  
-            #     with st.expander("绘图参数"):
-            #         options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
-            #                     plot.set_tick_fontsize(3),plot.set_legend_fontsize(4),plot.set_color('line color',6,5),plot.set_color('bin color',0,6)]
-            # with col2:
-            #     plot.feature_hist_kde(options_selected,feature_selected_name,feature_selected_value)
-            colored_header(label="特征变量在数据集中的分布", description=" ",color_name="violet-30")
-            feature_selected_name = st.selectbox('选择特征变量', list(features),1)
+            colored_header(label="Feature distribution", description=" ",color_name="violet-30")
+            feature_selected_name = st.selectbox('feature', list(features),1)
             feature_selected_value = features[feature_selected_name]
             plot = customPlot()
             col1, col2 = st.columns([1,3])
             with col1:  
-                with st.expander("绘图参数"):
+                with st.expander("plot parameters"):
                     options_selected = [plot.set_title_fontsize(18),plot.set_label_fontsize(19),
                                 plot.set_tick_fontsize(20),plot.set_legend_fontsize(21), plot.set_color('bin color', 0, 22)]
             with col2:
                 plot.feature_distribution(options_selected,feature_selected_name,feature_selected_value)
             
             with col1:  
-                with st.expander("绘图参数"):
+                with st.expander("plot parameters"):
                     options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
                                 plot.set_tick_fontsize(3),plot.set_legend_fontsize(4),plot.set_color('line color',6,5),plot.set_color('bin color',0,6)]
             with col2:
@@ -279,15 +264,15 @@ elif select_option == "基础功能":
 
             #=========== Targets visulization ==================
 
-            colored_header(label="目标变量统计分布", description=" ",color_name="violet-30")
+            colored_header(label="Target distribution", description=" ",color_name="violet-30")
 
-            target_selected_name = st.selectbox('选择目标变量',list(targets))
+            target_selected_name = st.selectbox('target',list(targets))
 
             target_selected_value = targets[target_selected_name]
             plot = customPlot()
             col1, col2 = st.columns([1,3])
             with col1:  
-                with st.expander("绘图参数"):
+                with st.expander("plot parameters"):
                     options_selected = [plot.set_title_fontsize(7),plot.set_label_fontsize(8),
                                 plot.set_tick_fontsize(9),plot.set_legend_fontsize(10), plot.set_color('line color',6,11), plot.set_color('bin color',0,12)]
             with col2:
@@ -295,9 +280,9 @@ elif select_option == "基础功能":
 
             #=========== Features analysis ==================
 
-            colored_header(label="特征变量配方（合金成分）", description=" ",color_name="violet-30")
+            colored_header(label="Recipes of feature ", description=" ",color_name="violet-30")
 
-            feature_range_selected_name = st.slider('选择特征变量个数',1,len(features.columns), (1,2))
+            feature_range_selected_name = st.slider('feature number',1,len(features.columns), (1,2))
             min_feature_selected = feature_range_selected_name[0]-1
             max_feature_selected = feature_range_selected_name[1]
             feature_range_selected_value = features.iloc[:,min_feature_selected: max_feature_selected]
@@ -307,64 +292,39 @@ elif select_option == "基础功能":
             Counts = feature_type_data['Count']
             col1, col2 = st.columns([1,3])
             with col1:  
-                with st.expander("绘图参数"):
+                with st.expander("plot parameters"):
                     options_selected = [plot.set_title_fontsize(13),plot.set_label_fontsize(14),
                                 plot.set_tick_fontsize(15),plot.set_legend_fontsize(16),plot.set_color('bin color',0, 17)]
             with col2:
                 plot.featureSets_statistics_hist(options_selected,IDs, Counts)
-
-
-
-            # colored_header(label="特征变量和目标变量关系", description=" ",color_name="violet-30")
-            # col1, col2 = st.columns([1,3])
-            # with col1:  
-            #     with st.expander("绘图参数"):
-            #         options_selected = [plot.set_title_fontsize(23),plot.set_label_fontsize(24),
-            #                     plot.set_tick_fontsize(25),plot.set_legend_fontsize(26),plot.set_color('scatter color',0, 27),plot.set_color('line color',6,28)]
-            # with col2:
-            #     plot.features_and_targets(options_selected,df, list(features), list(targets))
-            
-            # # st.write("### Targets and Targets ")
-            # if targets.shape[1] != 1:
-            #     colored_header(label="目标变量和目标变量关系", description=" ",color_name="violet-30")
-            #     col1, col2 = st.columns([1,3])
-            #     with col1:  
-            #         with st.expander("绘图参数"):
-            #             options_selected = [plot.set_title_fontsize(29),plot.set_label_fontsize(30),
-            #                         plot.set_tick_fontsize(31),plot.set_legend_fontsize(32),plot.set_color('scatter color',0, 33),plot.set_color('line color',6,34)]
-            #     with col2:
-            #         plot.targets_and_targets(options_selected,df, list(targets))
         st.write('---')
 
-elif select_option == "特征工程":
+elif select_option == "Feature Engineering":
     with st.sidebar:
-        sub_option = option_menu(None, ["空值处理","特征转换", "特征唯一值处理", "特征和特征相关性", "特征和目标相关性", "One-hot编码", "特征重要性"])
+        sub_option = option_menu(None, ["Missing Value","Feature Transform", "Duplicate Value", "Feature Correlation", "Feature & Target Correlation", "One-hot Coding", "Feature Importance Rank"])
 
-    if sub_option == "空值处理":
-        colored_header(label="空值处理",description=" ",color_name="violet-90")
+    if sub_option == "Missing Value":
+        colored_header(label="Missing Value",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)
         if file is not None:
-        # colored_header(label="数据信息",description=" ",color_name="violet-70")
-        # with st.expander('数据信息'):
             df = pd.read_csv(file)
-            # check NuLL 
             null_columns = df.columns[df.isnull().any()]
             if len(null_columns) == 0:
                 st.error('No missing features!')
                 st.stop()
                 
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="目标变量和特征变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -376,25 +336,24 @@ elif select_option == "特征工程":
             with col_target:   
                 st.write(targets.head())
         
-            # sub_sub_option = option_menu(None, ["丢弃空值", "填充空值"])
-            colored_header(label="选择方法",description=" ",color_name="violet-70")
-            sub_sub_option = option_menu(None, ["丢弃空值", "填充空值"],
+            colored_header(label="method",description=" ",color_name="violet-70")
+            sub_sub_option = option_menu(None, ["drop missing value", "fill missing value"],
                     icons=['house',  "list-task"],
                     menu_icon="cast", default_index=0, orientation="horizontal")
-            if sub_sub_option == "丢弃空值":
+            if sub_sub_option == "drop missing value":
                 fs = FeatureSelector(features, targets)
-                missing_threshold = st.slider("丢弃阈值(空值占比)",0.001, 1.0, 0.5)
+                missing_threshold = st.slider("drop threshold",0.001, 1.0, 0.5)
                 fs.identify_missing(missing_threshold)
                 fs.features_dropped_missing = fs.features.drop(columns=fs.ops['missing'])
                 
                 data = pd.concat([fs.features_dropped_missing, targets], axis=1)
                 st.write(data)
-                tmp_download_link = download_button(data, f'空值丢弃数据.csv', button_text='download')
+                tmp_download_link = download_button(data, f'dropeddata.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('%d features with $\gt$ %0.2f missing threshold.\n' % (len(fs.ops['missing']), fs.missing_threshold))
                 plot = customPlot()
 
-                with st.expander('绘图'):
+                with st.expander('plot parameters'):
                     col1, col2 = st.columns([1,3])
                     with col1:
                         options_selected = [plot.set_title_fontsize(1),plot.set_label_fontsize(2),
@@ -402,34 +361,34 @@ elif select_option == "特征工程":
                     with col2:
                         plot.feature_missing(options_selected, fs.record_missing, fs.missing_stats)
                 st.write('---')
-            if sub_sub_option == "填充空值":
+            if sub_sub_option == "fill missing value":
                 fs = FeatureSelector(features, targets)
                 missing_feature_list = fs.features.columns[fs.features.isnull().any()].tolist()
                 with st.container():
-                    fill_method = st.selectbox('填充方法',('常值', '随机森林算法'))
+                    fill_method = st.selectbox('fill method',('constant', 'random forest'))
                 
-                if fill_method == '常值':
+                if fill_method == 'constant':
 
-                    missing_feature = st.multiselect('丢失值特征',missing_feature_list,missing_feature_list[-1])
+                    missing_feature = st.multiselect('feature of drop value',missing_feature_list,missing_feature_list[-1])
                     
-                    option_filled = st.selectbox('均值',('均值','常数','中位数','众数'))
-                    if option_filled == '均值':
+                    option_filled = st.selectbox('mean',('mean','constant','median','mode'))
+                    if option_filled == 'mean':
                         # fs.features[missing_feature] = fs.features[missing_feature].fillna(fs.features[missing_feature].mean())
                         imp = SimpleImputer(missing_values=np.nan,strategy= 'mean')
 
                         fs.features[missing_feature] = imp.fit_transform(fs.features[missing_feature])
-                    elif option_filled == '常数':
+                    elif option_filled == 'constant':
                         # fs.features[missing_feature] = fs.features[missing_feature].fillna(0)
-                        fill_value = st.number_input('输入数值')
+                        fill_value = st.number_input('value')
                         imp = SimpleImputer(missing_values=np.nan, strategy= 'constant', fill_value = fill_value)
                         
                         fs.features[missing_feature] = imp.fit_transform(fs.features[missing_feature])
-                    elif option_filled == '中位数':
+                    elif option_filled == 'median':
                         # fs.features[missing_feature] = fs.features[missing_feature].fillna(0)
                         imp = SimpleImputer(missing_values=np.nan, strategy= 'median')
                         
                         fs.features[missing_feature] = imp.fit_transform(fs.features[missing_feature])
-                    elif option_filled == '众数':
+                    elif option_filled == 'mode':
 
                         imp = SimpleImputer(missing_values=np.nan, strategy= 'most_frequent')
                         
@@ -437,7 +396,7 @@ elif select_option == "特征工程":
 
                     data = pd.concat([fs.features, targets], axis=1)
                 else:
-                    with st.expander('超参数'):
+                    with st.expander('hyper parameters'):
                         num_estimators = st.number_input('number estimators',1, 10000, 100)
                         criterion = st.selectbox('criterion',('squared_error','absolute_error','friedman_mse','poisson'))
                         max_depth = st.number_input('max depth',1, 1000, 5)
@@ -446,8 +405,8 @@ elif select_option == "特征工程":
                         random_state = st.checkbox('random state 1024',True)
 
 
-                    option_filled = st.selectbox('均值',('均值','常数','中位数','众数'))
-                    if option_filled == '均值':
+                    option_filled = st.selectbox('mean',('mean','constant','median','mode'))
+                    if option_filled == 'mean':
                         feature_missing_reg = fs.features.copy()
                         null_columns = feature_missing_reg.columns[feature_missing_reg.isnull().any()] 
             
@@ -476,9 +435,9 @@ elif select_option == "特征工程":
             
                             feature_missing_reg.loc[feature_missing_reg[i].isnull(), i] = YPredict
 
-                    elif option_filled == '常数':
+                    elif option_filled == 'constant':
 
-                        fill_value = st.number_input('输入数值')
+                        fill_value = st.number_input('value')
                         feature_missing_reg = fs.features.copy()
                         
                         null_columns = feature_missing_reg.columns[feature_missing_reg.isnull().any()] 
@@ -508,7 +467,7 @@ elif select_option == "特征工程":
 
                             feature_missing_reg.loc[feature_missing_reg[i].isnull(), i] = YPredict
                         
-                    elif option_filled == '中位数':
+                    elif option_filled == 'median':
                         feature_missing_reg = fs.features.copy()
                     
                         null_columns = feature_missing_reg.columns[feature_missing_reg.isnull().any()] 
@@ -538,7 +497,7 @@ elif select_option == "特征工程":
         
                             feature_missing_reg.loc[feature_missing_reg[i].isnull(), i] = YPredict
             
-                    elif option_filled == '众数':
+                    elif option_filled == 'mode':
 
                         feature_missing_reg = fs.features.copy()
                     
@@ -572,31 +531,29 @@ elif select_option == "特征工程":
 
                 st.write(data)
 
-                tmp_download_link = download_button(data, f'空值填充数据.csv', button_text='download')
+                tmp_download_link = download_button(data, f'fillmissing.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('---')
     
-    elif sub_option == "特征唯一值处理":
-        colored_header(label="特征唯一值处理",description=" ",color_name="violet-90")
+    elif sub_option == "Duplicate Value":
+        colored_header(label="Duplicate Value",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)
         if file is not None:
-            colored_header(label="数据信息",description=" ",color_name="violet-70")
-
+            colored_header(label="Data information",description=" ",color_name="violet-70")
             df = pd.read_csv(file)
-            # 检测缺失值
             check_string_NaN(df)
 
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             
@@ -609,7 +566,7 @@ elif select_option == "特征工程":
             with col_target:   
                 st.write(targets.head())
 
-            colored_header(label="丢弃唯一值特征变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature of drop duplicate value",description=" ",color_name="violet-70")
             fs = FeatureSelector(features, targets)
             plot = customPlot() 
 
@@ -617,7 +574,7 @@ elif select_option == "特征工程":
             with col1:
                 
                 fs.identify_nunique()
-                option_counts = st.slider('丢弃唯一值特征数量',0, int(fs.unique_stats.max())-1,1)
+                option_counts = st.slider('number of drop duplicate value',0, int(fs.unique_stats.max())-1,1)
                 st.write(fs.unique_stats)
             with col2:
 
@@ -626,11 +583,11 @@ elif select_option == "特征工程":
                 data = pd.concat([fs.features_dropped_single, targets], axis=1)
                 st.write(fs.features_dropped_single)
                 
-                tmp_download_link = download_button(data, f'丢弃唯一值特征数据.csv', button_text='download')
+                tmp_download_link = download_button(data, f'dropduplicate.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('%d features $\leq$  %d unique value.\n' % (len(fs.ops['single_unique']),option_counts))
     
-            with st.expander('绘图'):
+            with st.expander('plot parameters'):
                 col1, col2 = st.columns([1,3])
                 with col1:
                     options_selected = [plot.set_title_fontsize(6),plot.set_label_fontsize(7),
@@ -640,15 +597,15 @@ elif select_option == "特征工程":
                 
             st.write('---')
 
-    elif sub_option == "特征转换":
-        colored_header(label="特征变换",description=" ",color_name="violet-90")
+    elif sub_option == "Feature Transform":
+        colored_header(label="Feature Transform",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
             table = PrettyTable(['Composition'])
             table.add_row(['(Fe0.76B0.24)96Nb4'])
             st.write(table)
         if file is not None:
-            colored_header(label="数据信息",description=" ",color_name="violet-70")
+            colored_header(label="Data information",description=" ",color_name="violet-70")
 
             df = pd.read_csv(file)
             df_nrow = df.head()
@@ -658,29 +615,27 @@ elif select_option == "特征工程":
             if button:
                 df = feature_transform(df, option)
                 st.write(df.head())
-                tmp_download_link = download_button(df, f'特征转换数据.csv', button_text='download')
+                tmp_download_link = download_button(df, f'transform.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)      
 
-
-    elif sub_option == "特征和特征相关性":
-        colored_header(label="特征和特征相关性",description=" ",color_name="violet-90")
+    elif sub_option == "Feature Correlation":
+        colored_header(label="Feature Correlation",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
-            table = PrettyTable(['上传文件名称', '名称','数据说明'])
-            table.add_row(['file_1','dataset','数据集'])
+            table = PrettyTable(['file name', 'class','description'])
+            table.add_row(['file_1','dataset','data file'])
             st.write(table)
         if file is not None:
             df = pd.read_csv(file)
-            # 检测缺失值
             check_string_NaN(df)
-            colored_header(label="数据信息", description=" ",color_name="violet-70")
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="特征变量和目标变量",description=" ",color_name="violet-70")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('目标变量数量',  min_value=1, max_value=10, value=1)
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
             col_feature, col_target = st.columns(2)
             # features
@@ -692,35 +647,35 @@ elif select_option == "特征工程":
             with col_target:   
                 st.write(targets.head())
         
-            colored_header(label="丢弃双线性特征变量",description=" ",color_name="violet-30")
+            colored_header(label="Drop collinear feature",description=" ",color_name="violet-30")
             fs = FeatureSelector(features, targets)
             plot = customPlot() 
 
-            target_selected_option = st.selectbox('选择目标', list(fs.targets))
+            target_selected_option = st.selectbox('target', list(fs.targets))
             target_selected = fs.targets[target_selected_option]
 
             col1, col2 = st.columns([1,3])
             with col1:
-                corr_method = st.selectbox("相关性分析方法",["pearson","spearman","kendall"])
-                correlation_threshold = st.slider("相关性阈值",0.001, 1.0, 0.9) # 0.52
+                corr_method = st.selectbox("correlation analysis method",["pearson","spearman","kendall"])
+                correlation_threshold = st.slider("correlation threshold",0.001, 1.0, 0.9) 
                 corr_matrix = pd.concat([fs.features, target_selected], axis=1).corr(corr_method)
                 fs.identify_collinear(corr_matrix, correlation_threshold)
                 fs.judge_drop_f_t_after_f_f([target_selected_option], corr_matrix)
 
-                is_mask = st.selectbox('掩码',('Yes', 'No'))
-                with st.expander('绘图参数'):
+                is_mask = st.selectbox('mask',('Yes', 'No'))
+                with st.expander('plot parameters'):
                     options_selected = [plot.set_tick_fontsize(21), plot.set_tick_fontsize(22)]
-                with st.expander('丢弃的特征变量'):
+                with st.expander('collinear feature'):
                     st.write(fs.record_collinear)
             with col2:
                 fs.features_dropped_collinear = fs.features.drop(columns=fs.ops['collinear'])
                 assert fs.features_dropped_collinear.size != 0,'zero feature !' 
                 corr_matrix_drop_collinear = fs.features_dropped_collinear.corr(corr_method)
                 plot.corr_cofficient(options_selected, is_mask, corr_matrix_drop_collinear)
-                with st.expander('处理之后的数据'):
+                with st.expander('dropped data'):
                     data = pd.concat([fs.features_dropped_collinear, targets], axis=1)
                     st.write(data)
-                    tmp_download_link = download_button(data, f'双线性特征变量处理数据.csv', button_text='download')
+                    tmp_download_link = download_button(data, f'droppedcollinear.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
 
     elif sub_option == "特征和目标相关性":
