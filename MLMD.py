@@ -104,6 +104,7 @@ from algorithm.TrAdaboostR2 import TrAdaboostR2
 from algorithm.mobo import Mobo4mat
 import scienceplots
 
+
 st.set_page_config(
         page_title="MLMD",
         page_icon="🍁",
@@ -1701,7 +1702,6 @@ elif select_option == "Regression":
             with col2:
                 with st.expander('Operator'):
                     operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                
                     if operator == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
                         reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
@@ -1745,7 +1745,7 @@ elif select_option == "Regression":
                 
                     if operator == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'], random_state=inputs['random state'])
                     elif operator == 'cross val score':
                         cv = st.number_input('cv',1,20,5)
                     elif operator == 'leave one out':
@@ -1759,7 +1759,7 @@ elif select_option == "Regression":
 
                         reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'])
+                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
                         reg.XGBRegressor()
 
                         result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
@@ -1770,14 +1770,14 @@ elif select_option == "Regression":
                 elif operator == 'cross val score':
                         reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'])
+                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
  
                         export_cross_val_results(reg, cv, "XGBR_cv", inputs['random state'])
 
                 elif operator == 'leave one out':
                         reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'])
+                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
                     
                         export_loo_results(reg, loo, "XGBR_loo")
 
