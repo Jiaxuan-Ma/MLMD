@@ -3392,9 +3392,9 @@ elif select_option == "Surrogate Optimization":
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 
-    elif sub_option == "Multi-objective surrogate OPtimization":
+    elif sub_option == "Multi-objective Surrogate Optimization":
 
-        colored_header(label="Multi-objective surrogate OPtimization",description=" ",color_name="violet-90")
+        colored_header(label="Multi-objective surrogate Optimization",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 4:
             table = PrettyTable(['file name', 'class','description'])
@@ -3571,7 +3571,7 @@ elif select_option == "Surrogate Optimization":
                     best_y = pd.DataFrame(best_y, columns = targets.columns.tolist())
                     data = pd.concat([best_x, best_y], axis = 1)
                     st.write(data)               
-                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+                    tmp_download_link = download_button(data, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 with col2:
                     iter_pareto_front = iter_pareto_front.reset_index(drop=True)
