@@ -10,8 +10,8 @@ The AI platform, MLMD (Machine Learning for Material Design) aims at utilizing g
 
 # Data Layoout
 
-![图片2](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa138ee2-b1a6-494d-a5de-741d1a54af14)
 
+<img src="https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa138ee2-b1a6-494d-a5de-741d1a54af14" width="800px">
 
 
 # Remote access
