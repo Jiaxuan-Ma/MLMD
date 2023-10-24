@@ -14,12 +14,6 @@ The AI platform, MLMD (Machine Learning for Material Design) aims at utilizing g
 
 
 
-# Flowcharts
-
-## Single / Multi-objective Surrogate Optimization and Active Learning
-
-
-Check out [help document](https://mlmd.netlify.app/) for more information
 # Remote access
 
 ```
