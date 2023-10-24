@@ -10,7 +10,8 @@ The MLMD platform (Machine Learning for Material Design) for Material or Enginee
 
 # Data Layoout
 
-![2](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/8d089d1e-7482-4665-97c4-a4eb090ba9a8)
+![图片2](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa138ee2-b1a6-494d-a5de-741d1a54af14)
+
 
 
 # Flowcharts
