@@ -139,7 +139,7 @@ if select_option == "Home Page":
 
     colored_header(label="Data Layout",description="only support `.csv` file",color_name="violet-90")
 
-    st.write('''![](https://github.com/Jiaxuan-Ma/Jiaxuan-Ma/assets/61132191/470e2fc4-0e99-4a28-afc3-1c93c44758da?raw=true)''')
+    st.write('''![](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/4733175e-1d24-46a1-8bf7-6a01fb284af4?raw=true)''')
     st.write(
         '''In order to ensure the sum of mass fraction of all compositions satisfa 100 \% in optimization, the base element column needs to be removed when using the **surrogate optimization module**.''')
     colored_header(label="Acknowledgements",description="",color_name="violet-90")
@@ -216,7 +216,7 @@ elif select_option == "Data Basic":
             tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-    elif sub_option == "Data Visualization":
+    elif sub_option == "Data visualization":
 
         colored_header(label="Data Visualization",description=" ",color_name="violet-90")
         file = st.file_uploader("Upload `.csv` file", type=['csv'], label_visibility="collapsed")

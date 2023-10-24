@@ -57,6 +57,7 @@ class Mobo4mat:
         Ypred, Ystd = gp_model.predict(Xtest, return_std=True)
         
         Ypred = pd.DataFrame(Ypred, columns=Ytrain.columns.tolist())
+        Ystd = pd.DataFrame(Ystd, columns=['std1', 'std2'])
 
         if method == 'HV':
             HV_values = []
@@ -83,22 +84,36 @@ class Mobo4mat:
             print('The recommended value is : \n ', tabulate(Ypred_recommend))
             print('The recommended point is :\n', tabulate(recommend_point.values, headers = feature_name+target_name, tablefmt = 'pretty'))
 
-        # elif method == 'EHVI':
-        #     HV_values = []
-        #     Ypred_std = pd.concat([Ypred, Ystd])
-        #     for i in range(Ypred_std.shape[0]):
-        #         i_Ypred_std = Ypred_std.iloc[i]
-        #         i_Ypred = i_Ypred.iloc[i]
-        #         Ytrain_i_Ypred = Ytrain.append(i_Ypred)
-        #         i_pareto_front = self.find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
-        #         i_EHVI_value = self.cal_EHVI(ref_point,i_pareto_front,i_Ypred_std, i_Ypred)
+        if method == 'EHVI':
+            HV_values = []
+            Ypred_std = pd.concat([Ypred, Ystd],axis=1)
+            for i in range(Ypred_std.shape[0]):
+                i_Ypred_std = Ypred_std.iloc[i]
+                i_Ypred = Ypred.iloc[i]
+                Ytrain_i_Ypred = Ytrain.append(i_Ypred)
+                i_pareto_front = self.find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
 
-        # elif method == 'EGO':
-        #     mean_1 = Ytrain[target_name[0]]
-        #     mean_2 = Ytrain[target_name[1]]
-        #     std_1 = Ystd['std1']
-        #     std_2 = Ystd['std2']
+                y_0 = pd.DataFrame([[ref_point[0], -np.inf]], columns=Ytrain.columns.tolist())
+               
 
+                i_EHVI_value = self.cal_EHVI(ref_point,i_pareto_front,i_Ypred_std, Ytrain.columns.tolist())
+                HV_values.append(i_EHVI_value)
+
+            HV_values = pd.DataFrame(HV_values, columns=['HV values'])
+            HV_values.set_index(Xtest.index, inplace=True)
+
+            max_idx = HV_values.nlargest(number, 'HV values').index
+            
+            Ypred_recommend = Ypred.iloc[max_idx]
+            if objective == 'max':
+                Ypred_recommend = - Ypred_recommend
+                recommend_point = -Xtest.loc[max_idx]
+            elif objective == 'min':        
+                recommend_point = Xtest.loc[max_idx]
+
+            print('The maximum value of HV: \n ', tabulate(HV_values.loc[max_idx].values))
+            print('The recommended value is : \n ', tabulate(Ypred_recommend))
+            print('The recommended point is :\n', tabulate(recommend_point.values, headers = feature_name+target_name, tablefmt = 'pretty'))            
 
 
         return HV_values.loc[max_idx].values, recommend_point, Ypred_recommend
@@ -110,20 +125,21 @@ class Mobo4mat:
         return psi_ab
 
     def cal_EHVI(self, ref_point, pareto_data, Ypred_std, target_name):
-        y_0 = pd.DataFrame([ref_point[0], -np.inf], columns=target_name)
-        y_inf = pd.DataFrame([-np.inf, ref_point[1]], columns=target_name)
+        pareto_data = pareto_data.sort_values(by=[target_name[0]], ascending=False)
+        y_0 = pd.DataFrame([[ref_point[0], -np.inf]], columns=target_name)
+        y_inf = pd.DataFrame([[-np.inf, ref_point[1]]], columns=target_name)
         pareto_data = pd.concat([y_0, pareto_data, y_inf], ignore_index=True)
-        
         row_size= pareto_data.shape[0]-1
         EHVI = np.zeros(row_size)
         for i in range(row_size):
-            z = (pareto_data.iloc[i+1][target_name[0]] - Ypred_std[target_name[0]]) / Ypred_std['sd1']
+            z = (pareto_data.iloc[i+1][target_name[0]] - Ypred_std[target_name[0]]) / Ypred_std['std1']
             value_1 = (pareto_data.iloc[i][target_name[0]] - pareto_data.iloc[i+1][target_name[0]]) * norm.cdf(z) * \
-                    self.func_psi(pareto_data.iloc[i+1][target_name[1]], pareto_data.iloc[i+1][target_name[1]], Ypred_std[target_name[1]], Ypred_std['sd2'])
-            value_2 = (self.func_psi(pareto_data.iloc[i][target_name[0]], pareto_data.iloc[i][target_name[0]], Ypred_std[target_name[0]], Ypred_std[target_name[0]])\
-                        - self.func_psi(pareto_data.iloc[i][target_name[0]], pareto_data.iloc[i+1][target_name[0]], Ypred_std[target_name[0]], Ypred_std['sd1'])) * \
-                            self.func_psi(pareto_data.iloc[i+1][target_name[1]], pareto_data.iloc[i+1][target_name[1]], Ypred_std[target_name[1]], Ypred_std['sd2'])
+                    self.func_psi(pareto_data.iloc[i+1][target_name[1]], pareto_data.iloc[i+1][target_name[1]], Ypred_std[target_name[1]], Ypred_std['std2'])
+            value_2 = (self.func_psi(pareto_data.iloc[i][target_name[0]], pareto_data.iloc[i][target_name[0]], Ypred_std[target_name[0]], Ypred_std['std1'])\
+                        - self.func_psi(pareto_data.iloc[i][target_name[0]], pareto_data.iloc[i+1][target_name[0]], Ypred_std[target_name[0]], Ypred_std['std1'])) * \
+                            self.func_psi(pareto_data.iloc[i+1][target_name[1]], pareto_data.iloc[i+1][target_name[1]], Ypred_std[target_name[1]], Ypred_std['std2'])
             EHVI[i] = value_1 + value_2
+            
         EHVI = EHVI[~np.isnan(EHVI)]
         EHVI_sum = np.sum(EHVI)
         return EHVI_sum
@@ -196,11 +212,3 @@ class Mobo4mat:
         value = round(value, 5)
         return value
 
-# df = pd.read_csv('./RAFM-dataset.csv')
-# vs = pd.read_csv('./RAFM-Visual.csv')
-# Xtrain = df.iloc[:,:-2]
-# Ytrain = df.iloc[:,-2:]
-
-# mobo = Mobo4mat()
-# print('wait....')
-# mobo.fit(X = Xtrain, y = Ytrain, visual_data=vs, method='HV',number= 1,kernel_option='DotProduct + WhiteKernel', objective='max', ref_point=[50, 50])
