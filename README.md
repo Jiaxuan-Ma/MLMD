@@ -5,11 +5,12 @@
 
 The MLMD platform (Machine Learning for Material Design) for Material or Engineering aims at utilizing general and frontier machine learning algrithm to accelerate the material design with no-programming.
 
-![图片1](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa3fd53d-e922-4d7e-b4a3-ed7dc5ab62d6)
+![1](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/98992016-e211-442a-aaec-2efc9ac8dc0f)
+
 
 # Data Layoout
 
-![图片4](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/8d089d1e-7482-4665-97c4-a4eb090ba9a8)
+![2](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/8d089d1e-7482-4665-97c4-a4eb090ba9a8)
 
 
 # Flowcharts
