@@ -3,7 +3,7 @@
 </div>
 </p>
 
-The MLMD platform (Machine Learning for Material Design) for Material or Engineering aims at utilizing general and frontier machine learning algrithm to accelerate the material design with no-programming.
+The AI platform, MLMD (Machine Learning for Material Design) aims at utilizing general and frontier machine learning algrithm to accelerate the end-to-end material design with programming-free.
 
 ![1](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/98992016-e211-442a-aaec-2efc9ac8dc0f)
 
