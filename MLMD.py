@@ -128,7 +128,7 @@ with st.sidebar:
              
     Contact: jiaxuanma.shu@gmail.com
     ''')
-    select_option = option_menu("MLMD", ["Home Page", "Data Basic", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Surrogate Optimization","Active Learning","Others"],
+    select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Surrogate Optimization","Active Learning","Others"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
                     menu_icon="boxes", default_index=0)
 if select_option == "Home Page":
@@ -159,7 +159,7 @@ if select_option == "Home Page":
     the Key Research Project of Zhejiang Lab (No. 2021PE0AC02), and Shanghai Engineering Research Center for Integrated Circuits and Advanced Display Materials.
     ''')
 
-elif select_option == "Data Basic":
+elif select_option == "Basic Data":
     with st.sidebar:
         sub_option = option_menu(None, ["Databases", "Data visualization"])
     if sub_option == "Databases":
@@ -168,51 +168,48 @@ elif select_option == "Data Basic":
         with col1:
             df = pd.read_csv('./data/Case 1.csv')
             st.write("Polycrystalline ceramic")
-            st.write(df.head())
-            tmp_download_link = download_button(df , f'prediction.csv', button_text='download')
+            image = Image.open('./data/fig4.png')
+            st.image(image, width=280,caption='')
+            tmp_download_link = download_button(df, f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
         with col2:
-            df = pd.read_csv('./data/Case 2.csv')
-            st.write("High entropy alloy")
-            st.write(df.head())
-            tmp_download_link = download_button(df , f'prediction.csv', button_text='download')
-            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-        col1, col2 = st.columns([2,2])
-        with col1:
-            df = pd.read_csv('./data/Case 1_R.csv')
-            st.write("low alloy steel")
-            image = Image.open('./data/fig1.jpg')
-            st.image(image, width=280,caption='test size')
-            tmp_download_link = download_button(df , f'data.csv', button_text='download')
-            st.markdown(tmp_download_link, unsafe_allow_html=True)
-        with col2:
-            df = pd.read_csv('./data/Case 2_R.csv')
-            st.write("Ferroelectric perovskites")
-            st.write(df.head())
-            tmp_download_link = download_button(df , f'data.csv', button_text='download')
-            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-        col1, col2 = st.columns([2,2])
-        with col1:
             df = pd.read_csv('./data/Case 3_R.csv')
             st.write("FGH98 superalloy")
-            image = Image.open('./data/fig1.jpg')
-            st.image(image, width=280,caption='test size')
+            image = Image.open('./data/fig2.png')
+            st.image(image, width=280,caption='')
             tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
-        with col2:
-            df = pd.read_csv('./data/RAFM-dataset.csv')
-            st.write("Ferriticmartensitic steel")
-            st.write(df.head())
-            tmp_download_link = download_button(df , f'data.csv', button_text='download')
-            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
         col1, col2 = st.columns([2,2])
         with col1:
             df = pd.read_csv('./data/HEA-Dataset.csv')
             st.write("High entropy alloy")
-            image = Image.open('./data/fig1.jpg')
-            st.image(image, width=280,caption='test size')
+            image = Image.open('./data/fig3.png')
+            st.image(image, width=280,caption='')
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+        with col2:
+            df = pd.read_csv('./data/Case 1_R.csv')
+            st.write("Low-alloy steel")
+            image = Image.open('./data/fig1.png')
+            st.image(image, width=280,caption='')
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+        col1, col2 = st.columns([2,2])
+        with col1:
+            df = pd.read_csv('./data/RAFM-dataset.csv')
+            st.write("Ferriticmartensitic steel")
+            image = Image.open('./data/fig6.png')
+            st.image(image, width=280,caption='')
+            tmp_download_link = download_button(df , f'data.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+        with col2:
+            df = pd.read_csv('./data/Case 2.csv')
+            st.write("Alloy")
+            image = Image.open('./data/fig5.png')
+            st.image(image, width=280,caption='')
             tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
