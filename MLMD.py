@@ -1601,98 +1601,6 @@ elif select_option == "Regression":
                     reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
                 
                     export_loo_results(reg, loo, "RidgeR_loo")
-
-        if inputs['model'] == 'BaggingRegressor':
-            with col2:
-                with st.expander('Operator'):
-
-                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
-                    if operator == 'train test split':
-                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        
-                        reg.features = pd.DataFrame(reg.features)    
-                        
-                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-
-                    elif operator == 'cross val score':
-
-                        cv = st.number_input('cv',1,20,5)
-
-                    elif operator == 'leave one out':
-
-                        reg.features = pd.DataFrame(reg.features)    
-                        loo = LeaveOneOut()
-
-            colored_header(label="Training", description=" ",color_name="violet-30")
-            with st.container():
-                button_train = st.button('Train', use_container_width=True)
-            if button_train:
-
-                if operator == 'train test split':
-
-                    reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                    
-                    reg.BaggingRegressor()
-    
-
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-
-                    plot_and_export_results(reg, "BaggingR")
-
-                elif operator == 'cross val score':
-
-                    reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                    export_cross_val_results(reg, cv, "BaggingR_cv", inputs['random state'])
-
-                elif operator == 'leave one out':
-                # if inputs['base estimator'] == "DecisionTree": 
-                    reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                            max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                
-                    export_loo_results(reg, loo, "BaggingR_loo")
-
-        if inputs['model'] == 'AdaBoostRegressor':
-
-            with col2:
-                with st.expander('Operator'):
-                    operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                
-                    if operator == 'train test split':
-                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
-                    elif operator == 'cross val score':
-                        cv = st.number_input('cv',1,20,5)
-                    elif operator == 'leave one out':
-                        loo = LeaveOneOut()
-            colored_header(label="Training", description=" ",color_name="violet-30")
-            with st.container():
-                button_train = st.button('Train', use_container_width=True)
-            if button_train:
-
-                if operator == 'train test split':
-
-                    reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                    
-                    reg.AdaBoostRegressor()
-    
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-
-                    plot_and_export_results(reg, "AdaBoostR")
-                    
-                elif operator == 'cross val score':
-
-                    reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-
-                    export_cross_val_results(reg, cv, "AdaBoostR_cv", inputs['random state'])
-
-                elif operator == 'leave one out':
-                    reg.model =  AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
-                
-                    export_loo_results(reg, loo, "AdaBoostR_loo")
                     
         if inputs['model'] == 'GradientBoostingRegressor':
 
@@ -1878,6 +1786,235 @@ elif select_option == "Regression":
                     export_loo_results(reg, loo, "MLP_loo")
 
             st.write('---')
+
+
+        if inputs['model'] == 'BaggingRegressor':
+            with col2:
+                with st.expander('Operator'):
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,20,5)
+
+                    elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        reg.features = pd.DataFrame(reg.features)    
+                        loo = LeaveOneOut()
+
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+
+                if operator == 'train test split':
+
+                    if inputs['base estimator'] == "DecisionTree": 
+                        reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        
+                        reg.BaggingRegressor()
+        
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "BaggingR")
+
+                    
+                    elif inputs['base estimator'] == "SupportVector": 
+                        reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        reg.BaggingRegressor()
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "BaggingR")
+                    
+                    elif inputs['base estimator'] == "LinearRegression": 
+                        reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        reg.BaggingRegressor()
+        
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "BaggingR")
+
+                elif operator == 'cross val score':
+                    if inputs['base estimator'] == "DecisionTree": 
+                        reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+
+                        export_cross_val_results(reg, cv, "BaggingR_cv", inputs['random state'])
+
+                    elif inputs['base estimator'] == "SupportVector": 
+
+                        reg.model = BaggingRegressor(estimator =  SVR(),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                        export_cross_val_results(reg, cv, "BaggingR_cv", inputs['random state'])
+
+                    elif inputs['base estimator'] == "LinearRegression":
+                        reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                        export_cross_val_results(reg, cv, "BaggingR_cv", inputs['random state'])
+
+                elif operator == 'leave one out':
+                    if inputs['base estimator'] == "DecisionTree": 
+                        reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    
+                        export_loo_results(reg, loo, "BaggingR_loo")
+
+                    elif inputs['base estimator'] == "SupportVector": 
+
+                        reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        
+                        export_loo_results(reg, loo, "BaggingR_loo")
+
+                    elif inputs['base estimator'] == "LinearRegression":
+                        reg.model = BaggingRegressor(estimator = LinearR(),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+        
+                        export_loo_results(reg, loo, "BaggingR_loo")
+
+        if inputs['model'] == 'AdaBoostRegressor':
+            with col2:
+                with st.expander('Operator'):
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
+                    if operator == 'train test split':
+                        inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+
+                    elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        cv = st.number_input('cv',1,20,5)
+
+                    elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        reg.features = pd.DataFrame(reg.features)    
+                        loo = LeaveOneOut()
+
+            colored_header(label="Training", description=" ",color_name="violet-30")
+            with st.container():
+                button_train = st.button('Train', use_container_width=True)
+            if button_train:
+
+                if operator == 'train test split':
+
+                    if inputs['base estimator'] == "DecisionTree": 
+                        reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                        
+                        reg.AdaBoostRegressor()
+        
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "AdaBoostR")
+
+                    
+                    elif inputs['base estimator'] == "SupportVector": 
+                        reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                        reg.AdaBoostRegressor()
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "AdaBoostR")
+                    
+                    elif inputs['base estimator'] == "LinearRegression": 
+                        reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        reg.AdaBoostRegressor()
+        
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "AdaBoostR")
+
+                elif operator == 'cross val score':
+                    if inputs['base estimator'] == "DecisionTree": 
+                        reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+
+                        export_cross_val_results(reg, cv, "AdaBoostR_cv", inputs['random state'])
+
+                    elif inputs['base estimator'] == "SupportVector": 
+
+                        reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                        export_cross_val_results(reg, cv, "AdaBoostR_cv", inputs['random state'])
+
+                    elif inputs['base estimator'] == "LinearRegression":
+                        reg.model = reg.model = AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                        export_cross_val_results(reg, cv, "AdaBoostR_cv", inputs['random state'])
+
+                elif operator == 'leave one out':
+                    if inputs['base estimator'] == "DecisionTree": 
+                        reg.model = AdaBoostRegressor(estimator=tree.DecisionTreeRegressor(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])  
+                    
+                        export_loo_results(reg, loo, "AdaBoostR_loo")
+
+                    elif inputs['base estimator'] == "SupportVector": 
+
+                        reg.model = AdaBoostRegressor(estimator=SVR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+                        
+                        export_loo_results(reg, loo, "AdaBoostR_loo")
+
+                    elif inputs['base estimator'] == "LinearRegression":
+                        reg.model =  AdaBoostRegressor(estimator=LinearR(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state']) 
+        
+                        export_loo_results(reg, loo, "AdaBoostR_loo")
+
+    st.write('---')                
                             
 elif select_option == "Classification":
 
