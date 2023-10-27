@@ -1542,7 +1542,6 @@ elif select_option == "Regression":
                     export_loo_results(reg, loo, "LassoR_loo")
 
         if inputs['model'] == 'RidgeRegressor':
-
             with col2:
                 with st.expander('Operator'):
 
@@ -1642,26 +1641,101 @@ elif select_option == "Regression":
                     
                         export_loo_results(reg, loo, "GradientBoostingR_loo")
 
-        if inputs['model'] == 'XGBRegressor':
+        # if inputs['model'] == 'XGBRegressor':
 
+        #     with col2:
+        #         with st.expander('Operator'):
+        #             operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
+                
+        #             if operator == 'train test split':
+        #                 inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+        #                 reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'], random_state=inputs['random state'])
+        #             elif operator == 'cross val score':
+        #                 cv = st.number_input('cv',1,20,5)
+        #             elif operator == 'leave one out':
+        #                 loo = LeaveOneOut()
+        #     colored_header(label="Training", description=" ",color_name="violet-30")
+        #     with st.container():
+        #         button_train = st.button('Train', use_container_width=True)
+        #     if button_train:
+
+        #         if operator == 'train test split':
+
+        #                 reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+        #                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+        #                                             learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+        #                 reg.XGBRegressor()
+
+        #                 result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+        #                 result_data.columns = ['actual','prediction']
+
+        #                 plot_and_export_results(reg, "XGBR")
+
+        #         elif operator == 'cross val score':
+        #                 reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+        #                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+        #                                             learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+ 
+        #                 export_cross_val_results(reg, cv, "XGBR_cv", inputs['random state'])
+
+        #         elif operator == 'leave one out':
+        #                 reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+        #                                             max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+        #                                             learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+                    
+        #                 export_loo_results(reg, loo, "XGBR_loo")
+
+        if inputs['model'] == 'XGBRegressor':
             with col2:
                 with st.expander('Operator'):
-                    operator = st.selectbox('data operator', ('train test split','cross val score','leave one out'))
-                
+                    preprocess = st.selectbox('data preprocess',['StandardScaler','MinMaxScaler'])
+                    operator = st.selectbox('operator', ('train test split','cross val score', 'leave one out'), label_visibility='collapsed')
                     if operator == 'train test split':
                         inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
-                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'], random_state=inputs['random state'])
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        
+                        reg.features = pd.DataFrame(reg.features)    
+                        
+                        reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.features,reg.targets,test_size=inputs['test size'],random_state=inputs['random state'])
+
                     elif operator == 'cross val score':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
                         cv = st.number_input('cv',1,20,5)
+
                     elif operator == 'leave one out':
+                        if preprocess == 'StandardScaler':
+                            reg.features = StandardScaler().fit_transform(reg.features)
+                        if preprocess == 'MinMaxScaler':
+                            reg.features = MinMaxScaler().fit_transform(reg.features)
+                        reg.features = pd.DataFrame(reg.features)    
                         loo = LeaveOneOut()
+
             colored_header(label="Training", description=" ",color_name="violet-30")
             with st.container():
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
-
+                
                 if operator == 'train test split':
 
+                    if inputs['base estimator'] == "gbtree": 
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+                        reg.XGBRegressor()
+        
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        
+                        plot_and_export_results(reg, "XGBR")
+
+                    
+                    elif inputs['base estimator'] == "gblinear": 
                         reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                     learning_rate=inputs['learning rate'], random_state = inputs['random state'])
@@ -1670,21 +1744,47 @@ elif select_option == "Regression":
                         result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                         result_data.columns = ['actual','prediction']
 
-                        plot_and_export_results(reg, "XGBR")
+                        plot_and_export_results(reg, "AdaBoostR")
+                    
 
                 elif operator == 'cross val score':
-                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                    if inputs['base estimator'] == "gbtree": 
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=inputs['nestimators'], 
                                                     max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                     learning_rate=inputs['learning rate'], random_state = inputs['random state'])
- 
+
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+
                         export_cross_val_results(reg, cv, "XGBR_cv", inputs['random state'])
 
-                elif operator == 'leave one out':
-                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                    elif inputs['base estimator'] == "gblinear": 
+
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=inputs['nestimators'], 
                                                     max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                     learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+                        cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
+            
+                        export_cross_val_results(reg, cv, "XGBR_cv", inputs['random state'])
+
+
+                elif operator == 'leave one out':
+                    if inputs['base estimator'] == "gbtree": 
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])  
                     
                         export_loo_results(reg, loo, "XGBR_loo")
+
+                    elif inputs['base estimator'] == "gblinear": 
+
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])  
+                        
+                        export_loo_results(reg, loo, "XGBR_loo")
+
+
+
 
         if inputs['model'] == 'CatBoostRegressor':
             with col2:
@@ -1787,7 +1887,6 @@ elif select_option == "Regression":
 
             st.write('---')
 
-
         if inputs['model'] == 'BaggingRegressor':
             with col2:
                 with st.expander('Operator'):
@@ -1827,10 +1926,11 @@ elif select_option == "Regression":
                 if operator == 'train test split':
 
                     if inputs['base estimator'] == "DecisionTree": 
-                        reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
                         
-                        reg.BaggingRegressor()
+                        reg.XGBRegressor()
         
 
                         result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
@@ -1863,8 +1963,7 @@ elif select_option == "Regression":
                 elif operator == 'cross val score':
                     if inputs['base estimator'] == "DecisionTree": 
                         reg.model = BaggingRegressor(estimator = tree.DecisionTreeRegressor(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-
+                                                        max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1)
                         cvs = CV(reg.model, reg.features, reg.targets, cv = cv, scoring=make_scorer(r2_score), return_train_score=False, return_estimator=True)
 
                         export_cross_val_results(reg, cv, "BaggingR_cv", inputs['random state'])
