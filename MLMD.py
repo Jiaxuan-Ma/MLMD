@@ -94,7 +94,7 @@ from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from sko.PSO import PSO
 from sko.DE import DE
 # from sko.AFSA import AFSA
-from sko.SA import SAFast
+from sko.SA import SAFast, SABoltzmann
 
 # import sys
 from prettytable import PrettyTable
@@ -3594,12 +3594,10 @@ elif select_option == "Surrogate Optimization":
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                 elif inputs['model'] == 'SA':
                     x0 = calculate_mean(inputs['lb'], inputs['ub'])
-                    alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
-                                lb=inputs['lb'], ub=inputs['ub'])
-
+                    alg = SABoltzmann(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'], lb=inputs['lb'], ub=inputs['ub'])
                     best_x, best_y = alg.run()
 
-                    loss_history = alg.generation_best_Y
+                    loss_history = alg.best_y_history
                     if inputs['objective'] == 'max':
                         loss_history = -np.array(loss_history)     
 
