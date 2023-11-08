@@ -3058,11 +3058,30 @@ elif select_option == "Active Learning":
             if inputs['model'] == 'BayeSampling':
 
                 with col2:
-
+                    
                     sp.vsfeatures = df_vs
                     st.info('You have upoaded the visual sample point file.')
                     feature_name = sp.features.columns.tolist()
-                
+                    if inputs['sample criterion'] == 'Augmented Expected Improvement':
+                        with st.expander('EI HyperParamters'):
+                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                            tao = st.slider('tao',0.0, 1.0, 0.0)
+                    if inputs['sample criterion'] == 'Expected Quantile Improvement':
+                        with st.expander('EQI HyperParamters'):
+                            beta= st.slider('beta',0.2, 0.8, 0.5)
+                            tao = st.slider('tao_new',0.0, 1.0, 0.0)  
+                    if inputs['sample criterion'] == 'Upper confidence bound':
+                        with st.expander('UCB HyperParamters'):
+                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)   
+                    if inputs['sample criterion'] == 'Probability of Improvement':
+                        with st.expander('PoI HyperParamters'):
+                            tao = st.slider('tao',0.0, 0.3, 0.0)  
+                    if inputs['sample criterion'] == 'Predictive Entropy Search':
+                        with st.expander('PES HyperParamters'):
+                            sam_num = st.number_input('sample number',100, 1000, 500)     
+                    if inputs['sample criterion'] == 'Knowledge Gradient':
+                        with st.expander('Knowldge_G Hyperparameters'):
+                            MC_num = st.number_input('MC number', 50,300,50)                      
                 with st.expander('visual samples'):
                     st.write(sp.vsfeatures)
                     tmp_download_link = download_button(sp.vsfeatures, f'visual samples.csv', button_text='download')
@@ -3082,38 +3101,38 @@ elif select_option == "Active Learning":
                         res = Mymodel.EI_plugin()
 
                     elif inputs['sample criterion'] == 'Augmented Expected Improvement':
-                        with st.expander('EI HyperParamters'):
-                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)
-                            tao = st.slider('tao',0.0, 1.0, 0.0)
+                        # with st.expander('EI HyperParamters'):
+                        #     alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                        #     tao = st.slider('tao',0.0, 1.0, 0.0)
                         res = Mymodel.Augmented_EI(alpha = alpha, tao = tao)
 
                     elif inputs['sample criterion'] == 'Expected Quantile Improvement':
-                        with st.expander('EQI HyperParamters'):
-                            beta= st.slider('beta',0.2, 0.8, 0.5)
-                            tao = st.slider('tao_new',0.0, 1.0, 0.0)            
+                        # with st.expander('EQI HyperParamters'):
+                        #     beta= st.slider('beta',0.2, 0.8, 0.5)
+                        #     tao = st.slider('tao_new',0.0, 1.0, 0.0)            
                         res = Mymodel.EQI(beta = beta,tao_new = tao)
 
                     elif inputs['sample criterion'] == 'Reinterpolation Expected Improvement':  
                         res = Mymodel.Reinterpolation_EI() 
 
                     elif inputs['sample criterion'] == 'Upper confidence bound':
-                        with st.expander('UCB HyperParamters'):
-                            alpha = st.slider('alpha', 0.0, 3.0, 1.0)
+                        # with st.expander('UCB HyperParamters'):
+                        #     alpha = st.slider('alpha', 0.0, 3.0, 1.0)
                         res = Mymodel.UCB(alpha=alpha)
 
                     elif inputs['sample criterion'] == 'Probability of Improvement':
-                        with st.expander('PoI HyperParamters'):
-                            tao = st.slider('tao',0.0, 0.3, 0.0)
+                        # with st.expander('PoI HyperParamters'):
+                        #     tao = st.slider('tao',0.0, 0.3, 0.0)
                         res = Mymodel.PoI(tao = tao)
 
                     elif inputs['sample criterion'] == 'Predictive Entropy Search':
-                        with st.expander('PES HyperParamters'):
-                            sam_num = st.number_input('sample number',100, 1000, 500)
+                        # with st.expander('PES HyperParamters'):
+                        #     sam_num = st.number_input('sample number',100, 1000, 500)
                         res = Mymodel.PES(sam_num = sam_num)  
                         
                     elif inputs['sample criterion'] == 'Knowledge Gradient':
-                        with st.expander('Knowldge_G Hyperparameters'):
-                            MC_num = st.number_input('MC number', 50,300,50)
+                        # with st.expander('Knowldge_G Hyperparameters'):
+                        #     MC_num = st.number_input('MC number', 50,300,50)
                         res = Mymodel.Knowledge_G(MC_num = MC_num) 
 
                     elif inputs['sample criterion'] == 'Least Confidence':
@@ -4234,7 +4253,7 @@ elif select_option == "Others":
             reg = RFR()
             X_train, X_test, y_train, y_test = TTS(fs.features, fs.targets, random_state=0) 
             test_size = st.slider('test size',0.1, 0.5, 0.2) 
-            random_state = st.checkbox('random state 1024',True)
+            random_state = st.checkbox('random state 42',True)
             if random_state:
                 random_state = 42
             else:
@@ -4319,7 +4338,7 @@ elif select_option == "Others":
 
             model = pickle.load(model_file)
             prediction = model.predict(features)
-
+            # st.write(std)
             plot = customPlot()
             plot.pred_vs_actual(targets, prediction)
             r2 = r2_score(targets, prediction)
