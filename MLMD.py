@@ -1926,9 +1926,8 @@ elif select_option == "Regression":
                 if operator == 'train test split':
 
                     if inputs['base estimator'] == "DecisionTree": 
-                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+                        reg.model = BaggingRegressor(estimator = SVR(),n_estimators=inputs['nestimators'],
+                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
                         
                         reg.XGBRegressor()
         
