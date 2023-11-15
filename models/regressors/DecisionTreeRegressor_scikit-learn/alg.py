@@ -53,7 +53,14 @@ def show():
                 inputs['random state'] = 42
             else:
                 inputs['random state'] = None
-             
+
+            auto_hyperparameters = st.checkbox('auto hyperparameters',False)
+            if auto_hyperparameters:
+                inputs['auto hyperparameters'] = True
+                inputs['init points'] = st.number_input('init points',1, 100, 10)
+                inputs['iteration number'] = st.number_input('iteration number',1, 500, 10)
+            else:
+                inputs['auto hyperparameters'] = False             
         # graph parameter
         with st.expander("Tree Graph"):
             inputs['tree graph'] = st.checkbox('tree graph', False)

@@ -977,7 +977,7 @@ class FeatureSelector:
 
         self.model.fit(self.features, self.targets)
 
-        st.info('train process is over')
+        # st.info('train process is over')
         feature_importance_values = abs(self.model.ranking_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})     
           
@@ -995,7 +995,7 @@ class FeatureSelector:
 
         self.model.fit(self.features, self.targets.astype('int'))
 
-        st.info('train process is over')
+        # st.info('train process is over')
         feature_importance_values = abs(self.model.feature_importances_)
         self.feature_importances = pd.DataFrame({'feature': feature_names,'importance':feature_importance_values})  
     
@@ -1034,10 +1034,10 @@ class CLASSIFIER:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-     
+
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
     
@@ -1052,7 +1052,7 @@ class CLASSIFIER:
 
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
         
@@ -1068,7 +1068,7 @@ class CLASSIFIER:
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
 
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
 
@@ -1084,7 +1084,7 @@ class CLASSIFIER:
         self.Ypred = self.model.predict(self.Xtest)
 
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))
 
@@ -1099,7 +1099,7 @@ class CLASSIFIER:
 
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))    
     
@@ -1114,7 +1114,7 @@ class CLASSIFIER:
 
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
 
@@ -1129,7 +1129,7 @@ class CLASSIFIER:
 
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))   
     
@@ -1145,7 +1145,7 @@ class CLASSIFIER:
 
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
 
@@ -1160,7 +1160,7 @@ class CLASSIFIER:
 
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
 
@@ -1175,7 +1175,7 @@ class CLASSIFIER:
 
         self.Ypred = self.model.predict(self.Xtest)
         self.Ypred = pd.DataFrame(self.Ypred, columns=columns)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.score = accuracy_score(self.Ypred ,self.Ytest)
         st.write('accuracy score: {}'.format(self.score))  
 
@@ -1197,7 +1197,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest, y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1209,7 +1209,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1222,7 +1222,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1235,7 +1235,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred, self.Ystd = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1248,7 +1248,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1260,7 +1260,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         model = self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1276,7 +1276,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         model = self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1293,7 +1293,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         model = self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1310,7 +1310,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))     
@@ -1322,7 +1322,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))     
@@ -1334,7 +1334,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score)) 
@@ -1346,7 +1346,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1358,19 +1358,19 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))   
     
-    def LGBMRegressor(self):
+    def CatBRegressor(self):
         self.Ytest = self.Ytest.reset_index(drop=True)
         self.Xtest = self.Xtest.reset_index(drop=True)
         self.Ytrain = self.Ytrain.astype('float')
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred = self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1383,7 +1383,7 @@ class REGRESSOR:
         self.Ytest = self.Ytest.astype('float')
 
         self.model.fit(self.Xtrain, self.Ytrain)
-        st.info('train process is over')
+        # st.info('train process is over')
         self.Ypred= self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
@@ -1406,7 +1406,7 @@ class CLUSTER():
         self.model.fit(self.features)
     
         self.score = silhouette_score(self.features, self.model.labels_)
-        st.info('train process is over')
+        # st.info('train process is over')
         st.write('silhouette score: {}'.format(self.score))
  
 
@@ -1701,3 +1701,4 @@ def feature_transform(df, option):
     else:
         st.warning('Table title need be named "Alloy" or "Inorganic"')     
     return df
+

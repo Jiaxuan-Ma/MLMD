@@ -65,6 +65,7 @@ from catboost import CatBoostClassifier
 from catboost import CatBoostRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor as GPR
 import Bgolearn.BGOsampling as BGOS
+from bayes_opt import BayesianOptimization
 
 from typing import Optional
 import graphviz
@@ -1127,25 +1128,60 @@ elif select_option == "Regression":
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
                 if operator == 'train test split':
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                        min_samples_split=inputs['min samples split']) 
+                        
+                        reg.DecisionTreeRegressor()
 
-                    reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-                                    max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                    min_samples_split=inputs['min samples split']) 
-                    
-                    reg.DecisionTreeRegressor()
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "DTR")
 
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    plot_and_export_results(reg, "DTR")
+                        if inputs['tree graph']:
+                            class_names = list(set(reg.targets.astype(str).tolist()))
+                            dot_data = tree.export_graphviz(reg.model,out_file=None, feature_names=list(reg.features), class_names=class_names,filled=True, rounded=True)
+                            graph = graphviz.Source(dot_data)
+                            graph.render('Tree graph', view=True)
 
-                    if inputs['tree graph']:
-                        class_names = list(set(reg.targets.astype(str).tolist()))
-                        dot_data = tree.export_graphviz(reg.model,out_file=None, feature_names=list(reg.features), class_names=class_names,filled=True, rounded=True)
-                        graph = graphviz.Source(dot_data)
-                        graph.render('Tree graph', view=True)
+                    elif inputs['auto hyperparameters']:
+                        def DTR_TT(max_depth, min_samples_leaf, min_samples_split):
+                            reg.model = tree.DecisionTreeRegressor(max_depth=int(max_depth), min_samples_leaf=int(min_samples_leaf), min_samples_split=int(min_samples_split))
+                            reg.DecisionTreeRegressor()
+                            return reg.score
+                        
+                        DTRbounds = {'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                        
+                            optimizer = BayesianOptimization(f=DTR_TT, pbounds=DTRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                                        max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                        min_samples_split=params_best['min_samples_split']) 
+                        
+                        reg.DecisionTreeRegressor()
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "DTR")
+
+                        if inputs['tree graph']:
+                            class_names = list(set(reg.targets.astype(str).tolist()))
+                            dot_data = tree.export_graphviz(reg.model,out_file=None, feature_names=list(reg.features), class_names=class_names,filled=True, rounded=True)
+                            graph = graphviz.Source(dot_data)
+                            graph.render('Tree graph', view=True)
 
                 elif operator == 'cross val score':
-
                     reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
                         max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
                         min_samples_split=inputs['min samples split']) 
@@ -1183,17 +1219,46 @@ elif select_option == "Regression":
             
             if button_train:
                 if operator == 'train test split':
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = RFR( n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                        min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
+                                                        n_jobs=inputs['njobs'])
+                        reg.RandomForestRegressor()
 
-                    reg.model = RFR( n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                    min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
-                                                    n_jobs=inputs['njobs'])
-                    
-                    reg.RandomForestRegressor()
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "RFR")
 
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    plot_and_export_results(reg, "RFR")
+                    elif inputs['auto hyperparameters']:
+                        def RFR_TT(n_estimators, max_depth, min_samples_leaf, min_samples_split):
+                            
+                            reg.model = RFR(n_estimators=int(n_estimators),max_depth=int(max_depth),min_samples_leaf=int(min_samples_leaf),
+                                                        min_samples_split=int(min_samples_split), n_jobs=-1)
+                            reg.RandomForestRegressor()
+                            return reg.score
+                        
+                        RFRbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=RFR_TT, pbounds=RFRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = RFR(n_estimators=params_best['n_estimators'],random_state=inputs['random state'],max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                    min_samples_split=params_best['min_samples_split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
+                                    n_jobs=inputs['njobs'])
+                        
+                        reg.RandomForestRegressor()
 
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "RFR")
 
                 elif operator == 'cross val score':
 
@@ -1257,16 +1322,39 @@ elif select_option == "Regression":
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
                 if operator == 'train test split':
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
+                        
+                        reg.SupportVector()
 
-                    reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        
+                        plot_and_export_results(reg, "SVR")
                     
-                    reg.SupportVector()
+                    elif inputs['auto hyperparameters']:
+                        def SVR_TT(C):                            
+                            reg.model = SVR(kernel='rbf', C=C)
+                            reg.SupportVector()
+                            return reg.score
+                        
+                        SVRbounds = {'C':(0.001, inputs['C'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=SVR_TT, pbounds=SVRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['kernel'] = 'rbf'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = SVR(kernel='rbf', C=params_best['C'])
 
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    
-                    plot_and_export_results(reg, "SVR")
+                        reg.SupportVector()
 
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "SVR")                    
                 elif operator == 'cross val score':
 
                     reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
@@ -1398,16 +1486,38 @@ elif select_option == "Regression":
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
                 if operator == 'train test split':
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
+                        
+                        reg.KNeighborsRegressor()
 
-                    reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
-                    
-                    reg.KNeighborsRegressor()
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        
+                        plot_and_export_results(reg, "KNR")
+                    elif inputs['auto hyperparameters']:
+                        def KNNR_TT(n_neighbors):                            
+                            reg.model = KNeighborsRegressor(n_neighbors = int(n_neighbors))
+                            reg.KNeighborsRegressor()
+                            return reg.score
+                        
+                        KNNRbounds = {'n_neighbors':(1, inputs['n neighbors'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=KNNR_TT, pbounds=KNNRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_neighbors'] = int(params_best['n_neighbors'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = KNeighborsRegressor(n_neighbors = params_best['n_neighbors'])
 
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    
-                    plot_and_export_results(reg, "KNR")
+                        reg.KNeighborsRegressor()
 
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "KNNR")   
                 elif operator == 'cross val score':
 
                     reg.model = KNeighborsRegressor(n_neighbors = inputs['n neighbors'])
@@ -1466,7 +1576,7 @@ elif select_option == "Regression":
                     result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                     result_data.columns = ['actual','prediction']
                     plot_and_export_results(reg, "LinearR")                     
-
+                    
 
                 elif operator == 'cross val score':
 
@@ -1519,16 +1629,38 @@ elif select_option == "Regression":
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
                 if operator == 'train test split':
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
+                        
+                        reg.LassoRegressor()
 
-                    reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        
+                        plot_and_export_results(reg, "LassoR")
                     
-                    reg.LassoRegressor()
+                    elif inputs['auto hyperparameters']:
+                        def LassoR_TT(alpha):                            
+                            reg.model = Lasso(alpha=alpha)
+                            reg.LassoRegressor()
+                            return reg.score
+                        
+                        LassoRbounds = {'alpha':(0.001, inputs['alpha'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=LassoR_TT, pbounds=LassoRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = Lasso(alpha=params_best['alpha'],random_state=inputs['random state'])
 
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    
-                    plot_and_export_results(reg, "LassoR")
+                        reg.LassoRegressor()
 
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "LassoR")   
                 elif operator == 'cross val score':
 
                     reg.model = Lasso(alpha=inputs['alpha'],random_state=inputs['random state'])
@@ -1578,16 +1710,38 @@ elif select_option == "Regression":
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
                 if operator == 'train test split':
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
+                        
+                        reg.RidgeRegressor()
 
-                    reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+
+                        plot_and_export_results(reg, "RidgeR")
                     
-                    reg.RidgeRegressor()
+                    elif inputs['auto hyperparameters']:
+                        def RidgeR_TT(alpha):                            
+                            reg.model = Ridge(alpha=alpha)
+                            reg.RidgeRegressor()
+                            return reg.score
+                        
+                        RidgeRbounds = {'alpha':(0.001, inputs['alpha'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=RidgeR_TT, pbounds=RidgeRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = Ridge(alpha=params_best['alpha'], random_state=inputs['random state'])
 
-                    result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
+                        reg.RidgeRegressor()
 
-                    plot_and_export_results(reg, "RidgeR")
-
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "RidgeR")   
                 elif operator == 'cross val score':
 
                     reg.model = Ridge(alpha=inputs['alpha'], random_state=inputs['random state'])
@@ -1620,16 +1774,39 @@ elif select_option == "Regression":
             if button_train:
 
                 if operator == 'train test split':
+                        if inputs['auto hyperparameters'] == False:
+                            reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
+                                                                random_state=inputs['random state']) 
+                            
+                            reg.GradientBoostingRegressor()
+            
+                            result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            result_data.columns = ['actual','prediction']
+                            plot_and_export_results(reg, "GradientBoostingR")
 
-                        reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
-                                                            random_state=inputs['random state']) 
-                        
-                        reg.GradientBoostingRegressor()
-        
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        plot_and_export_results(reg, "GradientBoostingR")
+                        elif inputs['auto hyperparameters']:
+                            def GBR_TT(learning_rate, n_estimators):                            
+                                reg.model = GradientBoostingRegressor(learning_rate=learning_rate, n_estimators=int(n_estimators),max_features=inputs['max features'])                                           
+                                reg.GradientBoostingRegressor()
+                                return reg.score
+                            
+                            GBRbounds = {'learning_rate':(0.001, inputs['learning rate']), 'n_estimators':(1, inputs['nestimators'])}
+                            
+                            with st.expander('hyperparameter opt'):
+                                optimizer = BayesianOptimization(f=GBR_TT, pbounds=GBRbounds, random_state=inputs['random state'])
+                                optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                            params_best = optimizer.max["params"]
+                            score_best = optimizer.max["target"]
+                            params_best['n_estimators'] = int(params_best['n_estimators'])
+                            params_best['max_features'] = inputs['max features']
+                            st.write("\n","\n","best params: ", params_best)
+                            reg.model = GradientBoostingRegressor(learning_rate=params_best['learning_rate'],n_estimators=params_best['n_estimators'],max_features=params_best['max_features'],
+                                                                random_state=inputs['random state']) 
+                            reg.GradientBoostingRegressor()
 
+                            result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                            result_data.columns = ['actual','prediction']
+                            plot_and_export_results(reg, "GBR")   
                 elif operator == 'cross val score':
                         reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
                                                             random_state=inputs['random state'])  
@@ -1722,30 +1899,91 @@ elif select_option == "Regression":
             if button_train:
                 
                 if operator == 'train test split':
+                        if inputs['base estimator'] == "gbtree": 
+                            if inputs['auto hyperparameters'] == False:
+                                reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=inputs['nestimators'], 
+                                                            max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                            learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+                                reg.XGBRegressor()
+                
+                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                                result_data.columns = ['actual','prediction']
+                                
+                                plot_and_export_results(reg, "XGBR")
 
-                    if inputs['base estimator'] == "gbtree": 
-                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=inputs['nestimators'], 
-                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
-                        reg.XGBRegressor()
-        
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        
-                        plot_and_export_results(reg, "XGBR")
+                            elif inputs['auto hyperparameters']:
+                                def XGBR_TT(n_estimators, max_depth, subsample, colsample_bytree, learning_rate):
+                                    
+                                    reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=int(n_estimators), 
+                                                                max_depth= int(max_depth), subsample=subsample, colsample_bytree=colsample_bytree, 
+                                                                learning_rate=learning_rate)
+                                    reg.XGBRegressor()
+                                    return reg.score
+                                
+                                XGBRbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'subsample':(0.5, inputs['subsample']), 'colsample_bytree':(0.5, inputs['subsample']), 'learning_rate':(0.001, inputs['learning rate'])}
+                                
+                                with st.expander('hyperparameter opt'):
+                                    optimizer = BayesianOptimization(f=XGBR_TT, pbounds=XGBRbounds, random_state=inputs['random state'])
+                                    optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                                params_best = optimizer.max["params"]
+                                score_best = optimizer.max["target"]
+                                params_best['n_estimators'] = int(params_best['n_estimators'])
+                                params_best['max_depth'] = int(params_best['max_depth'])
+                                params_best['base estimator'] = 'gbtree'
+                                st.write("\n","\n","best params: ", params_best)
+                                
+                                reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=params_best['n_estimators'], 
+                                                            max_depth= params_best['max_depth'], subsample=params_best['subsample'], colsample_bytree=params_best['colsample_bytree'], 
+                                                            learning_rate=params_best['learning_rate'])
+                                
+                                reg.XGBRegressor()
 
+                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                                result_data.columns = ['actual','prediction']
+                                plot_and_export_results(reg, "XGBR")
+
+                        elif inputs['base estimator'] == "gblinear": 
+                            if inputs['auto hyperparameters'] == False:
+                                reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
+                                                            max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                            learning_rate=inputs['learning rate'], random_state = inputs['random state'])
+                                reg.XGBRegressor()
+
+                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                                result_data.columns = ['actual','prediction']
+
+                                plot_and_export_results(reg, "XGBR")
+
+                            elif inputs['auto hyperparameters']:
+                                def XGBR_TT(n_estimators, max_depth, subsample, colsample_bytree, learning_rate):
+                                    
+                                    reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=int(n_estimators), 
+                                                                max_depth= int(max_depth), subsample=subsample, colsample_bytree=colsample_bytree, 
+                                                                learning_rate=learning_rate)
+                                    reg.XGBRegressor()
+                                    return reg.score
                     
-                    elif inputs['base estimator'] == "gblinear": 
-                        reg.model = xgb.XGBRegressor(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                    max_depth= inputs['max depth'], subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                    learning_rate=inputs['learning rate'], random_state = inputs['random state'])
-                        reg.XGBRegressor()
+                                XGBRbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'subsample':(0.5, inputs['subsample']), 'colsample_bytree':(0.5, inputs['subsample']), 'learning_rate':(0.001, inputs['learning rate'])}
+                                
+                                with st.expander('hyperparameter opt'):
+                                    optimizer = BayesianOptimization(f=XGBR_TT, pbounds=XGBRbounds, random_state=inputs['random state'])
+                                    optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                                params_best = optimizer.max["params"]
+                                score_best = optimizer.max["target"]
+                                params_best['n_estimators'] = int(params_best['n_estimators'])
+                                params_best['max_depth'] = int(params_best['max_depth'])
+                                params_best['base estimator'] = 'gblinear'
+                                st.write("\n","\n","best params: ", params_best)
+                                
+                                reg.model = xgb.XGBRegressor(booster=inputs['base estimator'] , n_estimators=params_best['n_estimators'], 
+                                                            max_depth= params_best['max_depth'], subsample=params_best['subsample'], colsample_bytree=params_best['colsample_bytree'], 
+                                                            learning_rate=params_best['learning_rate'])
+                                
+                                reg.XGBRegressor()
 
-                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-
-                        plot_and_export_results(reg, "AdaBoostR")
-                    
+                                result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                                result_data.columns = ['actual','prediction']
+                                plot_and_export_results(reg, "XGBR")
 
                 elif operator == 'cross val score':
                     if inputs['base estimator'] == "gbtree": 
@@ -1784,8 +2022,6 @@ elif select_option == "Regression":
                         export_loo_results(reg, loo, "XGBR_loo")
 
 
-
-
         if inputs['model'] == 'CatBoostRegressor':
             with col2:
                 with st.expander('Operator'):
@@ -1804,16 +2040,39 @@ elif select_option == "Regression":
             if button_train:
 
                 if operator == 'train test split':
-
+                    if inputs['auto hyperparameters'] == False:
                         reg.model =CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
-                        reg.LGBMRegressor()
+                        reg.CatBRegressor()
 
                         result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                         result_data.columns = ['actual','prediction']
 
                         plot_and_export_results(reg, "CatBoostR")
+                    elif inputs['auto hyperparameters']:
+                        def CatBR_TT(iterations, depth, learning_rate): 
+                            reg.model = CatBoostRegressor(iterations=int(iterations),learning_rate=learning_rate,depth = int(depth))
+                            reg.CatBRegressor()
+                            return reg.score
+                        
+                        CatBRbounds = {'iterations':(1, inputs['niteration']), 'depth':(1, inputs['max depth']), 'learning_rate':(0.001, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=CatBR_TT, pbounds=CatBRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['iterations'] = int(params_best['iterations'])
+                        params_best['depth'] = int(params_best['depth'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = CatBoostRegressor(iterations=params_best['iterations'],learning_rate=params_best['learning_rate'],depth = params_best['depth'], random_seed=inputs['random state'])
+                        
+                        reg.CatBRegressor()
 
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "CatBR")
                 elif operator == 'cross val score':
                         reg.model = CatBoostRegressor(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
                         
