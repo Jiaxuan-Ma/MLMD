@@ -1182,20 +1182,70 @@ elif select_option == "Regression":
                             graph.render('Tree graph', view=True)
 
                 elif operator == 'cross val score':
-                    reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                        min_samples_split=inputs['min samples split']) 
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                            min_samples_split=inputs['min samples split']) 
 
-                    export_cross_val_results(reg, cv, "DTR_cv", inputs['random state'])
-        
+                        export_cross_val_results(reg, cv, "DTR_cv", inputs['random state'])
+
+                    elif inputs['auto hyperparameters']:
+                        def DTR_TT(max_depth, min_samples_leaf, min_samples_split):
+                            reg.model = tree.DecisionTreeRegressor(max_depth=int(max_depth), min_samples_leaf=int(min_samples_leaf), min_samples_split=int(min_samples_split))
+                            cv_score = cv_cal(reg, cv, inputs['random state'])
+                            return cv_score
+                        
+                        DTRbounds = {'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                        
+                            optimizer = BayesianOptimization(f=DTR_TT, pbounds=DTRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)                        
+                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                                        max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                        min_samples_split=params_best['min_samples_split']) 
+                        
+                        export_cross_val_results(reg, cv, "DTR_cv", inputs['random state'])                          
+
+
                 elif operator == 'leave one out':
-
-                    reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
-                        max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                        min_samples_split=inputs['min samples split']) 
+                    if inputs['auto hyperparameters'] == False:
+                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                            min_samples_split=inputs['min samples split']) 
                     
-                    export_loo_results(reg, loo, "DTR_loo")
+                        export_loo_results(reg, loo, "DTR_loo")
 
+                    elif inputs['auto hyperparameters']:
+                        def DTR_TT(max_depth, min_samples_leaf, min_samples_split):
+                            reg.model = tree.DecisionTreeRegressor(max_depth=int(max_depth), min_samples_leaf=int(min_samples_leaf), min_samples_split=int(min_samples_split))
+                            loo_score = loo_cal(reg, loo)
+                            return loo_score
+                        
+                        DTRbounds = {'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                        
+                            optimizer = BayesianOptimization(f=DTR_TT, pbounds=DTRbounds, random_state=inputs['random state'])
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)                        
+                        reg.model = tree.DecisionTreeRegressor(random_state=inputs['random state'],splitter=inputs['splitter'],
+                                        max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                        min_samples_split=params_best['min_samples_split'])                     
+                        export_loo_results(reg, loo, "DTR_loo")
         if inputs['model'] == 'RandomForestRegressor':
             with col2:
                 with st.expander('Operator'):

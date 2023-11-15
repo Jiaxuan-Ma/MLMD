@@ -1452,6 +1452,12 @@ def export_cross_val_results(model, F, model_name, random_state):
         tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
+def cv_cal(model, F, random_state):
+    # chose the last mode in CV
+    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model, random_state)    
+    cv_score = r2_score(y_true=Y_test, y_pred=Y_pred)
+    return cv_score
+
 def export_cross_val_results_clf(model, F, model_name, col_name, unique_categories, random_state):
     
     Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model, random_state) 
@@ -1509,7 +1515,21 @@ def export_loo_results(model, loo, model_name):
         st.write(result_data)
         tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
+def loo_cal(model, loo):
+    Y_pred  =[]
+    Y_test = []
+    features = pd.DataFrame(model.features).values
+    targets = model.targets.values
 
+    for train,test in loo.split(features):
+        Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
+        
+        model.model.fit(Xtrain, Ytrain)
+        Ypred = model.model.predict(Xtest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
+    loo_score = r2_score(y_true=Y_test, y_pred=Y_pred)
+    return loo_score
 
 def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
     Y_pred  =[]
