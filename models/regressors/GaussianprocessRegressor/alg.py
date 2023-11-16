@@ -39,8 +39,7 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['kernel'] = st.selectbox('kernel',[None, 'DotProduct','WhiteKernel','DotProduct+WhiteKernel','CompoundKernel','ConstantKernel','Exponentiation',\
-                                                        'ExpSineSquared', 'Hyperparameter', 'Kernel', 'Matern', 'PairwiseKernel', 'Product', 'RationalQuadratic', 'RBF', 'Sum'])
+            inputs['kernel'] = st.selectbox('kernel',[None, 'DotProduct','WhiteKernel','DotProduct+WhiteKernel','Matern', 'PairwiseKernel', 'RationalQuadratic', 'RBF'])
             random_state = st.checkbox('random state 42',True)
             if random_state:
                 inputs['random state'] = 42
