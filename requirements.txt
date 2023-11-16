@@ -3,7 +3,7 @@ Bgolearn==2.0.0
 catboost==1.2
 graphviz==0.20.1
 matplotlib==3.6.3
-numpy==1.23.5
+numpy==1.25
 pandas==1.5.3
 Pillow==9.5.0
 PyYAML==6.0
@@ -22,6 +22,5 @@ SciencePlots==2.1.0
 prettytable==3.8.0
 tabulate==0.9.0
 pymoo==0.6.0.1
-SciencePlots==2.1.0
-numpy
-matminer
+matminer==0.9.0
+bayesian-optimization==1.4.3
