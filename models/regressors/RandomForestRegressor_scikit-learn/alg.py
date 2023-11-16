@@ -43,10 +43,7 @@ def show():
             inputs['criterion'] = st.selectbox('criterion',('squared_error','friedman_mse','absolute_error','poisson'))
             inputs['nestimators'] = st.number_input('number estimators',1, 10000, 100)
             inputs['splitter'] = st.selectbox('splitter',('best','random'))
-            max_depth = st.checkbox('max depth', None)
-            inputs['max depth'] = None
-            if max_depth:
-                inputs['max depth'] = st.number_input('max depth',1, 1000, 3)
+            inputs['max depth'] = st.number_input('max depth',1, 1000, 3)
             inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 100, 1)
             inputs['min samples split'] = st.number_input('min samples split', 2, 100, 2)
             inputs['oob score'] = False

@@ -43,15 +43,21 @@ def show():
             inputs['base estimator'] = st.selectbox('base estimator',['DecisionTree', 'SupportVector', 'LinearRegression'])
             inputs['nestimators'] = st.number_input('number estimators',1, 10000, 100)
             # if inputs['base estimator'] != 'SupportVector':
-            inputs['max samples'] = st.number_input('max samples',1, 100, 1)
-            inputs['max features'] = st.number_input('max features',1,100, 1)
+            inputs['max samples'] = st.number_input('max samples',1, 100, 2)
+            inputs['max features'] = st.number_input('max features',1,100, 2)
 
             random_state = st.checkbox('random state 42',True)
             if random_state:
                 inputs['random state'] = 42
             else:
                 inputs['random state'] = None
-
+            auto_hyperparameters = st.checkbox('auto hyperparameters',False)
+            if auto_hyperparameters:
+                inputs['auto hyperparameters'] = True
+                inputs['init points'] = st.number_input('init points',1, 100, 10)
+                inputs['iteration number'] = st.number_input('iteration number',1, 500, 10)
+            else:
+                inputs['auto hyperparameters'] = False  
     return inputs,col2
 
 
