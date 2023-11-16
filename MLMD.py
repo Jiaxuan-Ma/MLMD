@@ -130,8 +130,8 @@ with st.sidebar:
              
     Contact: jiaxuanma.shu@gmail.com
     ''')
-    select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Surrogate Optimization","Active Learning","Others"],
-                    icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft'],
+    select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Model Inference","Surrogate Optimization","Active Learning","Interpretable Machine Learning"],
+                    icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft','search','book-half'],
                     menu_icon="boxes", default_index=0)
 if select_option == "Home Page":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
@@ -5753,145 +5753,144 @@ elif select_option == "Surrogate Optimization":
                     loss_history = pd.DataFrame(loss_history)
                     tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    
-elif select_option == "Others":
-    with st.sidebar:
-        sub_option = option_menu(None, ["Model Inference","Interpretable Machine Learning"])
-    if sub_option == "Interpretable Machine Learning":
-        colored_header(label="Interpretable Machine Learning",description=" ",color_name="violet-90")
 
-        file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
-        if file is None:
-            table = PrettyTable(['file name', 'class','description'])
-            table.add_row(['file_1','dataset','data file'])
-            st.write(table)        
-        if file is not None:
-            df = pd.read_csv(file)
-            check_string_NaN(df)
-            colored_header(label="Data information", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df), 5)
-            df_nrow = df.head(nrow)
-            st.write(df_nrow)
+elif select_option == "Model Inference":
+    
+    colored_header(label="Model Inference",description=" ",color_name="violet-90")
+    file = st.file_uploader("Upload `.csv`file", label_visibility="collapsed", accept_multiple_files=True)
+    if len(file) < 2:
+        table = PrettyTable(['file name', 'class','description'])
+        table.add_row(['file_1','data set','data file'])
+        table.add_row(['file_2','model','model'])
+        st.write(table)
+    elif len(file) == 2:
+        df = pd.read_csv(file[0])
+        model_file = file[1]
 
-            colored_header(label="Feature and target",description=" ",color_name="violet-70")
+        check_string_NaN(df)
 
-            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
-            
-            col_feature, col_target = st.columns(2)
-                
-            features = df.iloc[:,:-target_num]
-            # targets
-            targets = df.iloc[:,-target_num:]
-            with col_feature:    
-                st.write(features.head())
-            with col_target:   
-                st.write(targets.head())
+        colored_header(label="Data information", description=" ",color_name="violet-70")
+        nrow = st.slider("rows", 1, len(df), 5)
+        df_nrow = df.head(nrow)
+        st.write(df_nrow)
 
-            colored_header(label="Shapley value",description=" ",color_name="violet-70")
+        colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            fs = FeatureSelector(features, targets)
+        target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
 
-            target_selected_option = st.selectbox('choose target', list(fs.targets))
-            fs.targets = fs.targets[target_selected_option]
+        col_feature, col_target = st.columns(2)
+        # features
+        features = df.iloc[:,:-target_num]
+        # targets
+        targets = df.iloc[:,-target_num:]
+        with col_feature:    
+            st.write(features.head())
+        with col_target:   
+            st.write(targets.head())    
+        colored_header(label="target", description=" ", color_name="violet-70")
 
-            reg = RFR()
-            X_train, X_test, y_train, y_test = TTS(fs.features, fs.targets, random_state=0) 
-            test_size = st.slider('test size',0.1, 0.5, 0.2) 
-            random_state = st.checkbox('random state 42',True)
-            if random_state:
-                random_state = 42
-            else:
-                random_state = None
-                
-            fs.Xtrain,fs.Xtest, fs.Ytrain, fs.Ytest = TTS(fs.features,fs.targets,test_size=test_size,random_state=random_state)
-            reg.fit(fs.Xtrain, fs.Ytrain)
+        target_selected_option = st.selectbox('target', list(targets)[::-1])
 
-            explainer = shap.TreeExplainer(reg)
-            
-            shap_values = explainer(fs.features)
+        targets = targets[target_selected_option]
+        preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
+        if preprocess == 'StandardScaler':
+            features = StandardScaler().fit_transform(features)
+        elif preprocess == 'MinMaxScaler':
+            features = MinMaxScaler().fit_transform(features)
 
-            colored_header(label="SHAP Feature Importance", description=" ",color_name="violet-30")
-            nfeatures = st.slider("features", 2, fs.features.shape[1],fs.features.shape[1])
-            st_shap(shap.plots.bar(shap_values, max_display=nfeatures))
+        model = pickle.load(model_file)
+        prediction = model.predict(features)
+        # st.write(std)
+        plot = customPlot()
+        plot.pred_vs_actual(targets, prediction)
+        r2 = r2_score(targets, prediction)
+        st.write('R2: {}'.format(r2))
+        result_data = pd.concat([targets, pd.DataFrame(prediction)], axis=1)
+        result_data.columns = ['actual','prediction']
+        with st.expander('prediction'):
+            st.write(result_data)
+            tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+        st.write('---')
 
-            colored_header(label="SHAP Feature Cluster", description=" ",color_name="violet-30")
-            clustering = shap.utils.hclust(fs.features, fs.targets)
-            clustering_cutoff = st.slider('clustering cutoff', 0.0,1.0,0.5)
-            nfeatures = st.slider("features", 2, fs.features.shape[1],fs.features.shape[1], key=2)
-            st_shap(shap.plots.bar(shap_values, clustering=clustering, clustering_cutoff=clustering_cutoff, max_display=nfeatures))
+elif select_option == "Interpretable Machine Learning":
+    colored_header(label="Interpretable Machine Learning",description=" ",color_name="violet-90")
 
-            colored_header(label="SHAP Beeswarm", description=" ",color_name="violet-30")
-            rank_option = st.selectbox('rank option',['max','mean'])
-            max_dispaly = st.slider('max display',2, fs.features.shape[1],fs.features.shape[1])
-            if rank_option == 'max':
-                st_shap(shap.plots.beeswarm(shap_values, order = shap_values.abs.max(0), max_display =max_dispaly))
-            else:
-                st_shap(shap.plots.beeswarm(shap_values, order = shap_values.abs.mean(0), max_display =max_dispaly))
+    file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
+    if file is None:
+        table = PrettyTable(['file name', 'class','description'])
+        table.add_row(['file_1','dataset','data file'])
+        st.write(table)        
+    if file is not None:
+        df = pd.read_csv(file)
+        check_string_NaN(df)
+        colored_header(label="Data information", description=" ",color_name="violet-70")
+        nrow = st.slider("rows", 1, len(df), 5)
+        df_nrow = df.head(nrow)
+        st.write(df_nrow)
 
-            colored_header(label="SHAP Dependence", description=" ",color_name="violet-30")
-            
-            shap_values = explainer.shap_values(fs.features) 
-            list_features = fs.features.columns.tolist()
-            feature = st.selectbox('feature',list_features)
-            interact_feature = st.selectbox('interact feature', list_features)
-            st_shap(shap.dependence_plot(feature, shap_values, fs.features, display_features=fs.features,interaction_index=interact_feature))
+        colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-    elif sub_option == "Model Inference":
+        target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
         
-        colored_header(label="Model Inference",description=" ",color_name="violet-90")
-        file = st.file_uploader("Upload `.csv`file", label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) < 2:
-            table = PrettyTable(['file name', 'class','description'])
-            table.add_row(['file_1','data set','data file'])
-            table.add_row(['file_2','model','model'])
-            st.write(table)
-        elif len(file) == 2:
-            df = pd.read_csv(file[0])
-            model_file = file[1]
+        col_feature, col_target = st.columns(2)
+            
+        features = df.iloc[:,:-target_num]
+        # targets
+        targets = df.iloc[:,-target_num:]
+        with col_feature:    
+            st.write(features.head())
+        with col_target:   
+            st.write(targets.head())
 
-            check_string_NaN(df)
+        colored_header(label="Shapley value",description=" ",color_name="violet-70")
 
-            colored_header(label="Data information", description=" ",color_name="violet-70")
-            nrow = st.slider("rows", 1, len(df), 5)
-            df_nrow = df.head(nrow)
-            st.write(df_nrow)
+        fs = FeatureSelector(features, targets)
 
-            colored_header(label="Feature and target",description=" ",color_name="violet-70")
+        target_selected_option = st.selectbox('choose target', list(fs.targets))
+        fs.targets = fs.targets[target_selected_option]
 
-            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
+        reg = RFR()
+        X_train, X_test, y_train, y_test = TTS(fs.features, fs.targets, random_state=0) 
+        test_size = st.slider('test size',0.1, 0.5, 0.2) 
+        random_state = st.checkbox('random state 42',True)
+        if random_state:
+            random_state = 42
+        else:
+            random_state = None
+            
+        fs.Xtrain,fs.Xtest, fs.Ytrain, fs.Ytest = TTS(fs.features,fs.targets,test_size=test_size,random_state=random_state)
+        reg.fit(fs.Xtrain, fs.Ytrain)
 
-            col_feature, col_target = st.columns(2)
-            # features
-            features = df.iloc[:,:-target_num]
-            # targets
-            targets = df.iloc[:,-target_num:]
-            with col_feature:    
-                st.write(features.head())
-            with col_target:   
-                st.write(targets.head())    
-            colored_header(label="target", description=" ", color_name="violet-70")
+        explainer = shap.TreeExplainer(reg)
+        
+        shap_values = explainer(fs.features)
 
-            target_selected_option = st.selectbox('target', list(targets)[::-1])
+        colored_header(label="SHAP Feature Importance", description=" ",color_name="violet-30")
+        nfeatures = st.slider("features", 2, fs.features.shape[1],fs.features.shape[1])
+        st_shap(shap.plots.bar(shap_values, max_display=nfeatures))
 
-            targets = targets[target_selected_option]
-            preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
-            if preprocess == 'StandardScaler':
-                features = StandardScaler().fit_transform(features)
-            elif preprocess == 'MinMaxScaler':
-                features = MinMaxScaler().fit_transform(features)
+        colored_header(label="SHAP Feature Cluster", description=" ",color_name="violet-30")
+        clustering = shap.utils.hclust(fs.features, fs.targets)
+        clustering_cutoff = st.slider('clustering cutoff', 0.0,1.0,0.5)
+        nfeatures = st.slider("features", 2, fs.features.shape[1],fs.features.shape[1], key=2)
+        st_shap(shap.plots.bar(shap_values, clustering=clustering, clustering_cutoff=clustering_cutoff, max_display=nfeatures))
 
-            model = pickle.load(model_file)
-            prediction = model.predict(features)
-            # st.write(std)
-            plot = customPlot()
-            plot.pred_vs_actual(targets, prediction)
-            r2 = r2_score(targets, prediction)
-            st.write('R2: {}'.format(r2))
-            result_data = pd.concat([targets, pd.DataFrame(prediction)], axis=1)
-            result_data.columns = ['actual','prediction']
-            with st.expander('prediction'):
-                st.write(result_data)
-                tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
-                st.markdown(tmp_download_link, unsafe_allow_html=True)
-            st.write('---')
+        colored_header(label="SHAP Beeswarm", description=" ",color_name="violet-30")
+        rank_option = st.selectbox('rank option',['max','mean'])
+        max_dispaly = st.slider('max display',2, fs.features.shape[1],fs.features.shape[1])
+        if rank_option == 'max':
+            st_shap(shap.plots.beeswarm(shap_values, order = shap_values.abs.max(0), max_display =max_dispaly))
+        else:
+            st_shap(shap.plots.beeswarm(shap_values, order = shap_values.abs.mean(0), max_display =max_dispaly))
+
+        colored_header(label="SHAP Dependence", description=" ",color_name="violet-30")
+        
+        shap_values = explainer.shap_values(fs.features) 
+        list_features = fs.features.columns.tolist()
+        feature = st.selectbox('feature',list_features)
+        interact_feature = st.selectbox('interact feature', list_features)
+        st_shap(shap.dependence_plot(feature, shap_values, fs.features, display_features=fs.features,interaction_index=interact_feature))
+
+
 
