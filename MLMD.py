@@ -1559,7 +1559,13 @@ elif select_option == "Regression":
                         kernel = RationalQuadratic()
                     elif inputs['kernel'] == 'RBF':
                         kernel = RBF()
-                    
+                    elif inputs['kernel'] == 'DotProduct+RationalQuadratic':
+                        kernel = DotProduct() + RationalQuadratic()
+                    elif inputs['kernel'] == 'PairwiseKernel+RationalQuadratic':
+                        kernel = PairwiseKernel() + RationalQuadratic()
+                    elif inputs['kernel'] == 'DotProduct+PairwiseKernel':
+                        kernel = DotProduct() + PairwiseKernel()
+
 
                     reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
                     
@@ -1587,6 +1593,12 @@ elif select_option == "Regression":
                         kernel = RationalQuadratic()
                     elif inputs['kernel'] == 'RBF':
                         kernel = RBF()
+                    elif inputs['kernel'] == 'DotProduct+RationalQuadratic':
+                        kernel = DotProduct() + RationalQuadratic()
+                    elif inputs['kernel'] == 'PairwiseKernel+RationalQuadratic':
+                        kernel = PairwiseKernel() + RationalQuadratic()
+                    elif inputs['kernel'] == 'DotProduct+PairwiseKernel':
+                        kernel = DotProduct() + PairwiseKernel() 
                     reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
 
                     export_cross_val_results(reg, cv, "GPR_cv",inputs['random state'])
@@ -1608,6 +1620,12 @@ elif select_option == "Regression":
                         kernel = RationalQuadratic()
                     elif inputs['kernel'] == 'RBF':
                         kernel = RBF()
+                    elif inputs['kernel'] == 'DotProduct+RationalQuadratic':
+                        kernel = DotProduct() + RationalQuadratic()
+                    elif inputs['kernel'] == 'PairwiseKernel+RationalQuadratic':
+                        kernel = PairwiseKernel() + RationalQuadratic()
+                    elif inputs['kernel'] == 'DotProduct+PairwiseKernel':
+                        kernel = DotProduct() + PairwiseKernel()
                     reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
                 
                     export_loo_results(reg, loo, "GPR_loo")
