@@ -36,7 +36,8 @@ from sklearn.linear_model import LogisticRegression as LR
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPRegressor
-from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
+from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel, RationalQuadratic, CompoundKernel, \
+Exponentiation,ConstantKernel, ExpSineSquared, Hyperparameter, Kernel, Matern, PairwiseKernel, Product, RationalQuadratic, RBF, Sum
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 
@@ -1548,8 +1549,34 @@ elif select_option == "Regression":
                         kernel = DotProduct()
                     elif inputs['kernel'] == 'WhiteKernel':
                         kernel = WhiteKernel()
-                    else:
+                    elif inputs['kernel'] == 'DotProduct+WhiteKernel':
                         kernel = DotProduct() + WhiteKernel()
+                    elif inputs['kernel'] == 'CompoundKernel':
+                        kernel = CompoundKernel()
+                    elif inputs['kernel'] == 'ConstantKernel':
+                        kernel = ConstantKernel()
+                    elif inputs['kernel'] == 'Exponentiation':
+                        kernel = Exponentiation()
+                    elif inputs['kernel'] == 'ExpSineSquared':
+                        kernel = ExpSineSquared()
+                    elif inputs['kernel'] == 'Hyperparameter':
+                        kernel = Hyperparameter()
+                    elif inputs['kernel'] == 'Kernel':
+                        kernel = Kernel()
+                    elif inputs['kernel'] == 'Matern':
+                        kernel = Matern()
+                    elif inputs['kernel'] == 'PairwiseKernel':
+                        kernel = PairwiseKernel()
+                    elif inputs['kernel'] == 'Product':
+                        kernel = Product()
+                    elif inputs['kernel'] == 'RationalQuadratic':
+                        kernel = RationalQuadratic()
+                    elif inputs['kernel'] == 'RBF':
+                        kernel = RBF()
+                    elif inputs['kernel'] == 'Sum':
+                        kernel = Sum()
+                    
+
                     reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
                     
                     reg.GPRegressor()
@@ -1568,6 +1595,33 @@ elif select_option == "Regression":
                         kernel = WhiteKernel()
                     else:
                         kernel = DotProduct() + WhiteKernel()
+                        kernel = WhiteKernel()
+                    elif inputs['kernel'] == 'DotProduct+WhiteKernel':
+                        kernel = DotProduct() + WhiteKernel()
+                    elif inputs['kernel'] == 'CompoundKernel':
+                        kernel = CompoundKernel()
+                    elif inputs['kernel'] == 'ConstantKernel':
+                        kernel = ConstantKernel()
+                    elif inputs['kernel'] == 'Exponentiation':
+                        kernel = Exponentiation()
+                    elif inputs['kernel'] == 'ExpSineSquared':
+                        kernel = ExpSineSquared()
+                    elif inputs['kernel'] == 'Hyperparameter':
+                        kernel = Hyperparameter()
+                    elif inputs['kernel'] == 'Kernel':
+                        kernel = Kernel()
+                    elif inputs['kernel'] == 'Matern':
+                        kernel = Matern()
+                    elif inputs['kernel'] == 'PairwiseKernel':
+                        kernel = PairwiseKernel()
+                    elif inputs['kernel'] == 'Product':
+                        kernel = Product()
+                    elif inputs['kernel'] == 'RationalQuadratic':
+                        kernel = RationalQuadratic()
+                    elif inputs['kernel'] == 'RBF':
+                        kernel = RBF()
+                    elif inputs['kernel'] == 'Sum':
+                        kernel = Sum()
                     reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
 
                     export_cross_val_results(reg, cv, "GPR_cv",inputs['random state'])
@@ -1581,6 +1635,33 @@ elif select_option == "Regression":
                         kernel = WhiteKernel()
                     else:
                         kernel = DotProduct() + WhiteKernel()
+                        kernel = WhiteKernel()
+                    elif inputs['kernel'] == 'DotProduct+WhiteKernel':
+                        kernel = DotProduct() + WhiteKernel()
+                    elif inputs['kernel'] == 'CompoundKernel':
+                        kernel = CompoundKernel()
+                    elif inputs['kernel'] == 'ConstantKernel':
+                        kernel = ConstantKernel()
+                    elif inputs['kernel'] == 'Exponentiation':
+                        kernel = Exponentiation()
+                    elif inputs['kernel'] == 'ExpSineSquared':
+                        kernel = ExpSineSquared()
+                    elif inputs['kernel'] == 'Hyperparameter':
+                        kernel = Hyperparameter()
+                    elif inputs['kernel'] == 'Kernel':
+                        kernel = Kernel()
+                    elif inputs['kernel'] == 'Matern':
+                        kernel = Matern()
+                    elif inputs['kernel'] == 'PairwiseKernel':
+                        kernel = PairwiseKernel()
+                    elif inputs['kernel'] == 'Product':
+                        kernel = Product()
+                    elif inputs['kernel'] == 'RationalQuadratic':
+                        kernel = RationalQuadratic()
+                    elif inputs['kernel'] == 'RBF':
+                        kernel = RBF()
+                    elif inputs['kernel'] == 'Sum':
+                        kernel = Sum()
                     reg.model = GPR(kernel = kernel, random_state = inputs['random state'])
                 
                     export_loo_results(reg, loo, "GPR_loo")
