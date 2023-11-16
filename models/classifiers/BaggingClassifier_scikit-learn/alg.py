@@ -43,8 +43,8 @@ def show():
             inputs['base estimator'] = st.selectbox('base estimator',['DecisionTree'])
             inputs['nestimators'] = st.number_input('number estimators',1, 10000, 100)
             if inputs['base estimator'] != 'SupportVector':
-                inputs['max samples'] = st.number_input('max samples',1, 100, 1)
-            inputs['max features'] = st.number_input('max features',1,100, 1)
+                inputs['max samples'] = st.number_input('max samples',1, 100, 2)
+            inputs['max features'] = st.number_input('max features',1,100, 2)
 
             random_state = st.checkbox('random state 42',True)
             if random_state:

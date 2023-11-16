@@ -3794,7 +3794,7 @@ elif select_option == "Classification":
             if button_train:
                 if data_process == 'train test split':
                     if inputs['auto hyperparameters'] == False:    
-                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(),n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
                         clf.BaggingClassifier()
@@ -3802,7 +3802,7 @@ elif select_option == "Classification":
                     
                     elif inputs['auto hyperparameters']:
                         def BaggingC_TT(n_estimators, max_samples, max_features):
-                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                            clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier() ,n_estimators=int(n_estimators),
                                 max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
                             clf.BaggingClassifier()
                             return clf.score
@@ -3820,7 +3820,7 @@ elif select_option == "Classification":
                         params_best['base estimator'] = 'decision tree'
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier() ,n_estimators=params_best['n_estimators'],
                                 max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
                         
                         clf.BaggingClassifier()
@@ -3829,13 +3829,13 @@ elif select_option == "Classification":
 
                 elif data_process == 'cross val score':
                     if inputs['auto hyperparameters'] == False:   
-                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(),n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
                         export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories, inputs['random state']) 
                     elif inputs['auto hyperparameters']:
                         def BaggingC_TT(n_estimators, max_samples, max_features):
-                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                            clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier() ,n_estimators=int(n_estimators),
                                 max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
                             cv_score = cv_cal_clf(clf, cv, inputs['random state'])
                             return cv_score
@@ -3853,22 +3853,20 @@ elif select_option == "Classification":
                         params_best['base estimator'] = 'decision tree'
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier() ,n_estimators=params_best['n_estimators'],
                                 max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
-                        
-                        clf.BaggingClassifier()
 
                         export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories, inputs['random state'])                    
 
                 elif data_process == 'leave one out':
                     if inputs['auto hyperparameters'] == False:   
-                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(),n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
                         export_loo_results_clf(clf, loo, "BaggingC_loo", col_name, unique_categories)  
                     elif inputs['auto hyperparameters']:
                         def BaggingC_TT(n_estimators, max_samples, max_features):
-                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                            clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier() ,n_estimators=int(n_estimators),
                                 max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
                             loo_score = loo_cal_clf(clf, loo)
                             return loo_score
@@ -3886,10 +3884,8 @@ elif select_option == "Classification":
                         params_best['base estimator'] = 'decision tree'
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier() ,n_estimators=params_best['n_estimators'],
                                 max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
-                        
-                        clf.BaggingClassifier()
 
                         export_loo_results_clf(clf, loo, "BaggingC_loo", col_name, unique_categories)                         
         
