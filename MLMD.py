@@ -4425,11 +4425,16 @@ elif select_option == "Cluster & ReduceDim":
             st.write(features.head())
         with col_target:   
             st.write(targets.head())
-        
+        cluster = CLUSTER(features,targets)
+
+        colored_header(label="target", description=" ", color_name="violet-70")
+
+        target_selected_name = st.selectbox('target', list(cluster.targets)[::-1])
+
+        cluster.targets = targets[target_selected_name]
        #=============== cluster ================
 
         colored_header(label="Cluster & ReduceDim",description=" ",color_name="violet-70")
-        cluster = CLUSTER(features, targets)
 
         # colored_header(label="Choose Target", description=" ", color_name="violet-30")
         # target_selected_option = st.selectbox('target', list(cluster.targets)[::-1])
