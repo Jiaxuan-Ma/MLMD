@@ -40,7 +40,7 @@ def show():
     with col1:
         with st.expander("Hyper Parameter"):
        
-            inputs['base estimator'] = st.selectbox('base estimator',['DecisionTree', 'SupportVector','LogisticRegression'])
+            inputs['base estimator'] = st.selectbox('base estimator',['DecisionTree'])
             inputs['nestimators'] = st.number_input('number estimators',1, 10000, 100)
             if inputs['base estimator'] != 'SupportVector':
                 inputs['max samples'] = st.number_input('max samples',1, 100, 1)
