@@ -1016,7 +1016,7 @@ elif select_option == "Feature Engineering":
             elif inputs['model'] == 'RandomForestRegressor':
                         
                         fs.model = RFR(criterion = inputs['criterion'], n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                        min_samples_split=inputs['min samples split'],oob_score=inputs['oob score'], warm_start=inputs['warm start'],
+                                                        min_samples_split=inputs['min samples split'],warm_start=inputs['warm start'],
                                                         n_jobs=inputs['njobs'])
                         with col2:
                             option_cumulative_importance = st.slider('cumulative importance threshold',0.5, 1.0, 0.95)
@@ -1384,7 +1384,6 @@ elif select_option == "Regression":
                                     n_jobs=inputs['njobs'])
                         
                         export_loo_results(reg, loo, "RFR_loo")   
-
 
         if inputs['model'] == 'SupportVector':
 
@@ -1973,7 +1972,6 @@ elif select_option == "Regression":
                         
                         reg.model = Ridge(alpha=params_best['alpha'], random_state=inputs['random state'])
                         export_cross_val_results(reg, cv, "RidgeR_cv", inputs['random state'])
-                          
 
                 elif operator == 'leave one out':
                     if inputs['auto hyperparameters'] == False:
@@ -3337,59 +3335,118 @@ elif select_option == "Classification":
                 button_train = st.button('Train', use_container_width=True)
             if button_train:
                 if data_process == 'train test split':
-                            
-                    clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
-                                                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                                                max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
 
-                    clf.DecisionTreeClassifier()
-
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-
-                    result_data = pd.concat([clf.Ytest, clf.Ypred], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    with st.expander('Actual vs Predict'):
-                        st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'actual vs prediciton.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    if inputs['tree graph']:
-                        class_names = list(set(clf.targets.astype(str).tolist()))
-                        dot_data = tree.export_graphviz(clf.model,out_file=None, feature_names=list(clf.features), class_names=class_names,filled=True, rounded=True)
-                        graph = graphviz.Source(dot_data)
-                        graph.render('Tree graph', view=True)
-                elif data_process == 'cross val score':
-                    clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
-                                                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
-                                                            
-                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "DTC_cv", col_name, unique_categories, inputs['random state'])
-
-                elif data_process == 'leave one out':
-                    clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
-                                                            max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])                        
+                        clf.DecisionTreeClassifier()
+                        plot_and_export_results_clf(clf, 'DTC', col_name, unique_categories)
+                        if inputs['tree graph']:
+                            class_names = list(clf.features)
+                            dot_data = tree.export_graphviz(clf.model,out_file=None, feature_names=list(clf.features), class_names=class_names,filled=True, rounded=True)
+                            graph = graphviz.Source(dot_data)
+                            graph.render('Tree graph', view=True)
                     
-                    export_loo_results_clf(clf, loo, "DTC_loo", col_name, unique_categories)
+                    elif inputs['auto hyperparameters']:
+                        def DTC_TT(max_depth, min_samples_leaf, min_samples_split):
+                            clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                                                max_depth=int(max_depth),min_samples_leaf=int(min_samples_leaf),min_samples_split=int(min_samples_split))
+                            clf.DecisionTreeClassifier()
+                            return clf.score
+                        
+                        DTCbounds = {'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                        
+                            optimizer = BayesianOptimization(f=DTC_TT, pbounds=DTCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)                        
+                        clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                        max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                        min_samples_split=params_best['min_samples_split'])                     
+                        clf.DecisionTreeClassifier()
+                        plot_and_export_results_clf(clf, 'DTC', col_name, unique_categories)
+                        if inputs['tree graph']:
+                            class_names = list(clf.targets)
+                            dot_data = tree.export_graphviz(clf.model,out_file=None, feature_names=list(clf.features), class_names=class_names,filled=True, rounded=True)
+                            graph = graphviz.Source(dot_data)
+                            graph.render('Tree graph', view=True)                        
+
+                elif data_process == 'cross val score':
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                                                max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])
+                                                                
+                        export_cross_val_results_clf(clf, cv, "DTC_cv", col_name, unique_categories, inputs['random state'])
+                        if inputs['tree graph']:
+                            class_names = list(clf.targets)
+                            dot_data = tree.export_graphviz(clf.model,out_file=None, feature_names=list(clf.features), class_names=class_names,filled=True, rounded=True)
+                            graph = graphviz.Source(dot_data)
+                            graph.render('Tree graph', view=True)    
+                    elif inputs['auto hyperparameters']:
+                        def DTC_TT(max_depth, min_samples_leaf, min_samples_split):
+                            clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                                                max_depth=int(max_depth),min_samples_leaf=int(min_samples_leaf),min_samples_split=int(min_samples_split))
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
+                        
+                        DTCbounds = {'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                        
+                            optimizer = BayesianOptimization(f=DTC_TT, pbounds=DTCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)                        
+                        clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                        max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                        min_samples_split=params_best['min_samples_split'])                     
+                        export_cross_val_results_clf(clf, cv, "DTC_cv", col_name, unique_categories, inputs['random state'])
+                        if inputs['tree graph']:
+                            class_names = list(clf.targets)
+                            dot_data = tree.export_graphviz(clf.model,out_file=None, feature_names=list(clf.features), class_names=class_names,filled=True, rounded=True)
+                            graph = graphviz.Source(dot_data)
+                            graph.render('Tree graph', view=True)                   
+                elif data_process == 'leave one out':
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                                                max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],min_samples_split=inputs['min samples split'])                        
+                        export_loo_results_clf(clf, loo, "DTC_loo", col_name, unique_categories)
+                    elif inputs['auto hyperparameters']:
+                        def DTC_TT(max_depth, min_samples_leaf, min_samples_split):
+                            clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                                                max_depth=int(max_depth),min_samples_leaf=int(min_samples_leaf),min_samples_split=int(min_samples_split))
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        DTCbounds = {'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                        
+                            optimizer = BayesianOptimization(f=DTC_TT, pbounds=DTCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)                        
+                        clf.model = tree.DecisionTreeClassifier(criterion=inputs['criterion'],random_state=inputs['random state'],splitter=inputs['splitter'],
+                                        max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                        min_samples_split=params_best['min_samples_split'])                     
+                        export_loo_results_clf(clf, loo, "DTC_loo", col_name, unique_categories)                
 
         if inputs['model'] == 'RandomForestClassifier':
 
@@ -3409,56 +3466,100 @@ elif select_option == "Classification":
             if button_train:
 
                 if data_process == 'train test split':
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                    min_samples_split=inputs['min samples split'], warm_start=inputs['warm start'])
+                        
+                        clf.RandomForestClassifier()
+                        plot_and_export_results_clf(clf, 'RFC', col_name, unique_categories)
+                    elif inputs['auto hyperparameters']:
+                        def RFC_TT(n_estimators, max_depth, min_samples_leaf, min_samples_split):
+                            clf.model = RFC(criterion = inputs['criterion'],n_estimators=int(n_estimators),max_depth=int(max_depth),min_samples_leaf=int(min_samples_leaf),
+                                                        min_samples_split=int(min_samples_split), n_jobs=-1)
+                            clf.RandomForestClassifier()
+                            return clf.score
+                        
+                        RFCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=RFC_TT, pbounds=RFCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = RFC(criterion = inputs['criterion'], n_estimators=params_best['n_estimators'],random_state=inputs['random state'],max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                    min_samples_split=params_best['min_samples_split'],warm_start=inputs['warm start'],
+                                    n_jobs=-1)
+                        
+                        clf.RandomForestClassifier()
+                        plot_and_export_results_clf(clf, 'RFC', col_name, unique_categories)
 
-                    clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
-                    
-                    clf.RandomForestClassifier()
-                    
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues', fmt='d',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    with st.expander('Actual vs Predict'):
-                        st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)        
                 elif data_process == 'cross val score':
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                    min_samples_split=inputs['min samples split'], warm_start=inputs['warm start'])
 
-                    clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'],random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
-                
-                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-
-                    export_cross_val_results_clf(clf, cv, "RFRC_cv", col_name, unique_categories, inputs['random state'])
-
+                        export_cross_val_results_clf(clf, cv, "RFC_cv", col_name, unique_categories, inputs['random state'])
+                    elif inputs['auto hyperparameters']:
+                        def RFC_TT(n_estimators, max_depth, min_samples_leaf, min_samples_split):
+                            clf.model = RFC(criterion = inputs['criterion'],n_estimators=int(n_estimators),max_depth=int(max_depth),min_samples_leaf=int(min_samples_leaf),
+                                                        min_samples_split=int(min_samples_split), n_jobs=-1)
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
+                        
+                        RFCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=RFC_TT, pbounds=RFCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = RFC(criterion = inputs['criterion'], n_estimators=params_best['n_estimators'],random_state=inputs['random state'],max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                    min_samples_split=params_best['min_samples_split'],warm_start=inputs['warm start'],
+                                    n_jobs=-1)
+                        
+                        export_cross_val_results_clf(clf, cv, "RFC_cv", col_name, unique_categories, inputs['random state'])
                 elif data_process == 'leave one out':
-
-                    clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
-                                                min_samples_split=inputs['min samples split'], oob_score=inputs['oob score'], warm_start=inputs['warm start'])
-                
-                    export_loo_results_clf(clf, loo, "RFRC_loo", col_name, unique_categories)     
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = RFC(criterion = inputs['criterion'],n_estimators=inputs['nestimators'] ,random_state=inputs['random state'],max_depth=inputs['max depth'],min_samples_leaf=inputs['min samples leaf'],
+                                                    min_samples_split=inputs['min samples split'], warm_start=inputs['warm start'])
+                    
+                        export_loo_results_clf(clf, loo, "RFC_loo", col_name, unique_categories)     
+                    elif inputs['auto hyperparameters']:
+                        def RFC_TT(n_estimators, max_depth, min_samples_leaf, min_samples_split):
+                            clf.model = RFC(criterion = inputs['criterion'],n_estimators=int(n_estimators),max_depth=int(max_depth),min_samples_leaf=int(min_samples_leaf),
+                                                        min_samples_split=int(min_samples_split), n_jobs=-1)
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        RFCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'min_samples_leaf':(1, inputs['min samples leaf']), 'min_samples_split':(2, inputs['min samples split'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=RFC_TT, pbounds=RFCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['min_samples_leaf'] = int(params_best['min_samples_leaf'])
+                        params_best['min_samples_split'] = int(params_best['min_samples_split'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = RFC(criterion = inputs['criterion'], n_estimators=params_best['n_estimators'],random_state=inputs['random state'],max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
+                                    min_samples_split=params_best['min_samples_split'],warm_start=inputs['warm start'],
+                                    n_jobs=-1)     
+                        export_loo_results_clf(clf, loo, "RFC_loo", col_name, unique_categories)                         
 
         if inputs['model'] == 'LogisticRegression':
 
@@ -3496,54 +3597,83 @@ elif select_option == "Classification":
             
             if button_train:
                 if data_process == 'train test split':
-                            
-                    clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
-                                   random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
-                    clf.LogisticRegreesion()
-                    
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
+                        clf.LogisticRegreesion()
+                        plot_and_export_results_clf(clf, 'LRC', col_name, unique_categories)
+                    elif inputs['auto hyperparameters']:
+                        def LRC_TT(C):
+                            clf.model = LR(penalty=inputs['penalty'],C=C,solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                        l1_ratio= inputs['l1 ratio'])   
+                            clf.LogisticRegreesion()
+                            return clf.score
+                        LRCbounds = {'C':(1, inputs['C'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=LRC_TT, pbounds=LRCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = LR(penalty=inputs['penalty'],C=params_best['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                        l1_ratio= inputs['l1 ratio'])   
+                        
+                        clf.LogisticRegreesion()
+                        plot_and_export_results_clf(clf, 'LRC', col_name, unique_categories)                     
 
-                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    with st.expander('Actual vs Predict'):
-                        st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
                 elif data_process == 'cross val score':
-                    clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
-                                   random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
-                     
-                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio'])   
 
-                    export_cross_val_results_clf(clf, cv, "LRC_cv", col_name, unique_categories, inputs['random state'])      
+                        export_cross_val_results_clf(clf, cv, "LRC_cv", col_name, unique_categories, inputs['random state'])      
+                    elif inputs['auto hyperparameters']:
+                        def LRC_TT(C):
+                            clf.model = LR(penalty=inputs['penalty'],C=C,solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                        l1_ratio= inputs['l1 ratio'])   
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
+                        LRCbounds = {'C':(1, inputs['C'])}
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=LRC_TT, pbounds=LRCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = LR(penalty=inputs['penalty'],C=params_best['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                        l1_ratio= inputs['l1 ratio'])   
+                        
+                        export_cross_val_results_clf(clf, cv, "LRC_cv", col_name, unique_categories, inputs['random state'])     
 
-                elif data_process == 'leave one out': 
-                    clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
-                                   random_state=inputs['random state'],l1_ratio= inputs['l1 ratio']) 
- 
-                    export_loo_results_clf(clf, loo, "LRC_loo", col_name, unique_categories)          
+                elif data_process == 'leave one out':
+                    if inputs['auto hyperparameters'] == False:
+                        clf.model = LR(penalty=inputs['penalty'],C=inputs['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                    random_state=inputs['random state'],l1_ratio= inputs['l1 ratio']) 
+    
+                        export_loo_results_clf(clf, loo, "LRC_loo", col_name, unique_categories)          
+                    elif inputs['auto hyperparameters']:
+                        def LRC_TT(C):
+                            clf.model = LR(penalty=inputs['penalty'],C=C,solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                        l1_ratio= inputs['l1 ratio'])   
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        LRCbounds = {'C':(1, inputs['C'])}
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=LRC_TT, pbounds=LRCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = LR(penalty=inputs['penalty'],C=params_best['C'],solver=inputs['solver'],max_iter=inputs['max iter'],multi_class=inputs['multi class'],
+                                        l1_ratio= inputs['l1 ratio'])   
+                        
+                        export_loo_results_clf(clf, loo, "LRC_loo", col_name, unique_categories)    
+
         if inputs['model'] == 'SupportVector':
             with col2:
                 with st.expander('Operator'):
@@ -3576,51 +3706,72 @@ elif select_option == "Classification":
                 button_train = st.button('Train', use_container_width=True)   
             if button_train:
                 if data_process == 'train test split':
-                            
-                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
-                                                               
-                    clf.SupportVector()
-                    
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-
-                    result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                    result_data.columns = ['actual','prediction']
-                    with st.expander('Actual vs Predict'):
-                        st.write(result_data)
-                        tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    if inputs['auto hyperparameters'] == False:        
+                        clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
+                                                                
+                        clf.SupportVector()
+                        plot_and_export_results_clf(clf, 'SVC', col_name, unique_categories)                    
+                    elif inputs['auto hyperparameters']:
+                        def SVC_TT(C):
+                            clf.model = SVC(C=C, kernel=inputs['kernel'], class_weight=inputs['class weight']) 
+                            clf.SupportVector()
+                            return clf.score
+                        SVCbounds = {'C':(1, inputs['C'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=SVC_TT, pbounds=SVCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = SVC(C=C, kernel=inputs['kernel'], class_weight=inputs['class weight']) 
+                        
+                        clf.SupportVector()
+                        plot_and_export_results_clf(clf, 'SVC', col_name, unique_categories)   
 
                 elif data_process == 'cross val score':
-                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])                                                                                       
-                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "SVC_cv", col_name, unique_categories, inputs['random state'])     
-
+                    if inputs['auto hyperparameters'] == False:    
+                        clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])                                                                                       
+                        export_cross_val_results_clf(clf, cv, "SVC_cv", col_name, unique_categories, inputs['random state'])     
+                    elif inputs['auto hyperparameters']:
+                        def SVC_TT(C):
+                            clf.model = SVC(C=C, kernel=inputs['kernel'], class_weight=inputs['class weight']) 
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
+                        SVCbounds = {'C':(1, inputs['C'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=SVC_TT, pbounds=SVCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = SVC(C=C, kernel=inputs['kernel'], class_weight=inputs['class weight']) 
+                        export_cross_val_results_clf(clf, cv, "SVC_cv", col_name, unique_categories, inputs['random state']) 
+                        
                 elif data_process == 'leave one out':
-                    clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
-      
-                    export_loo_results_clf(clf, loo, "SVC_loo", col_name, unique_categories)  
+                    if inputs['auto hyperparameters'] == False:    
+                        clf.model = SVC(C=inputs['C'], kernel=inputs['kernel'], class_weight=inputs['class weight'])
+        
+                        export_loo_results_clf(clf, loo, "SVC_loo", col_name, unique_categories)  
+                    elif inputs['auto hyperparameters']:
+                        def SVC_TT(C):
+                            clf.model = SVC(C=C, kernel=inputs['kernel'], class_weight=inputs['class weight']) 
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        SVCbounds = {'C':(1, inputs['C'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=SVC_TT, pbounds=SVCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = SVC(C=C, kernel=inputs['kernel'], class_weight=inputs['class weight']) 
+                        export_loo_results_clf(clf, loo, "SVC_loo", col_name, unique_categories)  
 
         if inputs['model'] == 'BaggingClassifier':
 
@@ -3642,54 +3793,105 @@ elif select_option == "Classification":
             
             if button_train:
                 if data_process == 'train test split':
-        
-                    clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    if inputs['auto hyperparameters'] == False:    
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
-                    clf.BaggingClassifier()
+                        clf.BaggingClassifier()
+                        plot_and_export_results_clf(clf, 'BaggingC', col_name, unique_categories)     
                     
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                            
-                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('Actual vs Predict'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                    elif inputs['auto hyperparameters']:
+                        def BaggingC_TT(n_estimators, max_samples, max_features):
+                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                                max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
+                            clf.BaggingClassifier()
+                            return clf.score
+                        
+                        BaggingCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_samples':(1, inputs['max samples']), 'max_features':(1, inputs['max features'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=BaggingC_TT, pbounds=BaggingCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_samples'] = int(params_best['max_samples'])
+                        params_best['max_features'] = int(params_best['max_features'])
+                        params_best['base estimator'] = 'decision tree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                                max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
+                        
+                        clf.BaggingClassifier()
+
+                        plot_and_export_results_clf(clf, 'BaggingC', col_name, unique_categories)   
 
                 elif data_process == 'cross val score':
-                    clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
-                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories, inputs['random state']) 
+                    if inputs['auto hyperparameters'] == False:   
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+
+                        export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories, inputs['random state']) 
+                    elif inputs['auto hyperparameters']:
+                        def BaggingC_TT(n_estimators, max_samples, max_features):
+                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                                max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
+                        
+                        BaggingCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_samples':(1, inputs['max samples']), 'max_features':(1, inputs['max features'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=BaggingC_TT, pbounds=BaggingCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_samples'] = int(params_best['max_samples'])
+                        params_best['max_features'] = int(params_best['max_features'])
+                        params_best['base estimator'] = 'decision tree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                                max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
+                        
+                        clf.BaggingClassifier()
+
+                        export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories, inputs['random state'])                    
 
                 elif data_process == 'leave one out':
-                    clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
-                                                max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
+                    if inputs['auto hyperparameters'] == False:   
+                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                                                    max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
-                    export_loo_results_clf(clf, loo, "BaggingC_loo", col_name, unique_categories)  
+                        export_loo_results_clf(clf, loo, "BaggingC_loo", col_name, unique_categories)  
+                    elif inputs['auto hyperparameters']:
+                        def BaggingC_TT(n_estimators, max_samples, max_features):
+                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                                max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        BaggingCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_samples':(1, inputs['max samples']), 'max_features':(1, inputs['max features'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=BaggingC_TT, pbounds=BaggingCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_samples'] = int(params_best['max_samples'])
+                        params_best['max_features'] = int(params_best['max_features'])
+                        params_best['base estimator'] = 'decision tree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                                max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
+                        
+                        clf.BaggingClassifier()
+
+                        export_loo_results_clf(clf, loo, "BaggingC_loo", col_name, unique_categories)                         
         
         if inputs['model'] == 'AdaBoostClassifier':
 
@@ -3712,52 +3914,89 @@ elif select_option == "Classification":
             
             if button_train:
                 if data_process == 'train test split':
-                
-                    clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                    if inputs['auto hyperparameters'] == False:   
+                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
 
-                    clf.AdaBoostClassifier()
-                    
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
+                        clf.AdaBoostClassifier()
+                        plot_and_export_results_clf(clf, 'AdaBoostC', col_name, unique_categories)  
 
-                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('Actual vs Predict'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-                            
+                    elif inputs['auto hyperparameters']:
+                        def AdaBoostC_TT(n_estimators, learning_rate):
+                            clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                                                        n_estimators=int(n_estimators), learning_rate=learning_rate) 
+                            clf.AdaBoostClassifier()
+                            return clf.score
+                        
+                        AdaBoostCbounds = {'n_estimators':(1, inputs['nestimators']), 'learning_rate':(1, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=AdaBoostC_TT, pbounds=AdaBoostCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['base estimator'] = 'decision tree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        reg.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                                                        n_estimators=params_best['n_estimators'], learning_rate=params_best['learning_rate'], random_state=inputs['random state'])                
+                        clf.AdaBoostClassifier()
+                        plot_and_export_results_clf(clf, 'AdaBoostC', col_name, unique_categories)                               
                 elif data_process == 'cross val score':
+                    if inputs['auto hyperparameters'] == False:  
+                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        
+                        export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories, inputs['random state']) 
+                    elif inputs['auto hyperparameters']:
+                        def AdaBoostC_TT(n_estimators, learning_rate):
+                            clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                                                        n_estimators=int(n_estimators), learning_rate=learning_rate) 
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
+                        
+                        AdaBoostCbounds = {'n_estimators':(1, inputs['nestimators']), 'learning_rate':(1, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=AdaBoostC_TT, pbounds=AdaBoostCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['base estimator'] = 'decision tree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                                                        n_estimators=params_best['n_estimators'], learning_rate=params_best['learning_rate'], random_state=inputs['random state'])                
+                        clf.AdaBoostClassifier()
+                        export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories, inputs['random state']) 
 
-                    clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories, inputs['random state']) 
-                
                 elif data_process == 'leave one out':
-                    clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
-                    
-                    export_loo_results_clf(clf, loo, "AdaBoostC_loo", col_name, unique_categories)  
+                    if inputs['auto hyperparameters'] == False:  
+                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        
+                        export_loo_results_clf(clf, loo, "AdaBoostC_loo", col_name, unique_categories)  
+                    elif inputs['auto hyperparameters']:
+                        def AdaBoostC_TT(n_estimators, learning_rate):
+                            clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                                                        n_estimators=int(n_estimators), learning_rate=learning_rate) 
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        AdaBoostCbounds = {'n_estimators':(1, inputs['nestimators']), 'learning_rate':(1, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=AdaBoostC_TT, pbounds=AdaBoostCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['base estimator'] = 'decision tree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                                                        n_estimators=params_best['n_estimators'], learning_rate=params_best['learning_rate'], random_state=inputs['random state'])                
+                        clf.AdaBoostClassifier()
+                        export_loo_results_clf(clf, loo, "AdaBoostC_loo", col_name, unique_categories)  
 
         if inputs['model'] == 'GradientBoostingClassifier':
 
@@ -3796,54 +4035,85 @@ elif select_option == "Classification":
             
             if button_train:
                 if data_process == 'train test split':
-                
-                    clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                        random_state=inputs['random state'])
-                    clf.GradientBoostingClassifier()
-                        
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
+                    if inputs['auto hyperparameters'] == False:   
+                        clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                                            random_state=inputs['random state'])
+                        clf.GradientBoostingClassifier()
 
-                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('Actual vs Predict'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                        plot_and_export_results_clf(clf, 'GBC', col_name, unique_categories)  
+                    elif inputs['auto hyperparameters']:
+                        def GBC_TT(learning_rate, n_estimators):                            
+                            clf.model = GradientBoostingClassifier(learning_rate=learning_rate, n_estimators=int(n_estimators),max_features=inputs['max features'])                                           
+                            clf.GradientBoostingClassifier()
+                            return clf.score
+                        
+                        GBCbounds = {'learning_rate':(0.001, inputs['learning rate']), 'n_estimators':(1, inputs['nestimators'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=GBC_TT, pbounds=GBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_features'] = inputs['max features']
+                        st.write("\n","\n","best params: ", params_best)
+                        clf.model = GradientBoostingClassifier(learning_rate=params_best['learning_rate'],n_estimators=params_best['n_estimators'],max_features=params_best['max_features'],
+                                                            random_state=inputs['random state']) 
+                        clf.GradientBoostingClassifier()
+                        plot_and_export_results_clf(clf, 'GBC', col_name, unique_categories)  
 
                 elif data_process == 'cross val score':
-                    
-                    clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                        random_state=inputs['random state'])
-                    cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
-                    export_cross_val_results_clf(clf, cv, "GBC_cv", col_name, unique_categories, inputs['random state'])   
+                    if inputs['auto hyperparameters'] == False:  
+                        clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                                            random_state=inputs['random state'])
+
+                        export_cross_val_results_clf(clf, cv, "GBC_cv", col_name, unique_categories, inputs['random state'])   
+                    elif inputs['auto hyperparameters']:
+                        def GBC_TT(learning_rate, n_estimators):                            
+                            clf.model = GradientBoostingClassifier(learning_rate=learning_rate, n_estimators=int(n_estimators),max_features=inputs['max features'])                                           
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
+                        GBCbounds = {'learning_rate':(0.001, inputs['learning rate']), 'n_estimators':(1, inputs['nestimators'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=GBC_TT, pbounds=GBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_features'] = inputs['max features']
+                        st.write("\n","\n","best params: ", params_best)
+                        clf.model = GradientBoostingClassifier(learning_rate=params_best['learning_rate'],n_estimators=params_best['n_estimators'],max_features=params_best['max_features'],
+                                                            random_state=inputs['random state']) 
+                        clf.GradientBoostingClassifier()
+                        export_cross_val_results_clf(clf, cv, "GBC_cv", col_name, unique_categories, inputs['random state'])   
+
 
                 elif data_process == 'leave one out':
-                    
-                    clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
-                                                        random_state=inputs['random state'])
-                    export_loo_results_clf(clf, loo, "GBC_loo", col_name, unique_categories)
+                    if inputs['auto hyperparameters'] == False:  
+                        clf.model = GradientBoostingClassifier(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_depth=inputs['max depth'],max_features=inputs['max features'],
+                                                            random_state=inputs['random state'])
+                        export_loo_results_clf(clf, loo, "GBC_loo", col_name, unique_categories)
+                    elif inputs['auto hyperparameters']:
+                        def GBC_TT(learning_rate, n_estimators):                            
+                            clf.model = GradientBoostingClassifier(learning_rate=learning_rate, n_estimators=int(n_estimators),max_features=inputs['max features'])                                           
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        GBCbounds = {'learning_rate':(0.001, inputs['learning rate']), 'n_estimators':(1, inputs['nestimators'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=GBC_TT, pbounds=GBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_features'] = inputs['max features']
+                        st.write("\n","\n","best params: ", params_best)
+                        clf.model = GradientBoostingClassifier(learning_rate=params_best['learning_rate'],n_estimators=params_best['n_estimators'],max_features=params_best['max_features'],
+                                                            random_state=inputs['random state']) 
+                        clf.GradientBoostingClassifier()
+                        export_loo_results_clf(clf, loo, "GBC_loo", col_name, unique_categories)
 
         if inputs['model'] == 'XGBClassifier':
 
@@ -3866,62 +4136,109 @@ elif select_option == "Classification":
             
             if button_train:
                 if data_process == 'train test split':
-                
-                    clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
-                                                subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
-                                                learning_rate=inputs['learning rate'])
-                    clf.Ytest = clf.Ytest.reset_index(drop=True)
-                
-                    clf.XGBClassifier()
+                    if inputs['auto hyperparameters'] == False:  
+                        clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], max_depth=inputs['max depth'],
+                                                    subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
+                                                    learning_rate=inputs['learning rate'])
+                        # clf.Ytest = clf.Ytest.reset_index(drop=True)
+                        clf.XGBClassifier()
+                        plot_and_export_results_clf(clf, 'XGBC', col_name, unique_categories)
+                    elif inputs['auto hyperparameters']:  
+                        def XGBC_TT(n_estimators, max_depth, subsample, colsample_bytree, learning_rate):
+                            
+                            clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=int(n_estimators), 
+                                                        max_depth= int(max_depth), subsample=subsample, colsample_bytree=colsample_bytree, 
+                                                        learning_rate=learning_rate)
+                            clf.XGBClassifier()
+                            return clf.score
                         
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt='d',
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-
-                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('Actual vs Predict'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                        XGBCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'subsample':(0.5, inputs['subsample']), 'colsample_bytree':(0.5, inputs['subsample']), 'learning_rate':(0.001, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=XGBC_TT, pbounds=XGBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['base estimator'] = 'gbtree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=params_best['n_estimators'], 
+                                                    max_depth= params_best['max_depth'], subsample=params_best['subsample'], colsample_bytree=params_best['colsample_bytree'], 
+                                                    learning_rate=params_best['learning_rate'])
+                        clf.XGBClassifier()
+                        plot_and_export_results_clf(clf, 'XGBC', col_name, unique_categories)
 
                 elif data_process == 'cross val score':
-                        
+                    if inputs['auto hyperparameters'] == False:  
                         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                     learning_rate=inputs['learning rate'])
                         
-                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+
                         export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories, inputs['random state'])  
-                
-                elif data_process == 'leave one out':
+                    elif inputs['auto hyperparameters']:  
+                        def XGBC_TT(n_estimators, max_depth, subsample, colsample_bytree, learning_rate):
+                            
+                            clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=int(n_estimators), 
+                                                        max_depth= int(max_depth), subsample=subsample, colsample_bytree=colsample_bytree, 
+                                                        learning_rate=learning_rate)
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
                         
+                        XGBCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'subsample':(0.5, inputs['subsample']), 'colsample_bytree':(0.5, inputs['subsample']), 'learning_rate':(0.001, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=XGBC_TT, pbounds=XGBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['base estimator'] = 'gbtree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=params_best['n_estimators'], 
+                                                    max_depth= params_best['max_depth'], subsample=params_best['subsample'], colsample_bytree=params_best['colsample_bytree'], 
+                                                    learning_rate=params_best['learning_rate'])
+                        clf.XGBClassifier()
+                        export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories, inputs['random state'])  
+
+                elif data_process == 'leave one out':
+                    if inputs['auto hyperparameters'] == False:      
                         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'], n_estimators=inputs['nestimators'], 
                                                     subsample=inputs['subsample'], colsample_bytree=inputs['subfeature'], 
                                                     learning_rate=inputs['learning rate'])
 
                         export_loo_results_clf(clf, loo, "XGBC_loo", col_name, unique_categories)
-        
+                    elif inputs['auto hyperparameters']:  
+                        def XGBC_TT(n_estimators, max_depth, subsample, colsample_bytree, learning_rate):
+                            
+                            clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=int(n_estimators), 
+                                                        max_depth= int(max_depth), subsample=subsample, colsample_bytree=colsample_bytree, 
+                                                        learning_rate=learning_rate)
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        XGBCbounds = {'n_estimators':(1, inputs['nestimators']), 'max_depth':(1, inputs['max depth']), 'subsample':(0.5, inputs['subsample']), 'colsample_bytree':(0.5, inputs['subsample']), 'learning_rate':(0.001, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=XGBC_TT, pbounds=XGBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['n_estimators'] = int(params_best['n_estimators'])
+                        params_best['max_depth'] = int(params_best['max_depth'])
+                        params_best['base estimator'] = 'gbtree'
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=params_best['n_estimators'], 
+                                                    max_depth= params_best['max_depth'], subsample=params_best['subsample'], colsample_bytree=params_best['colsample_bytree'], 
+                                                    learning_rate=params_best['learning_rate'])
+                        clf.XGBClassifier()
+                        export_loo_results_clf(clf, loo, "XGBC_loo", col_name, unique_categories)
+
         if inputs['model'] == 'CatBoostClassifier':
 
             with col2:
@@ -3959,56 +4276,83 @@ elif select_option == "Classification":
             
             if button_train:
                 if data_process == 'train test split':
-                
-                    clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
-
-                    clf.CatBoostClassifier()
-                        
-                    if not check_string(targets):
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values)
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, fmt="d",cmap='Blues')
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-                    else:
-                        clf.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ytest[col_name[0]]].values
-                        clf.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[clf.Ypred[col_name[0]]].values
-                        conf_matrix = confusion_matrix(clf.Ytest.values, clf.Ypred.values, labels=np.unique(clf.Ytest))
-                        conf_df = pd.DataFrame(conf_matrix, index=np.unique(clf.Ytest), columns=np.unique(clf.Ytest))
-                        with plt.style.context(['nature','no-latex']):
-                            fig, ax = plt.subplots()
-                            sns.heatmap(conf_df, annot=True, cmap='Blues',fmt="d",
-                                        xticklabels=conf_df.columns, yticklabels=conf_df.index)
-                            plt.xlabel('Actual')
-                            plt.ylabel('Prediction')
-                            plt.title('Confusion Matrix')
-                            st.pyplot(fig)
-
-                        result_data = pd.concat([clf.Ytest, pd.DataFrame(clf.Ypred)], axis=1)
-                        result_data.columns = ['actual','prediction']
-                        with st.expander('Actual vs Predict'):
-                            st.write(result_data)
-                            tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
-                            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-                elif data_process == 'cross val score':
-                        
+                    if inputs['auto hyperparameters'] == False:    
                         clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
-                        cvs = CVS(clf.model, clf.features, clf.targets, cv = cv)
+                        clf.CatBoostClassifier()
+                        plot_and_export_results_clf(clf, 'CatBoostC', col_name, unique_categories)   
+                    elif inputs['auto hyperparameters']:
+                        def CatBC_TT(iterations, depth, learning_rate): 
+                            clf.model = CatBoostClassifier(iterations=int(iterations),learning_rate=learning_rate,depth = int(depth))
+                            clf.CatBoostClassifier()
+                            return clf.score
+                        
+                        CatBCbounds = {'iterations':(1, inputs['niteration']), 'depth':(1, inputs['max depth']), 'learning_rate':(0.001, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=CatBC_TT, pbounds=CatBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['iterations'] = int(params_best['iterations'])
+                        params_best['depth'] = int(params_best['depth'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = CatBoostClassifier(iterations=params_best['iterations'],learning_rate=params_best['learning_rate'],depth = params_best['depth'], random_seed=inputs['random state'])
+                        
+                        clf.CatBoostClassifier()
+                        plot_and_export_results_clf(clf, 'CatBoostC', col_name, unique_categories)   
+
+                elif data_process == 'cross val score':
+                    if inputs['auto hyperparameters'] == False:   
+                        clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
                         export_cross_val_results_clf(clf, cv, "CatBoostC_cv", col_name, unique_categories, inputs['random state'])  
-                
-                elif data_process == 'leave one out':
+
+                    elif inputs['auto hyperparameters']:
+                        def CatBC_TT(iterations, depth, learning_rate): 
+                            clf.model = CatBoostClassifier(iterations=int(iterations),learning_rate=learning_rate,depth = int(depth))
+                            cv_score = cv_cal_clf(clf, cv, inputs['random state'])
+                            return cv_score
                         
+                        CatBCbounds = {'iterations':(1, inputs['niteration']), 'depth':(1, inputs['max depth']), 'learning_rate':(0.001, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=CatBC_TT, pbounds=CatBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['iterations'] = int(params_best['iterations'])
+                        params_best['depth'] = int(params_best['depth'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = CatBoostClassifier(iterations=params_best['iterations'],learning_rate=params_best['learning_rate'],depth = params_best['depth'], random_seed=inputs['random state'])
+                        export_cross_val_results_clf(clf, cv, "CatBoostC_cv", col_name, unique_categories, inputs['random state'])  
+
+                elif data_process == 'leave one out':
+                    if inputs['auto hyperparameters'] == False:      
                         clf.model = CatBoostClassifier(iterations=inputs['niteration'],learning_rate=inputs['learning rate'],depth = inputs['max depth'], random_seed=inputs['random state'])
 
                         export_loo_results_clf(clf, loo, "CatBoostC_loo", col_name, unique_categories)
-
+                    elif inputs['auto hyperparameters']:
+                        def CatBC_TT(iterations, depth, learning_rate): 
+                            clf.model = CatBoostClassifier(iterations=int(iterations),learning_rate=learning_rate,depth = int(depth))
+                            loo_score = loo_cal_clf(clf, loo)
+                            return loo_score
+                        
+                        CatBCbounds = {'iterations':(1, inputs['niteration']), 'depth':(1, inputs['max depth']), 'learning_rate':(0.001, inputs['learning rate'])}
+                        
+                        with st.expander('hyperparameter opt'):
+                            optimizer = BayesianOptimization(f=CatBC_TT, pbounds=CatBCbounds, random_state=inputs['random state'], allow_duplicate_points=True)
+                            optimizer.maximize(init_points=inputs['init points'], n_iter=inputs['iteration number'])
+                        params_best = optimizer.max["params"]
+                        score_best = optimizer.max["target"]
+                        params_best['iterations'] = int(params_best['iterations'])
+                        params_best['depth'] = int(params_best['depth'])
+                        st.write("\n","\n","best params: ", params_best)
+                        
+                        clf.model = CatBoostClassifier(iterations=params_best['iterations'],learning_rate=params_best['learning_rate'],depth = params_best['depth'], random_seed=inputs['random state'])
+                        export_loo_results_clf(clf, loo, "CatBoostC_loo", col_name, unique_categories)                 
         st.write('---')
 
 elif select_option == "Cluster & ReduceDim":

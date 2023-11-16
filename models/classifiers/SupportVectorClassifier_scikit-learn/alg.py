@@ -57,7 +57,13 @@ def show():
                 inputs['class weight'] = {inputs['min class weight']:inputs['max class weight']}
             else:
                 inputs['class weight'] = None
-
+            auto_hyperparameters = st.checkbox('auto hyperparameters',False)
+            if auto_hyperparameters:
+                inputs['auto hyperparameters'] = True
+                inputs['init points'] = st.number_input('init points',1, 100, 10)
+                inputs['iteration number'] = st.number_input('iteration number',1, 500, 10)
+            else:
+                inputs['auto hyperparameters'] = False     
 
     return inputs,col2
 

@@ -41,7 +41,7 @@ def show():
         with st.expander("Hyper Parameter"):
             inputs['penalty'] = st.selectbox('penalty',('l2','l1','elasticnet','None'))
         
-            inputs['C'] = st.number_input('C', 0.000001, 100000.0, 1.0)
+            inputs['C'] = st.number_input('C', 0.001, 10000.0, 1.0)
             
             inputs['max iter'] = st.number_input('max iter', 0, 100000, 100)
             inputs['multi class'] = st.selectbox('multi class',('auto','ovr','multinomial'))
@@ -59,6 +59,14 @@ def show():
                 inputs['solver'] = st.selectbox('solver',['saga'])
             else:
                 inputs['solver'] = st.selectbox('solver',('lbfgs','liblinear','newton-cg','newton-cholesky','sag','saga'))
+            auto_hyperparameters = st.checkbox('auto hyperparameters',False)
+                
+            if auto_hyperparameters:
+                inputs['auto hyperparameters'] = True
+                inputs['init points'] = st.number_input('init points',1, 100, 10)
+                inputs['iteration number'] = st.number_input('iteration number',1, 500, 10)
+            else:
+                inputs['auto hyperparameters'] = False     
         # with st.expander("Unbalanced Data"):
         #     inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
         #     if inputs['unbalanced data']:

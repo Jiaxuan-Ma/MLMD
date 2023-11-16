@@ -1436,6 +1436,30 @@ def plot_and_export_results(model, model_name):
             tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
 
+def plot_and_export_results_clf(model, model_name, col_name, unique_categories):
+    model.Ytest[col_name[0]] = pd.Series(unique_categories).iloc[model.Ytest[col_name[0]]].values
+    model.Ypred[col_name[0]] = pd.Series(unique_categories).iloc[model.Ypred[col_name[0]]].values
+
+    conf_matrix = confusion_matrix(model.Ytest.values, model.Ypred.values)
+    conf_df = pd.DataFrame(conf_matrix, index=np.unique(model.Ytest), columns=np.unique(model.Ytest))
+    with plt.style.context(['nature','no-latex']):
+        fig, ax = plt.subplots()
+        sns.heatmap(conf_df, annot=True, cmap='Blues',fmt="d",
+                    xticklabels=conf_df.columns, yticklabels=conf_df.index)
+        plt.xlabel('Actual')
+        plt.ylabel('Prediction')
+        plt.title('Confusion Matrix')
+        st.pyplot(fig)
+    with st.expander("model"):
+        tmp_download_link = download_button(model.model, model_name+'_model.pickle', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
+    result_data = pd.concat([pd.DataFrame(model.Ytest), pd.DataFrame(model.Ypred)], axis=1)
+    result_data.columns = ['actual','prediction']
+    with st.expander('Actual vs Predict'):
+        st.write(result_data)
+        tmp_download_link = download_button(result_data, f'actual vs prediction.csv', button_text='download')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)       
+
 def export_cross_val_results(model, F, model_name, random_state):
     # chose the last mode in CV
     Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model, random_state)    
@@ -1489,6 +1513,14 @@ def export_cross_val_results_clf(model, F, model_name, col_name, unique_categori
         st.write(result_data)
         tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+def cv_cal_clf(model, F, random_state):
+    Y_pred, Y_test = Ffold_cross_val(model.features, model.targets, F, model.model, random_state) 
+    model.Ytest = pd.DataFrame(Y_test, columns=model.targets.columns)
+    model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns)
+    cv_score = accuracy_score(y_true=Y_test, y_pred=Y_pred)
+    return cv_score
+
 
 def export_loo_results(model, loo, model_name):
     Y_pred  =[]
@@ -1573,7 +1605,25 @@ def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
         st.write(result_data)
         tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
+def loo_cal_clf(model, loo):
+    Y_pred  =[]
+    Y_test = []
+    features = pd.DataFrame(model.features).values
+    targets = model.targets.values
 
+    for train,test in loo.split(features):
+        Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
+        
+        model.model.fit(Xtrain, Ytrain)
+        Ypred = model.model.predict(Xtest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
+    Y_pred = np.array(Y_pred).reshape(-1,1)
+    Y_test = np.array(Y_test).reshape(-1,1)
+    model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns) 
+    model.Ytest = pd.DataFrame(Y_test, columns=model.targets.columns)        
+    loo_score = accuracy_score(y_true=Y_test, y_pred=Y_pred)
+    return loo_score
 
 def get_column_min(matrix):
     num_cols = len(matrix[0])

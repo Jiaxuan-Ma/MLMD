@@ -41,27 +41,23 @@ def show():
         with st.expander("Hyper Parameter"):
             inputs['criterion'] = st.selectbox('criterion',('gini','entropy'))
             inputs['splitter'] = st.selectbox('splitter',('random','best'))
-            max_depth = st.checkbox('max depth', None)
-            inputs['max depth'] = None
-            if max_depth:
-                inputs['max depth'] = st.number_input('max depth',1, 100, 3)
-            inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 100, 1)
-            inputs['min samples split'] = st.number_input('min samples split', 2, 100, 2)
+            inputs['max depth'] = st.number_input('max depth',1, 100, 3)
+            inputs['min samples leaf'] = st.number_input('min samples leaf', 1, 100, 2)
+            inputs['min samples split'] = st.number_input('min samples split', 2, 100, 3)
             
             random_state = st.checkbox('random state 42',True)
             if random_state:
                 inputs['random state'] = 42
             else:
                 inputs['random state'] = None
-             # graph parameter
-        # with st.expander("Unbalanced Data"):
-        #     inputs['unbalanced data'] = st.checkbox('unbalanced data', False)
-        #     if inputs['unbalanced data']:
-        #         inputs['class weight'] = st.selectbox('class weight',(None,'balanced'))
-        #         inputs['min weight fraction leaf'] = st.slider('min weight fraction leaf',0.0, 1.0, 0.0)
-        #     else:
-        #         inputs['class weight'] = None
-        #         inputs['min weight fraction leaf'] = 0.0
+            auto_hyperparameters = st.checkbox('auto hyperparameters',False)
+            if auto_hyperparameters:
+                inputs['auto hyperparameters'] = True
+                inputs['init points'] = st.number_input('init points',1, 100, 10)
+                inputs['iteration number'] = st.number_input('iteration number',1, 500, 10)
+            else:
+                inputs['auto hyperparameters'] = False       
+
         with st.expander("Tree Graph"):
             inputs['tree graph'] = st.checkbox('tree graph', False)
             if inputs['tree graph']:

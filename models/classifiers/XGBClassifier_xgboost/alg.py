@@ -44,7 +44,7 @@ def show():
 
             inputs['nestimators'] = st.number_input('number estimators',1, 10000, 100)
             inputs['learning rate'] = st.number_input('learning rate',0.01,10.0,0.3)
-            # inputs['max depth'] = st.number_input('max depth',1, 10, 6)
+            inputs['max depth'] = st.number_input('max depth',1, 10, 5)
             inputs['subsample'] = st.slider('subsample', 0.5,1.0,1.0)
             inputs['subfeature'] = st.slider('colsample_bytree', 0.5,1.0,1.0)
             random_state = st.checkbox('random state 42',True)
@@ -52,7 +52,13 @@ def show():
                 inputs['random state'] = 42
             else:
                 inputs['random state'] = None
-
+            auto_hyperparameters = st.checkbox('auto hyperparameters',False)
+            if auto_hyperparameters:
+                inputs['auto hyperparameters'] = True
+                inputs['init points'] = st.number_input('init points',1, 100, 10)
+                inputs['iteration number'] = st.number_input('iteration number',1, 500, 10)
+            else:
+                inputs['auto hyperparameters'] = False      
     return inputs,col2
 
 
