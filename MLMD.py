@@ -3794,7 +3794,7 @@ elif select_option == "Classification":
             if button_train:
                 if data_process == 'train test split':
                     if inputs['auto hyperparameters'] == False:    
-                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                        clf.model = BaggingClassifier(estimator = inputs['base estimator'], n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
                         clf.BaggingClassifier()
@@ -3802,7 +3802,7 @@ elif select_option == "Classification":
                     
                     elif inputs['auto hyperparameters']:
                         def BaggingC_TT(n_estimators, max_samples, max_features):
-                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                            clf.model = BaggingClassifier(estimator = inputs['base estimator'], n_estimators=int(n_estimators),
                                 max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
                             clf.BaggingClassifier()
                             return clf.score
@@ -3817,10 +3817,10 @@ elif select_option == "Classification":
                         params_best['n_estimators'] = int(params_best['n_estimators'])
                         params_best['max_samples'] = int(params_best['max_samples'])
                         params_best['max_features'] = int(params_best['max_features'])
-                        params_best['base estimator'] = 'decision tree'
+                        params_best['base estimator'] = inputs['base estimator']
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                        clf.model = BaggingClassifier(estimator = inputs['base estimator'] ,n_estimators=params_best['n_estimators'],
                                 max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
                         
                         clf.BaggingClassifier()
@@ -3829,13 +3829,13 @@ elif select_option == "Classification":
 
                 elif data_process == 'cross val score':
                     if inputs['auto hyperparameters'] == False:   
-                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                        clf.model = BaggingClassifier(estimator = inputs['base estimator'],n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
                         export_cross_val_results_clf(clf, cv, "BaggingC_cv", col_name, unique_categories, inputs['random state']) 
                     elif inputs['auto hyperparameters']:
                         def BaggingC_TT(n_estimators, max_samples, max_features):
-                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                            clf.model = BaggingClassifier(estimator = inputs['base estimator'] ,n_estimators=int(n_estimators),
                                 max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
                             cv_score = cv_cal_clf(clf, cv, inputs['random state'])
                             return cv_score
@@ -3853,7 +3853,7 @@ elif select_option == "Classification":
                         params_best['base estimator'] = 'decision tree'
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                        clf.model = BaggingClassifier(estimator = inputs['base estimator'], n_estimators=params_best['n_estimators'],
                                 max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
                         
                         clf.BaggingClassifier()
@@ -3862,13 +3862,13 @@ elif select_option == "Classification":
 
                 elif data_process == 'leave one out':
                     if inputs['auto hyperparameters'] == False:   
-                        clf.model = BaggingClassifier(estimator = tree.DecisionTreeClassifier(random_state=inputs['random state']),n_estimators=inputs['nestimators'],
+                        clf.model = BaggingClassifier(estimator = inputs['base estimator'],n_estimators=inputs['nestimators'],
                                                     max_samples=inputs['max samples'], max_features=inputs['max features'], n_jobs=-1) 
 
                         export_loo_results_clf(clf, loo, "BaggingC_loo", col_name, unique_categories)  
                     elif inputs['auto hyperparameters']:
                         def BaggingC_TT(n_estimators, max_samples, max_features):
-                            clf.model = BaggingClassifier(estimator = None ,n_estimators=int(n_estimators),
+                            clf.model = BaggingClassifier(estimator = inputs['base estimator'] ,n_estimators=int(n_estimators),
                                 max_samples=int(max_samples), max_features=int(max_features), n_jobs=-1) 
                             loo_score = loo_cal_clf(clf, loo)
                             return loo_score
@@ -3886,7 +3886,7 @@ elif select_option == "Classification":
                         params_best['base estimator'] = 'decision tree'
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = BaggingClassifier(estimator = None ,n_estimators=params_best['n_estimators'],
+                        clf.model = BaggingClassifier(estimator = inputs['base estimator'], n_estimators=params_best['n_estimators'],
                                 max_samples=params_best['max_samples'], max_features=params_best['max_features'], n_jobs=-1) 
                         
                         clf.BaggingClassifier()
@@ -3915,14 +3915,14 @@ elif select_option == "Classification":
             if button_train:
                 if data_process == 'train test split':
                     if inputs['auto hyperparameters'] == False:   
-                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
 
                         clf.AdaBoostClassifier()
                         plot_and_export_results_clf(clf, 'AdaBoostC', col_name, unique_categories)  
 
                     elif inputs['auto hyperparameters']:
                         def AdaBoostC_TT(n_estimators, learning_rate):
-                            clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                            clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], 
                                                         n_estimators=int(n_estimators), learning_rate=learning_rate) 
                             clf.AdaBoostClassifier()
                             return clf.score
@@ -3938,18 +3938,18 @@ elif select_option == "Classification":
                         params_best['base estimator'] = 'decision tree'
                         st.write("\n","\n","best params: ", params_best)
                         
-                        reg.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                        clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], 
                                                         n_estimators=params_best['n_estimators'], learning_rate=params_best['learning_rate'], random_state=inputs['random state'])                
                         clf.AdaBoostClassifier()
                         plot_and_export_results_clf(clf, 'AdaBoostC', col_name, unique_categories)                               
                 elif data_process == 'cross val score':
                     if inputs['auto hyperparameters'] == False:  
-                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                         
                         export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories, inputs['random state']) 
                     elif inputs['auto hyperparameters']:
                         def AdaBoostC_TT(n_estimators, learning_rate):
-                            clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                            clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], 
                                                         n_estimators=int(n_estimators), learning_rate=learning_rate) 
                             cv_score = cv_cal_clf(clf, cv, inputs['random state'])
                             return cv_score
@@ -3962,22 +3962,22 @@ elif select_option == "Classification":
                         params_best = optimizer.max["params"]
                         score_best = optimizer.max["target"]
                         params_best['n_estimators'] = int(params_best['n_estimators'])
-                        params_best['base estimator'] = 'decision tree'
+                        params_best['base estimator'] = inputs['base estimator']
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                        clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], 
                                                         n_estimators=params_best['n_estimators'], learning_rate=params_best['learning_rate'], random_state=inputs['random state'])                
-                        clf.AdaBoostClassifier()
+
                         export_cross_val_results_clf(clf, cv, "AdaBoostC_cv", col_name, unique_categories, inputs['random state']) 
 
                 elif data_process == 'leave one out':
                     if inputs['auto hyperparameters'] == False:  
-                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
+                        clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], n_estimators=inputs['nestimators'], learning_rate=inputs['learning rate'],random_state=inputs['random state'])
                         
                         export_loo_results_clf(clf, loo, "AdaBoostC_loo", col_name, unique_categories)  
                     elif inputs['auto hyperparameters']:
                         def AdaBoostC_TT(n_estimators, learning_rate):
-                            clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                            clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], 
                                                         n_estimators=int(n_estimators), learning_rate=learning_rate) 
                             loo_score = loo_cal_clf(clf, loo)
                             return loo_score
@@ -3990,12 +3990,12 @@ elif select_option == "Classification":
                         params_best = optimizer.max["params"]
                         score_best = optimizer.max["target"]
                         params_best['n_estimators'] = int(params_best['n_estimators'])
-                        params_best['base estimator'] = 'decision tree'
+                        params_best['base estimator'] = inputs['base estimator']
                         st.write("\n","\n","best params: ", params_best)
                         
-                        clf.model = AdaBoostClassifier(estimator=tree.DecisionTreeClassifier(), 
+                        clf.model = AdaBoostClassifier(estimator=inputs['base estimator'], 
                                                         n_estimators=params_best['n_estimators'], learning_rate=params_best['learning_rate'], random_state=inputs['random state'])                
-                        clf.AdaBoostClassifier()
+                        
                         export_loo_results_clf(clf, loo, "AdaBoostC_loo", col_name, unique_categories)  
 
         if inputs['model'] == 'GradientBoostingClassifier':
@@ -4085,7 +4085,7 @@ elif select_option == "Classification":
                         st.write("\n","\n","best params: ", params_best)
                         clf.model = GradientBoostingClassifier(learning_rate=params_best['learning_rate'],n_estimators=params_best['n_estimators'],max_features=params_best['max_features'],
                                                             random_state=inputs['random state']) 
-                        clf.GradientBoostingClassifier()
+                        
                         export_cross_val_results_clf(clf, cv, "GBC_cv", col_name, unique_categories, inputs['random state'])   
 
 
@@ -4112,7 +4112,7 @@ elif select_option == "Classification":
                         st.write("\n","\n","best params: ", params_best)
                         clf.model = GradientBoostingClassifier(learning_rate=params_best['learning_rate'],n_estimators=params_best['n_estimators'],max_features=params_best['max_features'],
                                                             random_state=inputs['random state']) 
-                        clf.GradientBoostingClassifier()
+                        
                         export_loo_results_clf(clf, loo, "GBC_loo", col_name, unique_categories)
 
         if inputs['model'] == 'XGBClassifier':
@@ -4202,7 +4202,7 @@ elif select_option == "Classification":
                         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=params_best['n_estimators'], 
                                                     max_depth= params_best['max_depth'], subsample=params_best['subsample'], colsample_bytree=params_best['colsample_bytree'], 
                                                     learning_rate=params_best['learning_rate'])
-                        clf.XGBClassifier()
+                        
                         export_cross_val_results_clf(clf, cv, "XGBC_cv", col_name, unique_categories, inputs['random state'])  
 
                 elif data_process == 'leave one out':
@@ -4236,7 +4236,7 @@ elif select_option == "Classification":
                         clf.model = xgb.XGBClassifier(booster=inputs['base estimator'] , n_estimators=params_best['n_estimators'], 
                                                     max_depth= params_best['max_depth'], subsample=params_best['subsample'], colsample_bytree=params_best['colsample_bytree'], 
                                                     learning_rate=params_best['learning_rate'])
-                        clf.XGBClassifier()
+                        
                         export_loo_results_clf(clf, loo, "XGBC_loo", col_name, unique_categories)
 
         if inputs['model'] == 'CatBoostClassifier':
