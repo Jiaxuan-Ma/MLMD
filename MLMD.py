@@ -177,7 +177,7 @@ elif select_option == "Basic Data":
         with col2:
             df = pd.read_csv('./data/Case 3_R.csv')
             st.write("FGH98 superalloy")
-            image = Image.open('./data/fig2.png')
+            image = Image.open('./data/fig6.png')
             st.image(image, width=280,caption='')
             tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
@@ -203,14 +203,14 @@ elif select_option == "Basic Data":
         with col1:
             df = pd.read_csv('./data/RAFM-dataset.csv')
             st.write("Ferriticmartensitic steel")
-            image = Image.open('./data/fig6.png')
+            image = Image.open('./data/fig5.png')
             st.image(image, width=280,caption='')
             tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
         with col2:
             df = pd.read_csv('./data/Case 2.csv')
-            st.write("Alloy")
-            image = Image.open('./data/fig5.png')
+            st.write("Amorphous Alloy")
+            image = Image.open('./data/fig2.png')
             st.image(image, width=280,caption='')
             tmp_download_link = download_button(df , f'data.csv', button_text='download')
             st.markdown(tmp_download_link, unsafe_allow_html=True)
