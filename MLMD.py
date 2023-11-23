@@ -5760,7 +5760,7 @@ elif select_option == "Model Inference":
     file = st.file_uploader("Upload `.csv`file", label_visibility="collapsed", accept_multiple_files=True)
     if len(file) < 2:
         table = PrettyTable(['file name', 'class','description'])
-        table.add_row(['file_1','data set','data file'])
+        table.add_row(['file_1','data set (+test data)','data file'])
         table.add_row(['file_2','model','model'])
         st.write(table)
     elif len(file) == 2:
