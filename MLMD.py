@@ -149,9 +149,9 @@ if select_option == "Home Page":
     st.markdown(
     '''
     #### Contributors
-    **Research Group**: [Materials and mechanics informatics lab (MMIL), Shanghai Unversity](http://www.sshome.space/MMIL/PI/)
+    **Research Group**: Materials and mechanics informatics lab (MMIL), Shanghai Unversity
 
-    **Developers**: Jiaxuan Ma (Phd candidate), Jie xiong (Lecturer), Yuan Tian (Doctor), Bin Cao (Phd candidate)
+    **Developers**: Jiaxuan Ma (PhD Candidate), Jie xiong (Lecturer), Yuan Tian (Doctor), Bin Cao (PhD Candidate)
 
     **Adviser**: Prof Sheng Sun
 
