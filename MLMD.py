@@ -128,7 +128,7 @@ with st.sidebar:
     st.write('''
     Support: Jiaxuan Ma
              
-    Contact: jiaxuanma.shu@gmail.com
+    Contact: terry.jx.ma@gmail.com
     ''')
     select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Model Inference","Surrogate Optimization","Active Learning","Interpretable Machine Learning"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft','search','book-half'],
