@@ -613,7 +613,7 @@ elif select_option == "Feature Engineering":
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed")
         if file is None:
             table = PrettyTable(['Composition'])
-            table.add_row(['(Fe0.76B0.24)96Nb4'])
+            table.add_row(['Ti50Cu42.5Ni7.5'])
             st.write(table)
         if file is not None:
             colored_header(label="Data information",description=" ",color_name="violet-70")
@@ -626,7 +626,7 @@ elif select_option == "Feature Engineering":
             if button:
                 df = feature_transform(df, option)
                 st.write(df.head())
-                tmp_download_link = download_button(df, f'transform.csv', button_text='download')
+                tmp_download_link = download_button(df, f'trans_data.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True)      
 
     elif sub_option == "Feature Correlation":
