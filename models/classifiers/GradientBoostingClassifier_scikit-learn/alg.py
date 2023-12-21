@@ -41,7 +41,7 @@ def show():
         with st.expander("Hyper Parameter"):
             inputs['learning rate'] = st.number_input('learning rate',0.001,10.0,0.1)
             inputs['nestimators'] = st.number_input('number estimators',1, 1000, 100)
-            inputs['max features'] = st.selectbox('max features', ['auto', 'sqrt', 'log2'])
+            inputs['max features'] = st.selectbox('max features', ['sqrt', 'log2'])
             max_depth = st.checkbox('max depth', None)
             inputs['max depth'] = None
             if max_depth:
