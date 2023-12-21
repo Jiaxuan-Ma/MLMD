@@ -91,8 +91,8 @@ def create_data_with_group_and_counts(feature_type):
     comp_ids = []
     comp_counts = []
     for name,group in feature_type:
-        comp_ids._append(name)
-        comp_counts._append(len(group))
+        comp_ids.append(name)
+        comp_counts.append(len(group))
     comp_instances= list(zip(comp_ids,comp_counts))
     comp_data = pd.DataFrame(comp_instances,columns=['ID','Count']).sort_values(by='Count')
     return comp_data
@@ -108,7 +108,7 @@ def check_string_NaN(df):
     string_contains_columns = []
     for column in string_columns:
         if df[column].astype(str).str.contains('').any():
-            string_contains_columns._append(column)
+            string_contains_columns.append(column)
     if len(string_contains_columns) > 0:
         st.error(f"Error: string in column {string_contains_columns} !")
         st.stop()
@@ -122,7 +122,7 @@ def check_string(df):
     string_contains_columns = []
     for column in string_columns:
         if df[column].astype(str).str.contains('').any():
-            string_contains_columns._append(column)
+            string_contains_columns.append(column)
     if len(string_contains_columns) == 0:
         st.error(f"Error: need string in label column!")
         st.stop()
@@ -1533,8 +1533,8 @@ def export_loo_results(model, loo, model_name):
         
         model.model.fit(Xtrain, Ytrain)
         Ypred = model.model.predict(Xtest)
-        Y_pred._append(Ypred)
-        Y_test._append(Ytest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
     st.write('R2: {}'.format(r2_score(y_true=Y_test, y_pred=Y_pred)))
     plot = customPlot()
     plot.pred_vs_actual(Y_test, Y_pred)
@@ -1558,8 +1558,8 @@ def loo_cal(model, loo):
         
         model.model.fit(Xtrain, Ytrain)
         Ypred = model.model.predict(Xtest)
-        Y_pred._append(Ypred)
-        Y_test._append(Ytest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
     loo_score = r2_score(y_true=Y_test, y_pred=Y_pred)
     return loo_score
 
@@ -1574,8 +1574,8 @@ def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
         
         model.model.fit(Xtrain, Ytrain)
         Ypred = model.model.predict(Xtest)
-        Y_pred._append(Ypred)
-        Y_test._append(Ytest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
     Y_pred = np.array(Y_pred).reshape(-1,1)
     Y_test = np.array(Y_test).reshape(-1,1)
     model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns) 
@@ -1616,8 +1616,8 @@ def loo_cal_clf(model, loo):
         
         model.model.fit(Xtrain, Ytrain)
         Ypred = model.model.predict(Xtest)
-        Y_pred._append(Ypred)
-        Y_test._append(Ytest)
+        Y_pred.append(Ypred)
+        Y_test.append(Ytest)
     Y_pred = np.array(Y_pred).reshape(-1,1)
     Y_test = np.array(Y_test).reshape(-1,1)
     model.Ypred = pd.DataFrame(Y_pred, columns=model.targets.columns) 
@@ -1634,7 +1634,7 @@ def get_column_min(matrix):
         for row in range(1, len(matrix)):
             if matrix[row][col] < min_val:
                 min_val = matrix[row][col]
-        result._append(min_val)
+        result.append(min_val)
 
     return result
 
@@ -1647,7 +1647,7 @@ def get_column_max(matrix):
         for row in range(1, len(matrix)):
             if matrix[row][col] > max_val:
                 max_val = matrix[row][col]
-        result._append(max_val)
+        result.append(max_val)
 
     return result
 
@@ -1668,15 +1668,15 @@ def non_dominated_sorting(fitness_values):
                 if np.any(fitness_values[i] < fitness_values[j]):
                     domination_counts[j] += 1
                 else:
-                    dominated_solutions[i]._append(j)
+                    dominated_solutions[i].append(j)
             elif np.all(fitness_values[i] >= fitness_values[j]):
                 if np.any(fitness_values[i] > fitness_values[j]):
                     domination_counts[i] += 1
                 else:
-                    dominated_solutions[j]._append(i)
+                    dominated_solutions[j].append(i)
 
         if domination_counts[i] == 0:
-            frontiers[0]._append(i)
+            frontiers[0].append(i)
 
     i = 0
     while len(frontiers[i]) > 0:
@@ -1685,9 +1685,9 @@ def non_dominated_sorting(fitness_values):
             for k in dominated_solutions[j]:
                 domination_counts[k] -= 1
                 if domination_counts[k] == 0:
-                    next_frontier._append(k)
+                    next_frontier.append(k)
         i += 1
-        frontiers._append(next_frontier)
+        frontiers.append(next_frontier)
 
     return frontiers[:-1]
 
