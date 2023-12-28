@@ -15,7 +15,7 @@ The AI platform, MLMD (Machine Learning for Material Design) aims at utilizing g
 
 
 # Remote access
-
+The remote access is unstable, and we recommend deploying mlmd on a local laptop.
 ```
 https://mgi-mlmd.streamlit.app/
 ```
