@@ -5052,7 +5052,7 @@ elif select_option == "Surrogate Optimization":
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
                     if inputs['objective'] == 'max':
-                        best_= -best_y
+                        best_y= -best_y
                     st.info('PSO best_y: %s' % best_y.item())
                     plot.evolutionary_history(loss_history, 'PSO')
                     loss_history = pd.DataFrame(loss_history)
