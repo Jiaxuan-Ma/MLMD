@@ -39,7 +39,7 @@ def show():
     col1, col2 = st.columns([2,2])
     with col1:
         with st.expander("Hyper Parameter"):
-            inputs['kernel'] = st.selectbox('kernel',['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'])
+            inputs['kernel'] = st.selectbox('kernel',['linear', 'poly', 'rbf', 'sigmoid'])
             inputs['C'] = st.number_input('C', 1, 50000, 1000)
             random_state = st.checkbox('random state 42',True)
             if random_state:
