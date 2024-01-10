@@ -42,7 +42,7 @@ def show():
             inputs['mission'] = st.selectbox('mission',['Regression'])
             # if inputs['mission'] == 'Regression':
             inputs['Regressor'] = st.selectbox('regressor',['GaussianProcess'])
-            inputs['noise std'] = st.selectbox('noise std',['0.001','0.0001','0.00001','0.000001'])
+            inputs['noise std'] = st.selectbox('noise std',['0.01','0.001','0.0001','heteroheneous'])
                             
             inputs['opt num'] = st.number_input('sample number',0, 10, 1)
             inputs['min search'] = st.selectbox('min search',[False, True])

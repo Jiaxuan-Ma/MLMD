@@ -63,7 +63,7 @@ class Mobo4mat:
             HV_values = []
             for i in range(Ypred.shape[0]):
                 i_Ypred = Ypred.iloc[i]
-                Ytrain_i_Ypred = Ytrain.append(i_Ypred)
+                Ytrain_i_Ypred = Ytrain._append(i_Ypred)
                 i_pareto_front = self.find_non_dominated_solutions(Ytrain_i_Ypred.values, Ytrain_i_Ypred.columns.tolist())
                 i_HV_value = self.dominated_hypervolume(i_pareto_front, ref_point)
                 HV_values.append(i_HV_value)

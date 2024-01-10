@@ -4557,7 +4557,7 @@ elif select_option == "Active Learning":
             table.add_row(['file_2','visual data','design space'])
             st.write(table)      
         if len(file) == 2:
-            
+
             colored_header(label="Data information",description=" ",color_name="violet-70")
 
             df = pd.read_csv(file[0])
@@ -4636,8 +4636,17 @@ elif select_option == "Active Learning":
                 with st.container():
                     button_train = st.button('Train', use_container_width=True)
                 if button_train:
-                    Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
-                                        opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
+                    if inputs['noise std'] != 'heteroheneous':
+                        Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                            opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std= float(inputs['noise std']))
+                    else:
+                        if 'noise' in df.columns:
+                            noise_std = df['noise'].values
+                            Mymodel = Bgolearn.fit(data_matrix = sp.features, Measured_response = sp.targets, virtual_samples = sp.vsfeatures,
+                                                opt_num=inputs['opt num'], min_search=inputs['min search'], noise_std=noise_std)
+                        else:
+                            st.write("Column 'noise' is not exist")   
+                        
                     if inputs['sample criterion'] == 'Expected Improvement algorith':
                         res = Mymodel.EI()
                         
