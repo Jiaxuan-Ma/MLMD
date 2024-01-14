@@ -129,6 +129,7 @@ with st.sidebar:
     Support: Jiaxuan Ma
              
     Contact: terry.jx.ma@gmail.com
+             
     ''')
     select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Model Inference","Surrogate Optimization","Active Learning","Interpretable Machine Learning"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft','search','book-half'],
@@ -151,14 +152,14 @@ if select_option == "Home Page":
     #### Contributors
     **Research Group**: Materials and mechanics informatics lab (MMIL), Shanghai Unversity
 
-    **Developers**: Jiaxuan Ma (PhD Candidate), Jie xiong (Lecturer), Yuan Tian (Doctor), Bin Cao (PhD Candidate)
-
-    **Adviser**: Prof Sheng Sun
+    **Developers**: Jiaxuan Ma (PhD Candidate), Bin Cao (PhD Candidate), Yuan Tian (Doctor), Jie xiong (Assist Prof), Sheng Sun (Prof)
 
     #### Funding
-    This work was financially supported by the National Key Research and Development Program of China 
-    (No. 2022YFB3707803), the National Natural Science Foundation of China Project (No. 12072179 and 11672168), 
-    the Key Research Project of Zhejiang Lab (No. 2021PE0AC02), and Shanghai Engineering Research Center for Integrated Circuits and Advanced Display Materials.
+    This work was nancially supported by the National Key Research and Development
+    Program of China (No. 2022YFB3707803), the National Natural Science Foundation of
+    China Project (No. 12072179 and 11672168), the Key Research Project of Zhejiang Lab
+    (No. 2021PE0AC02), Shanghai Pujiang Program Grant (23PJ1403500), and Shanghai
+    Engineering Research Center for Integrated Circuits and Advanced Display Materials.
     ''')
 
 elif select_option == "Basic Data":
