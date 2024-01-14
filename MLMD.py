@@ -126,11 +126,12 @@ st.markdown(sysmenu,unsafe_allow_html=True)
 
 with st.sidebar:
     st.write('''
-    Support: Jiaxuan Ma
+    **Contact**: 
 
-    Contact: terry.jx.ma@gmail.com
-             xiongjie@shu.edu.cn
-    ''')
+    terry.jx.ma@gmail.com (Jiaxuan Ma)
+
+    george-jie.xiong@connect.polyu.hk (Jie Xiong)
+''')
     select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Model Inference","Surrogate Optimization","Active Learning","Interpretable Machine Learning"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft','search','book-half'],
                     menu_icon="boxes", default_index=0)
