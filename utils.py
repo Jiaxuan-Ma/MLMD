@@ -1529,8 +1529,9 @@ def export_loo_results(model, loo, model_name):
     targets = model.targets.values
 
     for train,test in loo.split(features):
-        Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-        
+        # Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
+        Xtrain, Xtest = features[train], features[test]
+        Ytrain, Ytest = targets[train], targets[test]
         model.model.fit(Xtrain, Ytrain)
         Ypred = model.model.predict(Xtest)
         Y_pred.append(Ypred)
@@ -1563,6 +1564,7 @@ def loo_cal(model, loo):
     loo_score = r2_score(y_true=Y_test, y_pred=Y_pred)
     return loo_score
 
+
 def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
     Y_pred  =[]
     Y_test = []
@@ -1570,8 +1572,9 @@ def export_loo_results_clf(model, loo, model_name, col_name, unique_categories):
     targets = model.targets.values
 
     for train,test in loo.split(features):
-        Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
-        
+        # Xtrain, Xtest, Ytrain,Ytest = features[train],features[test],targets[train],targets[test]
+        Xtrain, Xtest = features[train], features[test]
+        Ytrain, Ytest = targets[train], targets[test]
         model.model.fit(Xtrain, Ytrain)
         Ypred = model.model.predict(Xtest)
         Y_pred.append(Ypred)

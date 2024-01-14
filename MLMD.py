@@ -2123,7 +2123,6 @@ elif select_option == "Regression":
                     if inputs['auto hyperparameters'] == False:
                         reg.model = GradientBoostingRegressor(learning_rate=inputs['learning rate'],n_estimators=inputs['nestimators'],max_features=inputs['max features'],
                                                             random_state=inputs['random state']) 
-                    
                         export_loo_results(reg, loo, "GradientBoostingR_loo")
                     elif inputs['auto hyperparameters']:
                         def GBR_TT(learning_rate, n_estimators):                            
