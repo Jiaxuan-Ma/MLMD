@@ -127,7 +127,7 @@ st.markdown(sysmenu,unsafe_allow_html=True)
 with st.sidebar:
     st.write('''
     **Contact**: 
-    
+
     terry.jx.ma@gmail.com (Jiaxuan Ma)
 
 ''')
@@ -152,7 +152,7 @@ if select_option == "Home Page":
     #### Contributors
     **Research Group**: Materials and mechanics informatics lab (MMIL), Shanghai Unversity
 
-    **Developers**: Jiaxuan Ma (PhD Candidate), Bin Cao (PhD Candidate), Yuan Tian (Doctor), Jie xiong (Assist Prof), Sheng Sun (Prof)
+    **Developers**: Jiaxuan Ma (PhD Candidate), Bin Cao (PhD Candidate), Yuan Tian (Doctor), Jie Xiong (Assist Prof), Sheng Sun (Prof)
 
     #### Funding
     This work was nancially supported by the National Key Research and Development
