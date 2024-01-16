@@ -127,7 +127,7 @@ st.markdown(sysmenu,unsafe_allow_html=True)
 with st.sidebar:
     st.write('''
     **Contact**: 
-
+    
     terry.jx.ma@gmail.com (Jiaxuan Ma)
 
 ''')
