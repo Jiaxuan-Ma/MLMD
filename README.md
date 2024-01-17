@@ -19,7 +19,7 @@ The remote access is unstable, and we recommend deploying mlmd on a local laptop
 ```
 https://mgi-mlmd.streamlit.app/
 ```
-
+Stable version
 ```
 http://123.60.55.8/
 ```
