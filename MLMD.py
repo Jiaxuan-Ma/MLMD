@@ -129,6 +129,7 @@ with st.sidebar:
     **Contact**: 
 
     terry.jx.ma@gmail.com (Jiaxuan Ma)
+    george-jie.xiong@connect.polyu.hk (Jie Xiong)         
 
 ''')
     select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Model Inference","Surrogate Optimization","Active Learning","Interpretable Machine Learning"],
