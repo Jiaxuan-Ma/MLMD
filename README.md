@@ -20,6 +20,9 @@ The remote access is unstable, and we recommend deploying mlmd on a local laptop
 https://mgi-mlmd.streamlit.app/
 ```
 
+```
+http://123.60.55.8/
+```
 # Local deploy
 
 1. Install [anaconda](https://www.anaconda.com/). 
