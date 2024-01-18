@@ -129,6 +129,7 @@ with st.sidebar:
     **Contact**: 
 
     terry.jx.ma@gmail.com (Jiaxuan Ma)
+             
     george-jie.xiong@connect.polyu.hk (Jie Xiong)         
 
 ''')
@@ -5901,6 +5902,4 @@ elif select_option == "Interpretable Machine Learning":
         feature = st.selectbox('feature',list_features)
         interact_feature = st.selectbox('interact feature', list_features)
         st_shap(shap.dependence_plot(feature, shap_values, fs.features, display_features=fs.features,interaction_index=interact_feature))
-
-
 
