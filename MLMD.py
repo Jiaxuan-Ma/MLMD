@@ -1486,7 +1486,9 @@ elif select_option == "Regression":
 
                 elif operator == 'leave one out':
                     if inputs['auto hyperparameters'] == False:
+                        # kernel = PairwiseKernel() 
                         reg.model = SVR(kernel=inputs['kernel'], C=inputs['C'])
+                        # reg.model = SVR(kernel=kernel, C=inputs['C'])
                     
                         export_loo_results(reg, loo, "SVR_loo")
                     elif inputs['auto hyperparameters']:
