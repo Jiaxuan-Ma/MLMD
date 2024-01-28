@@ -5,12 +5,14 @@ from sklearn.gaussian_process.kernels import RBF
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct, WhiteKernel
 from tabulate import tabulate
-
+from sklearn.gaussian_process.kernels import PairwiseKernel, RationalQuadratic
+from sklearn.utils import resample
 import pandas as pd
 from typing import Optional
 import numpy as np
 import warnings
-
+from sklearn.gaussian_process import GaussianProcessRegressor as GPR
+from sklearn.ensemble import GradientBoostingRegressor
 from scipy.stats import norm
 import streamlit as st
 
@@ -32,6 +34,17 @@ class Mobo4mat:
     --------
     """
     def fit(self, X, y, visual_data, method, kernel_option, number, objective, ref_point):
+        def sample_bs(model, n_iterations, Xtrain, Ytrain, Xtest):
+            y_pred = []
+            for _ in range(n_iterations):
+                X_bs, y_bs = resample(Xtrain, Ytrain, replace=True)
+                y_hat = model.fit(X_bs, y_bs).predict(Xtest)
+                y_pred.append(y_hat)
+            y_pred = np.array(y_pred)
+            mean = np.mean(y_pred, axis=0)
+            std = np.std(y_pred, axis=0)
+            return mean, std
+        
         if objective == 'max':
             Xtrain = -X
             Ytrain = -y
@@ -47,15 +60,30 @@ class Mobo4mat:
             target_name = Ytrain.columns.tolist()
             feature_name = Xtrain.columns.tolist()
             ref_point = np.array(ref_point)
+        
         if kernel_option == 'rbf':
             kernel = RBF()
         elif kernel_option == 'DotProduct + WhiteKernel':
             kernel = DotProduct() + WhiteKernel()
         gp_model = GaussianProcessRegressor(kernel=kernel)
         gp_model.fit(Xtrain, Ytrain)
+        # elif kernel == 'FFF':
+        # UTS_Ytrain = Ytrain.iloc[:,0].values
+        # st.write(UTS_Ytrain)
+        # kernel = PairwiseKernel()+RationalQuadratic()
+        # UTS_model = GPR(kernel=kernel)
+        # UTS_mean, UTS_std = UTS_model.fit(Xtrain, UTS_Ytrain).predict(Xtest, return_std=True)
+        # EL_model = GradientBoostingRegressor(learning_rate=0.1, n_estimators=100, random_state=42)
+        # EL_Ytrain = Ytrain.iloc[:,1].values
+        # EL_mean, EL_std = sample_bs(EL_model, 50, Xtrain, EL_Ytrain, Xtest)
+
+        # Ypred = np.concatenate([UTS_mean.reshape(-1,1), EL_mean.reshape(-1,1)], axis=1)
+        # Ystd = np.concatenate([UTS_std.reshape(-1,1), EL_std.reshape(-1,1)], axis=1)
+        # st.write(Ypred)
+
 
         Ypred, Ystd = gp_model.predict(Xtest, return_std=True)
-        
+
         Ypred = pd.DataFrame(Ypred, columns=Ytrain.columns.tolist())
         Ystd = pd.DataFrame(Ystd, columns=['std1', 'std2'])
 
