@@ -315,7 +315,7 @@ elif select_option == "Basic Data":
         st.write('---')
 
     elif sub_option == "Outlier detection":
-        colored_header(label="Data Visualization",description=" ", color_name="violet-90")
+        colored_header(label="Outlier detection",description=" ", color_name="violet-90")
         file = st.file_uploader("Upload `.csv` file", type=['csv'], label_visibility="collapsed")
         if file is None:
             table = PrettyTable(['file name', 'class', 'description'])
