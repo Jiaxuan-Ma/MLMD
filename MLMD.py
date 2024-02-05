@@ -164,6 +164,7 @@ if select_option == "Home Page":
     Engineering Research Center for Integrated Circuits and Advanced Display Materials.
     ''')
 
+
 elif select_option == "Basic Data":
     with st.sidebar:
         sub_option = option_menu(None, ["Data visualization", "Outlier detection", "Databases"])
