@@ -166,7 +166,7 @@ if select_option == "Home Page":
 
 elif select_option == "Basic Data":
     with st.sidebar:
-        sub_option = option_menu(None, ["Databases", "Data visualization"])
+        sub_option = option_menu(None, ["Data visualization", "Outlier detection", "Databases"])
     if sub_option == "Databases":
         colored_header(label="Databases",description=" ",color_name="violet-90")
         col1, col2 = st.columns([2,2])
@@ -312,6 +312,47 @@ elif select_option == "Basic Data":
             with col2:
                 plot.featureSets_statistics_hist(options_selected,IDs, Counts)
         st.write('---')
+
+    elif sub_option == "Outlier detection":
+        colored_header(label="Data Visualization",description=" ", color_name="violet-90")
+        file = st.file_uploader("Upload `.csv` file", type=['csv'], label_visibility="collapsed")
+        if file is None:
+            table = PrettyTable(['file name', 'class', 'description'])
+            table.add_row(['file_1','dataset', 'data file'])
+            st.write(table)
+        if file is not None:
+            df = pd.read_csv(file)
+            check_string_NaN(df)
+            
+            colored_header(label="Data information",description=" ",color_name="violet-70")
+
+            nrow = st.slider("rows", 1, len(df), 5)
+            df_nrow = df.head(nrow)
+            st.write(df_nrow)
+
+            colored_header(label="Data statistics",description=" ",color_name="violet-30")
+
+            st.write(df.describe())
+
+            tmp_download_link = download_button(df.describe(), f'statistics.csv', button_text='download')
+            
+            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+            colored_header(label="Outlier detection", description=" ", color_name="violet-70")
+            
+            target_num = st.number_input('target number', min_value=1, max_value=10, value=1)
+            col_feature, col_target = st.columns(2)
+            # features
+            features = df.iloc[:,:-target_num]
+            # targets
+            targets = df.iloc[:,-target_num:]
+            with col_feature:    
+                st.write(features.head())
+            with col_target:   
+                st.write(targets.head())
+
+
+
 
 elif select_option == "Feature Engineering":
     with st.sidebar:
