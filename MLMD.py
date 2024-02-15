@@ -4978,9 +4978,8 @@ elif select_option == "Transfer Learning":
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
         if len(file) < 2:
             table = PrettyTable(['file name', 'class','descirption'])
-            table.add_row(['file_1','test_data','target domain with no-label'])
-            table.add_row(['file_2','target_data','target domain with label'])
-            table.add_row(['file_3','source_data_1','1 source domain'])
+            table.add_row(['file_1','target_data','target domain'])
+            table.add_row(['file_2','source_data_1','1 source domain'])
             table.add_row(['...','...','...'])
             table.add_row(['file_n','source_data_n','n source domain'])
             st.write(table)
@@ -4988,9 +4987,7 @@ elif select_option == "Transfer Learning":
         elif len(file) >= 2:
             df_target = pd.read_csv(file[0])
             df_source = pd.read_csv(file[1])
-            # source_files = file[1:]
-            # df = [pd.read_csv(f) for f in source_files]
-            # df_source = pd.concat(df, axis=0)
+
 
             colored_header(label="Data information", description=" ",color_name="violet-70")
 
@@ -5153,48 +5150,131 @@ elif select_option == "Transfer Learning":
                             st.write(result_data)
                             tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
-                # with st.container():
-                #     button_train = st.button('Train', use_container_width=True)
-                # if button_train:
-                #     TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
-                    
-                #     Xtest = df_test[list(target_features.columns)]
-                #     predict = TrAdaboostR2.predict(Xtest)
-                #     prediction = pd.DataFrame(predict, columns=[reg.targets.name])
-                #     try:
-                #         Ytest = df_test[target_selected_option]
-                #         plot = customPlot()
-                #         plot.pred_vs_actual(Ytest, prediction)
-                #         r2 = r2_score(Ytest, prediction)
-                #         st.write('R2: {}'.format(r2))
-                #         result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
-                #         result_data.columns = ['actual','prediction']
-                #         with st.expander('prediction'):
-                #             st.write(result_data)
-                #             tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
-                #             st.markdown(tmp_download_link, unsafe_allow_html=True)
-                #     except KeyError:
-                #         st.write(prediction)
-                #         tmp_download_link = download_button(prediction, f'prediction.csv', button_text='download')
-                #         st.markdown(tmp_download_link, unsafe_allow_html=True)         
-                #     with st.expander("weak estimators"):
-                #         st.write(TrAdaboostR2.estimator_weight)
-                #         model_name = 'estimators'
-                #         tmp_download_link = download_button(TrAdaboostR2.estimators, model_name+f'.pickle', button_text='download')
-                #         st.markdown(tmp_download_link, unsafe_allow_html=True)
-                #         data_name = 'estimator_weights'       
-                #         tmp_download_link = download_button(TrAdaboostR2.estimator_weight, data_name+f'.pickle', button_text='download')
-                #         st.markdown(tmp_download_link, unsafe_allow_html=True)        
+ 
 
             elif inputs['model'] == 'TwoStageTrAdaboostR2':
-                st.write('Please wait...')
-            elif inputs['model'] == 'TwoStageTrAdaboostR2-revised':
-                st.write('Please wait...')
+                DTR = tree.DecisionTreeRegressor()
+                with col2:
+                    with st.expander('Operator'):
+                        operator = st.selectbox('', ('train test split','cross val score', 'leave one out'), label_visibility= "collapsed")
+                        if operator == 'train test split':
+                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.td_features,reg.td_targets,test_size=inputs['test size'],random_state=inputs['random state'])
+
+                        elif operator == 'cross val score':
+                            cv = st.number_input('cv',1,20,5)
+                        
+                        elif operator == 'leave one out':
+                            loo = LeaveOneOut()
+                
+                colored_header(label="Training", description=" ",color_name="violet-30")
+                with st.container():
+                    button_train = st.button('Train', use_container_width=True)
+                if button_train:
+                    if operator == 'train test split':
+                        reg.model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=reg.Xtrain, yt=reg.Ytrain, verbose=-1)
+                        
+                        reg.TrAdaBoostR2()
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
+                        result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "TrAdaboostR2")
+
+                    elif operator == 'cross val score':
+
+                        kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+                        y_pred_list = []
+                        y_test_list = []
+
+                        for train_index, test_index in kf.split(reg.td_features.values):
+                            X_train, X_test = reg.td_features.values[train_index], reg.td_features.values[test_index]
+                            y_train, y_test = reg.td_targets.values[train_index], reg.td_targets.values[test_index]
+                            y_train = y_train.reshape(-1, 1)
+                            y_test = y_test.reshape(-1, 1)
+                            
+                            # 创建模型并训练
+                            model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
+                            model.fit(reg.sd_features.values, reg.sd_targets.values.reshape(-1, 1))
+                            
+                            y_pred = model.predict(X_test)
+                            y_pred_list.append(y_pred)
+                            y_test_list.append(y_test)
+
+                        Y_pred = np.concatenate(y_pred_list)
+                        Y_test = np.concatenate(y_test_list)
+                        st.write(f'R2: {r2_score(Y_pred, Y_test)}')
+                        fig, ax = plt.subplots(figsize = (5,4))  
+                        ax.scatter(Y_pred, Y_test, marker='o', color='#000080',zorder=1, facecolors='none')
+                        lims = [
+                            np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
+                            np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
+                                ]
+                        ax.tick_params(direction='in', length=5)
+                        ax.plot(lims, lims, zorder=8, linewidth=2, linestyle='solid', color='#FF0000')
+                        ax.set_xlim(lims)
+                        ax.set_ylim(lims)
+                        plt.xlabel("Actual")
+                        plt.ylabel("Prediction")
+                        st.pyplot(fig)
+                        
+                        with st.expander("model"):
+                            tmp_download_link = download_button(model, 'TaAdaboostR2_cv'+'.pickle', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
+                        result_data.columns = ['actual', 'prediction']
+                        with st.expander('prediction'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+
+                    elif operator == 'leave one out':
+
+                        y_pred_list = []
+                        y_test_list = []
+                        for train_index, test_index in loo.split(reg.td_features.values):
+                            X_train, X_test = reg.td_features.values[train_index], reg.td_features.values[test_index]
+                            y_train, y_test = reg.td_targets.values[train_index], reg.td_targets.values[test_index]
+                            y_train = y_train.reshape(-1, 1)
+                            y_test = y_test.reshape(-1, 1)
+                            # 创建模型并训练
+                            model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
+                            model.fit(reg.sd_features.values, reg.sd_targets.values.reshape(-1,1))
+                            y_pred = model.predict(X_test)
+                            y_pred_list.append(y_pred)
+                            y_test_list.append(y_test)
+
+                        Y_pred = np.ravel(y_pred_list)
+                        Y_test = np.ravel(y_test_list)
+                        st.write(f'R2: {r2_score(Y_pred, Y_test)}')
+                        fig, ax = plt.subplots(figsize = (5,4))  
+                        ax.scatter(Y_pred, Y_test, marker='o', color='#000080',zorder=1, facecolors='none')
+                        lims = [
+                            np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
+                            np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
+                                ]
+                        ax.tick_params(direction='in', length=5)
+                        ax.plot(lims, lims, zorder=8, linewidth=2, linestyle='solid', color='#FF0000')
+                        ax.set_xlim(lims)
+                        ax.set_ylim(lims)
+                        plt.xlabel("Actual")
+                        plt.ylabel("Prediction")
+                        st.pyplot(fig)
+
+                        with st.expander("model"):
+                            tmp_download_link = download_button(model, 'TaAdaboostR2_loo'+'.pickle', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
+                        result_data.columns = ['actual', 'prediction']
+                        with st.expander('prediction'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
                 st.write('---')   
 
 elif select_option == "Surrogate Optimization":
     with st.sidebar:
-        sub_option = option_menu(None, ["Single-objective Surrogate Optimization", "Multi-objective Surrogate Optimization","Single-objective Surrogate Optimization (TL)","Multi-objective Surrogate Optimization (TL)"])
+        sub_option = option_menu(None, ["Single-objective Surrogate Optimization", "Multi-objective Surrogate Optimization"])
     if sub_option == "Single-objective Surrogate Optimization":
 
         colored_header(label="Single-objective Surrogate Optimization",description=" ",color_name="violet-90")
@@ -5247,7 +5327,6 @@ elif select_option == "Surrogate Optimization":
             with col2:
                 preprocess = st.selectbox('data preprocess',[None, 'StandardScaler','MinMaxScaler'])
                 data = pd.concat([features,vars_bound])
-               
                 if preprocess == 'StandardScaler':
                     features, scaler = normalize(data, 'StandardScaler')
                     vars_bound = features.tail(2)
@@ -5619,386 +5698,384 @@ elif select_option == "Surrogate Optimization":
                     tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-    elif sub_option == "Multi-objective Surrogate Optimization (TL)":
-        colored_header(label="Multi-objective Surrogate Optimization (TL)",description=" ",color_name="violet-90")
-        file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) < 6:
-            table = PrettyTable(['file name', 'class','description'])
-            table.add_row(['file_1','dataset','data file'])
-            table.add_row(['file_2','boundary','feature design constraint'])
-            table.add_row(['file_3','weights_1','obj1 estimator weight'])
-            table.add_row(['file_4','weights_2','obj2 estimator weight'])
-            table.add_row(['file_5','model_1','obj1 model1'])
-            table.add_row(['file_6','model_2','obj2 model2'])
-            st.write(table)
-        if len(file) >= 6:
-            df = pd.read_csv(file[0])
-            check_string_NaN(df)
-            colored_header(label="Feature and target",description=" ",color_name="violet-70")
+    # elif sub_option == "Multi-objective Surrogate Optimization (TL)":
+    #     colored_header(label="Multi-objective Surrogate Optimization (TL)",description=" ",color_name="violet-90")
+    #     file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
+    #     if len(file) < 6:
+    #         table = PrettyTable(['file name', 'class','description'])
+    #         table.add_row(['file_1','dataset','data file'])
+    #         table.add_row(['file_2','boundary','feature design constraint'])
+    #         table.add_row(['file_3','model_1','obj1 model1'])
+    #         table.add_row(['file_4','model_2','obj2 model2'])
+    #         st.write(table)
+    #     if len(file) >= 6:
+    #         df = pd.read_csv(file[0])
+    #         check_string_NaN(df)
+    #         colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            target_num = st.number_input('target number',  min_value=2, max_value=2, value=2)
+    #         target_num = st.number_input('target number',  min_value=2, max_value=2, value=2)
             
-            col_feature, col_target = st.columns(2)
-            # features
-            features = df.iloc[:,:-target_num]
-            # targets
-            targets = df.iloc[:,-target_num:]
-            with col_feature:    
-                st.write(features.head())
-            with col_target:   
-                st.write(targets.head())
-            colored_header(label="target", description=" ", color_name="violet-70")
-            target_selected_option = st.multiselect('target', list(targets)[::-1], default=targets.columns.tolist())
-            df_var = pd.read_csv(file[1])
-            features_name = df_var.columns.tolist()
-            range_var = df_var.values
-            vars_min = get_column_min(range_var)
-            vars_max = get_column_max(range_var)
-            array_vars_min = np.array(vars_min).reshape(1,-1)
-            array_vars_max = np.array(vars_max).reshape(1,-1)
-            vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
-            colored_header(label="Feature design constraint", description=" ", color_name="violet-70")
-            vars_bound = pd.DataFrame(vars_bound, columns=features_name)
-            st.write(vars_bound)
+    #         col_feature, col_target = st.columns(2)
+    #         # features
+    #         features = df.iloc[:,:-target_num]
+    #         # targets
+    #         targets = df.iloc[:,-target_num:]
+    #         with col_feature:    
+    #             st.write(features.head())
+    #         with col_target:   
+    #             st.write(targets.head())
+    #         colored_header(label="target", description=" ", color_name="violet-70")
+    #         target_selected_option = st.multiselect('target', list(targets)[::-1], default=targets.columns.tolist())
+    #         df_var = pd.read_csv(file[1])
+    #         features_name = df_var.columns.tolist()
+    #         range_var = df_var.values
+    #         vars_min = get_column_min(range_var)
+    #         vars_max = get_column_max(range_var)
+    #         array_vars_min = np.array(vars_min).reshape(1,-1)
+    #         array_vars_max = np.array(vars_max).reshape(1,-1)
+    #         vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
+    #         colored_header(label="Feature design constraint", description=" ", color_name="violet-70")
+    #         vars_bound = pd.DataFrame(vars_bound, columns=features_name)
+    #         st.write(vars_bound)
 
-            colored_header(label="Optimize", description=" ", color_name="violet-70")
-            model_weight_1 = pickle.load(file[2])
-            model_weight_2 = pickle.load(file[3])
-            model_1 = pickle.load(file[4])
-            model_2 = pickle.load(file[5])
-            model_path = './models/moo'
-            template_alg = model_platform(model_path)
+    #         colored_header(label="Optimize", description=" ", color_name="violet-70")
+    #         model_weight_1 = pickle.load(file[2])
+    #         model_weight_2 = pickle.load(file[3])
+    #         model_1 = pickle.load(file[4])
+    #         model_2 = pickle.load(file[5])
+    #         model_path = './models/moo'
+    #         template_alg = model_platform(model_path)
 
-            inputs, col2 = template_alg.show()
-            inputs['lb'] = vars_min
-            inputs['ub'] = vars_max
+    #         inputs, col2 = template_alg.show()
+    #         inputs['lb'] = vars_min
+    #         inputs['ub'] = vars_max
             
-            if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                with col2: 
-                    st.warning('the variable number should be %d' % vars_bound.shape[1])
-            else:
-                with col2:
-                    st.info("the variable number is correct")
+    #         if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+    #             with col2: 
+    #                 st.warning('the variable number should be %d' % vars_bound.shape[1])
+    #         else:
+    #             with col2:
+    #                 st.info("the variable number is correct")
 
-                pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
-                pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+    #             pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
+    #             pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
 
-                if inputs['objective'] == 'max':  
+    #             if inputs['objective'] == 'max':  
 
-                    targets = - targets
-                    pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
-                    pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
-                    pareto_front = -pareto_front
-                    targets = -targets
+    #                 targets = - targets
+    #                 pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
+    #                 pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+    #                 pareto_front = -pareto_front
+    #                 targets = -targets
     
-                col1, col2 = st.columns([2, 1])
-                with col1:
-                    with plt.style.context(['nature','no-latex']):
-                        fig, ax = plt.subplots()
-                        ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
-                        ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
-                        ax.set_xlabel(target_selected_option[0])
-                        ax.set_ylabel(target_selected_option[1])
-                        ax.set_title('Pareto front of visual space')
-                        st.pyplot(fig)
-                with col2:
-                    pareto_front = pareto_front.reset_index(drop=True)
-                    st.write(pareto_front)
-                    tmp_download_link = download_button(pareto_front, f'Pareto_front.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #             col1, col2 = st.columns([2, 1])
+    #             with col1:
+    #                 with plt.style.context(['nature','no-latex']):
+    #                     fig, ax = plt.subplots()
+    #                     ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
+    #                     ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
+    #                     ax.set_xlabel(target_selected_option[0])
+    #                     ax.set_ylabel(target_selected_option[1])
+    #                     ax.set_title('Pareto front of visual space')
+    #                     st.pyplot(fig)
+    #             with col2:
+    #                 pareto_front = pareto_front.reset_index(drop=True)
+    #                 st.write(pareto_front)
+    #                 tmp_download_link = download_button(pareto_front, f'Pareto_front.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
-            with st.container():
-                button_train = st.button('Opt', use_container_width=True)
+    #         with st.container():
+    #             button_train = st.button('Opt', use_container_width=True)
 
-            if button_train:               
-                plot = customPlot()  
-                alg = NSGA2(
-                    pop_size=inputs['size pop'],
-                    crossover=nsgaSBX(prob=0.9, eta=15),
-                    mutation=PM(eta=20),
-                    eliminate_duplicates=True
-                    )
-                if inputs['model'] == 'SMSEMOA':
-                    alg = SMSEMOA()
-                termination = get_termination("n_gen", inputs['max iter']) 
-                TrAdaboostR2_1 = TrAdaboostR2()  
-                TrAdaboostR2_1.estimator_weight = model_weight_1
-                TrAdaboostR2_1.estimators = model_1
-                TrAdaboostR2_1.N = len(model_1)   
-                TrAdaboostR2_2 = TrAdaboostR2()  
-                TrAdaboostR2_2.estimator_weight = model_weight_2
-                TrAdaboostR2_2.estimators = model_2
-                TrAdaboostR2_2.N = len(model_2)                    
-                class MyProblem(ElementwiseProblem):
-                    def __init__(self):
-                        super().__init__(n_var=inputs['n dim'],
-                                        n_obj=2,
-                                        xl=np.array(inputs['lb']),
-                                        xu=np.array(inputs['ub']))
-                    def _evaluate(self, x, out, *args, **kwargs):
-                        x = x.reshape(1,-1)
-                        y1_pred = TrAdaboostR2_1.inference(x)
-                        if inputs['objective'] == 'max':
-                            y1_pred = -y1_pred
-                        y2_pred = TrAdaboostR2_2.inference(x)
-                        if inputs['objective'] == 'max':
-                            y2_pred = -y2_pred
-                        out["F"] = [y1_pred, y2_pred]
+    #         if button_train:               
+    #             plot = customPlot()  
+    #             alg = NSGA2(
+    #                 pop_size=inputs['size pop'],
+    #                 crossover=nsgaSBX(prob=0.9, eta=15),
+    #                 mutation=PM(eta=20),
+    #                 eliminate_duplicates=True
+    #                 )
+    #             if inputs['model'] == 'SMSEMOA':
+    #                 alg = SMSEMOA()
+    #             termination = get_termination("n_gen", inputs['max iter']) 
+    #             TrAdaboostR2_1 = TrAdaboostR2()  
+    #             TrAdaboostR2_1.estimator_weight = model_weight_1
+    #             TrAdaboostR2_1.estimators = model_1
+    #             TrAdaboostR2_1.N = len(model_1)   
+    #             TrAdaboostR2_2 = TrAdaboostR2()  
+    #             TrAdaboostR2_2.estimator_weight = model_weight_2
+    #             TrAdaboostR2_2.estimators = model_2
+    #             TrAdaboostR2_2.N = len(model_2)                    
+    #             class MyProblem(ElementwiseProblem):
+    #                 def __init__(self):
+    #                     super().__init__(n_var=inputs['n dim'],
+    #                                     n_obj=2,
+    #                                     xl=np.array(inputs['lb']),
+    #                                     xu=np.array(inputs['ub']))
+    #                 def _evaluate(self, x, out, *args, **kwargs):
+    #                     x = x.reshape(1,-1)
+    #                     y1_pred = TrAdaboostR2_1.inference(x)
+    #                     if inputs['objective'] == 'max':
+    #                         y1_pred = -y1_pred
+    #                     y2_pred = TrAdaboostR2_2.inference(x)
+    #                     if inputs['objective'] == 'max':
+    #                         y2_pred = -y2_pred
+    #                     out["F"] = [y1_pred, y2_pred]
 
-                problem = MyProblem()                    
-                res = minimize(problem,
-                                alg,
-                                termination,
-                                seed=inputs['random state'],
-                                save_history=True,
-                                verbose=False)
-                res.F[:, [0, 1]] = res.F[:, [1, 0]]
-                if inputs['objective'] == 'max':
-                    best_y = res.F
-                    targets = - targets
-                    iter_data = np.concatenate([targets.values, best_y], axis = 0)
-                    iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
-                    iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
-                    iter_pareto_front = -iter_pareto_front       
-                    pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
-                    pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
-                    pareto_front = -pareto_front
-                    targets = - targets
-                    best_y = - res.F
+    #             problem = MyProblem()                    
+    #             res = minimize(problem,
+    #                             alg,
+    #                             termination,
+    #                             seed=inputs['random state'],
+    #                             save_history=True,
+    #                             verbose=False)
+    #             res.F[:, [0, 1]] = res.F[:, [1, 0]]
+    #             if inputs['objective'] == 'max':
+    #                 best_y = res.F
+    #                 targets = - targets
+    #                 iter_data = np.concatenate([targets.values, best_y], axis = 0)
+    #                 iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
+    #                 iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
+    #                 iter_pareto_front = -iter_pareto_front       
+    #                 pareto_front = find_non_dominated_solutions(targets.values, target_selected_option)
+    #                 pareto_front = pd.DataFrame(pareto_front, columns=target_selected_option)
+    #                 pareto_front = -pareto_front
+    #                 targets = - targets
+    #                 best_y = - res.F
 
-                else:
-                    best_y = res.F
-                    iter_data = np.concatenate([targets.values, best_y], axis = 0)
-                    iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
-                    iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
+    #             else:
+    #                 best_y = res.F
+    #                 iter_data = np.concatenate([targets.values, best_y], axis = 0)
+    #                 iter_pareto_front = find_non_dominated_solutions(iter_data, target_selected_option)
+    #                 iter_pareto_front = pd.DataFrame(iter_pareto_front, columns=target_selected_option)
                 
-                with plt.style.context(['nature','no-latex']):
-                    fig, ax = plt.subplots()
-                    ax.plot(iter_pareto_front[target_selected_option[0]],iter_pareto_front[target_selected_option[1]], 'r--')
-                    ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
-                    ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
-                    ax.scatter(best_y[:, 0], best_y[:,1])
-                    ax.set_xlabel(target_selected_option[0])
-                    ax.set_ylabel(target_selected_option[1])
-                    ax.set_title('Pareto front of visual space')
-                    st.pyplot(fig)                    
-                best_x = res.X
+    #             with plt.style.context(['nature','no-latex']):
+    #                 fig, ax = plt.subplots()
+    #                 ax.plot(iter_pareto_front[target_selected_option[0]],iter_pareto_front[target_selected_option[1]], 'r--')
+    #                 ax.plot(pareto_front[target_selected_option[0]], pareto_front[target_selected_option[1]], 'k--')
+    #                 ax.scatter(targets[target_selected_option[0]], targets[target_selected_option[1]])
+    #                 ax.scatter(best_y[:, 0], best_y[:,1])
+    #                 ax.set_xlabel(target_selected_option[0])
+    #                 ax.set_ylabel(target_selected_option[1])
+    #                 ax.set_title('Pareto front of visual space')
+    #                 st.pyplot(fig)                    
+    #             best_x = res.X
 
-                st.info('Recommmended Sample')
-                truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+    #             st.info('Recommmended Sample')
+    #             truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
 
-                best_x = truncate_func(best_x)
+    #             best_x = truncate_func(best_x)
                 
-                best_x = pd.DataFrame(best_x, columns = features_name)
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    best_y = pd.DataFrame(best_y, columns = targets.columns.tolist())
-                    data = pd.concat([best_x, best_y], axis = 1)
-                    tmp_download_link = download_button(data, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                with col2:
-                    iter_pareto_front = iter_pareto_front.reset_index(drop=True)
-                    st.write(iter_pareto_front)
-                    tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #             best_x = pd.DataFrame(best_x, columns = features_name)
+    #             col1, col2 = st.columns([3, 1])
+    #             with col1:
+    #                 best_y = pd.DataFrame(best_y, columns = targets.columns.tolist())
+    #                 data = pd.concat([best_x, best_y], axis = 1)
+    #                 tmp_download_link = download_button(data, f'recommended samples.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #             with col2:
+    #                 iter_pareto_front = iter_pareto_front.reset_index(drop=True)
+    #                 st.write(iter_pareto_front)
+    #                 tmp_download_link = download_button(iter_pareto_front, f'iter_pareto_front.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
             
-    elif sub_option == "Single-objective Surrogate Optimization (TL)":
-        colored_header(label="Single-objective Surrogate Optimization (TL)",description=" ",color_name="violet-90")
-        file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) < 3:
-            table = PrettyTable(['file name', 'class','description'])
-            table.add_row(['file_1','boundary','feature design constraint'])
-            table.add_row(['file_2','weights','estimator weight'])
-            table.add_row(['file_3','model','model'])
-            st.write(table)
-        elif len(file) >= 3:
+    # elif sub_option == "Single-objective Surrogate Optimization (TL)":
+    #     colored_header(label="Single-objective Surrogate Optimization (TL)",description=" ",color_name="violet-90")
+    #     file = st.file_uploader("Upload `.pickle` model and `.csv` file",  label_visibility="collapsed", accept_multiple_files=True)
+    #     if len(file) < 3:
+    #         table = PrettyTable(['file name', 'class','description'])
+    #         table.add_row(['file_1','boundary','feature design constraint'])
+    #         table.add_row(['file_2','weights','estimator weight'])
+    #         table.add_row(['file_3','model','model'])
+    #         st.write(table)
+    #     elif len(file) >= 3:
 
-            df_var = pd.read_csv(file[0])
-            features_name = df_var.columns.tolist()
-            range_var = df_var.values
-            vars_min = get_column_min(range_var)
-            vars_max = get_column_max(range_var)
-            array_vars_min = np.array(vars_min).reshape(1,-1)
-            array_vars_max = np.array(vars_max).reshape(1,-1)
-            vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
-            colored_header(label="Feature design constraint", description=" ", color_name="violet-70")
-            vars_bound = pd.DataFrame(vars_bound, columns=features_name)
-            st.write(vars_bound)
+    #         df_var = pd.read_csv(file[0])
+    #         features_name = df_var.columns.tolist()
+    #         range_var = df_var.values
+    #         vars_min = get_column_min(range_var)
+    #         vars_max = get_column_max(range_var)
+    #         array_vars_min = np.array(vars_min).reshape(1,-1)
+    #         array_vars_max = np.array(vars_max).reshape(1,-1)
+    #         vars_bound = np.concatenate([array_vars_min, array_vars_max], axis=0)
+    #         colored_header(label="Feature design constraint", description=" ", color_name="violet-70")
+    #         vars_bound = pd.DataFrame(vars_bound, columns=features_name)
+    #         st.write(vars_bound)
         
-            model_weight = pickle.load(file[1])
-            colored_header(label="Optimize", description=" ", color_name="violet-70")
-            model = pickle.load(file[2])
-            model_path = './models/surrogate optimize'
-            template_alg = model_platform(model_path)
+    #         model_weight = pickle.load(file[1])
+    #         colored_header(label="Optimize", description=" ", color_name="violet-70")
+    #         model = pickle.load(file[2])
+    #         model_path = './models/surrogate optimize'
+    #         template_alg = model_platform(model_path)
 
-            inputs, col2 = template_alg.show()
-            inputs['lb'] = vars_min
-            inputs['ub'] = vars_max
+    #         inputs, col2 = template_alg.show()
+    #         inputs['lb'] = vars_min
+    #         inputs['ub'] = vars_max
 
-            if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
-                st.warning('the variable number should be %d' % vars_bound.shape[1])
-            else:
-                st.info("the variable number is correct")
+    #         if not len(inputs['lb']) == len(inputs['ub']) == inputs['n dim']:
+    #             st.warning('the variable number should be %d' % vars_bound.shape[1])
+    #         else:
+    #             st.info("the variable number is correct")
 
-            with st.container():
-                button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
-                TrAdaboostR2 = TrAdaboostR2()
-                TrAdaboostR2.estimator_weight = model_weight
-                TrAdaboostR2.estimators = model
-                TrAdaboostR2.N = len(model)
-                def opt_func(x):
-                    x = x.reshape(1,-1)
-                    y_pred = TrAdaboostR2.inference(x)
-                    if inputs['objective'] == 'max':
-                        y_pred = -y_pred
-                    return y_pred
-                plot = customPlot()      
-                if inputs['model'] == 'PSO':    
+    #         with st.container():
+    #             button_train = st.button('Opt', use_container_width=True)
+    #         if button_train:  
+    #             TrAdaboostR2 = TrAdaboostR2()
+    #             TrAdaboostR2.estimator_weight = model_weight
+    #             TrAdaboostR2.estimators = model
+    #             TrAdaboostR2.N = len(model)
+    #             def opt_func(x):
+    #                 x = x.reshape(1,-1)
+    #                 y_pred = TrAdaboostR2.inference(x)
+    #                 if inputs['objective'] == 'max':
+    #                     y_pred = -y_pred
+    #                 return y_pred
+    #             plot = customPlot()      
+    #             if inputs['model'] == 'PSO':    
                     
-                    alg = PSO(func=opt_func, dim=inputs['n dim'], pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                            w=inputs['w'], c1=inputs['c1'], c2=inputs['c2'])
+    #                 alg = PSO(func=opt_func, dim=inputs['n dim'], pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+    #                         w=inputs['w'], c1=inputs['c1'], c2=inputs['c2'])
             
-                    alg.run()
-                    best_x = alg.gbest_x
-                    best_y = alg.gbest_y
+    #                 alg.run()
+    #                 best_x = alg.gbest_x
+    #                 best_y = alg.gbest_y
 
-                    loss_history = alg.gbest_y_hist
-                    if inputs['objective'] == 'max':
-                        loss_history = -np.array(loss_history)                    
+    #                 loss_history = alg.gbest_y_hist
+    #                 if inputs['objective'] == 'max':
+    #                     loss_history = -np.array(loss_history)                    
 
-                    st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
-                    best_x = truncate_func(best_x).reshape(1,-1)
+    #                 st.info('Recommmended Sample')
+    #                 truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+    #                 best_x = truncate_func(best_x).reshape(1,-1)
 
-                    best_x = pd.DataFrame(best_x, columns = features_name)
+    #                 best_x = pd.DataFrame(best_x, columns = features_name)
 
-                    st.write(best_x)         
-                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    if inputs['objective'] == 'max':
-                        best_= -best_y
-                    st.info('PSO best_y: %s' % best_y.item())
-                    plot.evolutionary_history(loss_history, 'PSO')
-                    loss_history = pd.DataFrame(loss_history)
-                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                elif inputs['model'] == 'GA':
+    #                 st.write(best_x)         
+    #                 tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #                 if inputs['objective'] == 'max':
+    #                     best_= -best_y
+    #                 st.info('PSO best_y: %s' % best_y.item())
+    #                 plot.evolutionary_history(loss_history, 'PSO')
+    #                 loss_history = pd.DataFrame(loss_history)
+    #                 tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #             elif inputs['model'] == 'GA':
 
-                    alg = GA(pop_size=inputs['size pop'], 
-                            crossover=SBX(prob=0.9, eta=15),
-                            mutation=PM(eta=20),
-                            eliminate_duplicates=True)
+    #                 alg = GA(pop_size=inputs['size pop'], 
+    #                         crossover=SBX(prob=0.9, eta=15),
+    #                         mutation=PM(eta=20),
+    #                         eliminate_duplicates=True)
 
-                    termination = get_termination("n_gen", inputs['max iter'])                    
-                    class MyProblem(ElementwiseProblem):
-                        def __init__(self):
-                            super().__init__(n_var=inputs['n dim'],
-                                            n_obj=1,
-                                            xl=np.array(inputs['lb']),
-                                            xu=np.array(inputs['ub']))
-                        def _evaluate(self, x, out, *args, **kwargs):
-                            x = x.reshape(1,-1)
-                            y_pred = model.predict(x)
-                            if inputs['objective'] == 'max':
-                                y_pred = -y_pred
-                            out["F"] = y_pred
+    #                 termination = get_termination("n_gen", inputs['max iter'])                    
+    #                 class MyProblem(ElementwiseProblem):
+    #                     def __init__(self):
+    #                         super().__init__(n_var=inputs['n dim'],
+    #                                         n_obj=1,
+    #                                         xl=np.array(inputs['lb']),
+    #                                         xu=np.array(inputs['ub']))
+    #                     def _evaluate(self, x, out, *args, **kwargs):
+    #                         x = x.reshape(1,-1)
+    #                         y_pred = model.predict(x)
+    #                         if inputs['objective'] == 'max':
+    #                             y_pred = -y_pred
+    #                         out["F"] = y_pred
                             
-                    problem = MyProblem()                    
-                    res = minimize(problem,
-                                    alg,
-                                    termination,
-                                    seed=1,
-                                    save_history=True,
-                                    verbose=False)
-                    if inputs['objective'] == 'max':
-                        best_y = -res.F
-                    else:
-                        best_y = res.F
-                    best_x = res.X
-                    hist = res.history
-                    hist_F = []              # the objective space values in each generation
-                    # st.write("Best solution found: \nX = %s\nF = %s" % (best_x, y_pred))
-                    for algo in hist:
-                        # retrieve the optimum from the algorithm
-                        opt = algo.opt
-                        # filter out only the feasible and append and objective space values
-                        feas = np.where(opt.get("feasible"))[0]
-                        hist_F.append(opt.get("F")[feas])
-                    # replace this line by `hist_cv` if you like to analyze the least feasible optimal solution and not the population
-                    if inputs['objective'] == 'max':
-                        loss_history = - np.array(hist_F).reshape(-1,1)
-                    else:
-                        loss_history = np.array(hist_F).reshape(-1,1)
-                    st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
-                    best_x = truncate_func(best_x).reshape(1,-1)
+    #                 problem = MyProblem()                    
+    #                 res = minimize(problem,
+    #                                 alg,
+    #                                 termination,
+    #                                 seed=1,
+    #                                 save_history=True,
+    #                                 verbose=False)
+    #                 if inputs['objective'] == 'max':
+    #                     best_y = -res.F
+    #                 else:
+    #                     best_y = res.F
+    #                 best_x = res.X
+    #                 hist = res.history
+    #                 hist_F = []              # the objective space values in each generation
+    #                 # st.write("Best solution found: \nX = %s\nF = %s" % (best_x, y_pred))
+    #                 for algo in hist:
+    #                     # retrieve the optimum from the algorithm
+    #                     opt = algo.opt
+    #                     # filter out only the feasible and append and objective space values
+    #                     feas = np.where(opt.get("feasible"))[0]
+    #                     hist_F.append(opt.get("F")[feas])
+    #                 # replace this line by `hist_cv` if you like to analyze the least feasible optimal solution and not the population
+    #                 if inputs['objective'] == 'max':
+    #                     loss_history = - np.array(hist_F).reshape(-1,1)
+    #                 else:
+    #                     loss_history = np.array(hist_F).reshape(-1,1)
+    #                 st.info('Recommmended Sample')
+    #                 truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+    #                 best_x = truncate_func(best_x).reshape(1,-1)
                     
-                    best_x = pd.DataFrame(best_x, columns = features_name)
+    #                 best_x = pd.DataFrame(best_x, columns = features_name)
 
-                    st.write(best_x)         
-                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    st.info('GA best_y: %s' %  best_y.item())
-                    plot.evolutionary_history(loss_history, 'GA')   
-                    loss_history = pd.DataFrame(loss_history)
-                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                elif inputs['model'] == 'DE':
-                    alg = DE(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
-                            prob_mut = inputs['prob mut'], F=inputs['F'])
+    #                 st.write(best_x)         
+    #                 tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #                 st.info('GA best_y: %s' %  best_y.item())
+    #                 plot.evolutionary_history(loss_history, 'GA')   
+    #                 loss_history = pd.DataFrame(loss_history)
+    #                 tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #             elif inputs['model'] == 'DE':
+    #                 alg = DE(func=opt_func, n_dim=inputs['n dim'], size_pop=inputs['size pop'], max_iter=inputs['max iter'], lb=inputs['lb'], ub=inputs['ub'],
+    #                         prob_mut = inputs['prob mut'], F=inputs['F'])
 
-                    best_x, best_y = alg.run()
+    #                 best_x, best_y = alg.run()
 
-                    loss_history = alg.generation_best_Y
-                    if inputs['objective'] == 'max':
-                        loss_history = -np.array(loss_history)     
+    #                 loss_history = alg.generation_best_Y
+    #                 if inputs['objective'] == 'max':
+    #                     loss_history = -np.array(loss_history)     
 
-                    st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
-                    best_x = truncate_func(best_x).reshape(1,-1)
+    #                 st.info('Recommmended Sample')
+    #                 truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+    #                 best_x = truncate_func(best_x).reshape(1,-1)
                     
 
-                    best_x = pd.DataFrame(best_x, columns = features_name)
+    #                 best_x = pd.DataFrame(best_x, columns = features_name)
 
 
-                    st.write(best_x)         
-                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    if inputs['objective'] == 'max':
-                        best_y = -best_y               
-                    st.info('DE best_y: %s' %  best_y.item())    
-                    plot.evolutionary_history(loss_history, 'DE')  
-                    loss_history = pd.DataFrame(loss_history)
-                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                elif inputs['model'] == 'SA':
-                    x0 = calculate_mean(inputs['lb'], inputs['ub'])
-                    alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
-                                lb=inputs['lb'], ub=inputs['ub'])
+    #                 st.write(best_x)         
+    #                 tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #                 if inputs['objective'] == 'max':
+    #                     best_y = -best_y               
+    #                 st.info('DE best_y: %s' %  best_y.item())    
+    #                 plot.evolutionary_history(loss_history, 'DE')  
+    #                 loss_history = pd.DataFrame(loss_history)
+    #                 tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #             elif inputs['model'] == 'SA':
+    #                 x0 = calculate_mean(inputs['lb'], inputs['ub'])
+    #                 alg = SAFast(func=opt_func, x0=x0, T_max = inputs['T max'], q=inputs['q'], L=inputs['L'], max_stay_counter=inputs['max stay counter'],
+    #                             lb=inputs['lb'], ub=inputs['ub'])
 
-                    best_x, best_y = alg.run()
+    #                 best_x, best_y = alg.run()
 
-                    loss_history = alg.generation_best_Y
-                    if inputs['objective'] == 'max':
-                        loss_history = -np.array(loss_history)     
+    #                 loss_history = alg.generation_best_Y
+    #                 if inputs['objective'] == 'max':
+    #                     loss_history = -np.array(loss_history)     
 
-                    st.info('Recommmended Sample')
-                    truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
-                    best_x = truncate_func(best_x).reshape(1,-1)
+    #                 st.info('Recommmended Sample')
+    #                 truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
+    #                 best_x = truncate_func(best_x).reshape(1,-1)
 
-                    best_x = pd.DataFrame(best_x, columns = features_name)
-                    st.write(best_x)         
-                    tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    if inputs['objective'] == 'max':
-                        best_y = -best_y  
-                    st.info('SA best_y: %s' %  best_y.item()) 
-                    plot.evolutionary_history(loss_history, 'SA')  
+    #                 best_x = pd.DataFrame(best_x, columns = features_name)
+    #                 st.write(best_x)         
+    #                 tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #                 if inputs['objective'] == 'max':
+    #                     best_y = -best_y  
+    #                 st.info('SA best_y: %s' %  best_y.item()) 
+    #                 plot.evolutionary_history(loss_history, 'SA')  
 
-                    loss_history = pd.DataFrame(loss_history)
-                    tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
-                    st.markdown(tmp_download_link, unsafe_allow_html=True)
+    #                 loss_history = pd.DataFrame(loss_history)
+    #                 tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
+    #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 elif select_option == "Model Inference":
     
