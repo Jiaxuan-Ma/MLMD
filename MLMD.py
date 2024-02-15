@@ -6077,6 +6077,7 @@ elif select_option == "Surrogate Optimization":
     #                 tmp_download_link = download_button(loss_history, f'evolutionary history.csv', button_text='download')
     #                 st.markdown(tmp_download_link, unsafe_allow_html=True)
 
+
 elif select_option == "Model Inference":
     
     colored_header(label="Model Inference",description=" ",color_name="violet-90")
