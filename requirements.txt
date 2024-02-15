@@ -1,3 +1,4 @@
+adapt==0.4.4
 altair==4.2.2
 Bgolearn==2.0.0
 catboost==1.2
@@ -24,3 +25,4 @@ tabulate==0.9.0
 pymoo==0.6.0.1
 matminer==0.9.0
 bayesian-optimization==1.4.3
+pymatgen==2023.12.18

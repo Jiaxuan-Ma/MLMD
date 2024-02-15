@@ -65,7 +65,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import LocalOutlierFactor
 from PIL import Image
 
-from adapt.instance_based import TrAdaBoostR2
+from adapt.instance_based import TwoStageTrAdaBoostR2
 from adapt.instance_based import TwoStageTrAdaBoostR2
 
 import xgboost as xgb
@@ -5172,9 +5172,9 @@ elif select_option == "Transfer Learning":
                     button_train = st.button('Train', use_container_width=True)
                 if button_train:
                     if operator == 'train test split':
-                        reg.model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=reg.Xtrain, yt=reg.Ytrain, verbose=-1)
+                        reg.model = TwoStageTrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=reg.Xtrain, yt=reg.Ytrain, verbose=-1)
                         
-                        reg.TrAdaBoostR2()
+                        reg.TwoStageTrAdaBoostR2()
 
                         result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                         result_data.columns = ['actual','prediction']
@@ -5194,7 +5194,7 @@ elif select_option == "Transfer Learning":
                             y_test = y_test.reshape(-1, 1)
                             
                             # 创建模型并训练
-                            model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
+                            model = TwoStageTrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
                             model.fit(reg.sd_features.values, reg.sd_targets.values.reshape(-1, 1))
                             
                             y_pred = model.predict(X_test)
@@ -5238,7 +5238,7 @@ elif select_option == "Transfer Learning":
                             y_train = y_train.reshape(-1, 1)
                             y_test = y_test.reshape(-1, 1)
                             # 创建模型并训练
-                            model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
+                            model = TwoStageTrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
                             model.fit(reg.sd_features.values, reg.sd_targets.values.reshape(-1,1))
                             y_pred = model.predict(X_test)
                             y_pred_list.append(y_pred)
