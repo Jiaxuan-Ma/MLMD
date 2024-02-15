@@ -26,6 +26,8 @@ from sklearn.model_selection import cross_validate as CV
 from sklearn.metrics import make_scorer, r2_score
 from sklearn.model_selection import LeaveOneOut
 from sklearn import tree
+from sklearn import svm
+
 
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
@@ -58,8 +60,13 @@ from sklearn.ensemble import BaggingRegressor
 from sklearn.ensemble import AdaBoostRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.manifold import TSNE
+from sklearn.ensemble import IsolationForest
+from sklearn.cluster import DBSCAN
+from sklearn.neighbors import LocalOutlierFactor
 from PIL import Image
 
+from adapt.instance_based import TrAdaBoostR2
+from adapt.instance_based import TwoStageTrAdaBoostR2
 
 import xgboost as xgb
 from catboost import CatBoostClassifier
@@ -101,8 +108,6 @@ from sko.SA import SAFast, SABoltzmann
 # import sys
 from prettytable import PrettyTable
 
-
-from algorithm.TrAdaboostR2 import TrAdaboostR2
 from algorithm.mobo import Mobo4mat
 import scienceplots
 
@@ -324,35 +329,103 @@ elif select_option == "Basic Data":
         if file is not None:
             df = pd.read_csv(file)
             check_string_NaN(df)
-            
-            colored_header(label="Data information",description=" ",color_name="violet-70")
-
+            colored_header(label="Data information", description=" ",color_name="violet-70")
             nrow = st.slider("rows", 1, len(df), 5)
             df_nrow = df.head(nrow)
             st.write(df_nrow)
 
-            colored_header(label="Data statistics",description=" ",color_name="violet-30")
+            colored_header(label="Feature and target",description=" ",color_name="violet-70")
 
-            st.write(df.describe())
-
-            tmp_download_link = download_button(df.describe(), f'statistics.csv', button_text='download')
+            target_num = st.number_input('target number',  min_value=1, max_value=10, value=1)
             
-            st.markdown(tmp_download_link, unsafe_allow_html=True)
-
-            colored_header(label="Outlier detection", description=" ", color_name="violet-70")
-            
-            target_num = st.number_input('target number', min_value=1, max_value=10, value=1)
             col_feature, col_target = st.columns(2)
-            # features
+
             features = df.iloc[:,:-target_num]
-            # targets
+
             targets = df.iloc[:,-target_num:]
             with col_feature:    
                 st.write(features.head())
             with col_target:   
                 st.write(targets.head())
 
+            # colored_header(label="target", description=" ", color_name="violet-70")
 
+            # target_selected_option = st.selectbox('target', list(targets)[::-1])
+
+            # target = targets[target_selected_option]
+
+            colored_header(label="Outlier detection", description=" ",color_name="violet-30")
+
+            model_path = './models/outlier detection'
+
+            template_alg = model_platform(model_path)
+
+            inputs, col2 = template_alg.show()
+
+            if inputs['model'] == 'One Class SVM':
+                detector = svm.OneClassSVM(nu=inputs['nu'], kernel='rbf', gamma=inputs['gamma'])
+                detector.fit(features)
+                outlier = detector.predict(features)
+                normal = df[outlier == 1]
+                abnormal = df[outlier == -1]
+                st.write('------------------ normal --------------------')
+                st.write(normal)
+                tmp_download_link = download_button(normal, f'normal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True) 
+
+                st.write('------------------ abnormal --------------------')
+                st.write(abnormal)
+                tmp_download_link = download_button(abnormal, f'abnormal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True) 
+
+            elif inputs['model'] == 'IsolationForest':
+                detector = IsolationForest(n_estimators=inputs['n_estimators'], contamination=inputs['contamination'], random_state=inputs['random state'])
+                detector.fit(features)
+                outlier = detector.predict(features)
+
+                normal = df[outlier == 1]
+                abnormal = df[outlier == -1]
+                st.write('------------------ normal --------------------')
+                st.write(normal)
+                tmp_download_link = download_button(normal, f'normal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True) 
+
+                st.write('------------------ abnormal --------------------')
+                st.write(abnormal)
+                tmp_download_link = download_button(abnormal, f'abnormal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)    
+
+            elif inputs['model'] == 'DBSCAN':
+                model = DBSCAN()
+                model.fit(features)
+                outlier = model.labels_
+                normal = df[outlier == 1]
+                abnormal = df[outlier == -1]
+                st.write('------------------ normal --------------------')
+                st.write(normal)
+                tmp_download_link = download_button(normal, f'normal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True) 
+
+                st.write('------------------ abnormal --------------------')
+                st.write(abnormal)
+                tmp_download_link = download_button(abnormal, f'abnormal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True)    
+
+            elif inputs['model'] == 'LocalOutlierFactor':
+                detector = LocalOutlierFactor(n_neighbors=20, contamination=0.1)
+                outlier = detector.fit_predict(features)
+
+                normal = df[outlier == 1]
+                abnormal = df[outlier == -1]
+                st.write('------------------ normal --------------------')
+                st.write(normal)
+                tmp_download_link = download_button(normal, f'normal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True) 
+
+                st.write('------------------ abnormal --------------------')
+                st.write(abnormal)
+                tmp_download_link = download_button(abnormal, f'abnormal.csv', button_text='download')
+                st.markdown(tmp_download_link, unsafe_allow_html=True) 
 
 
 elif select_option == "Feature Engineering":
@@ -1292,6 +1365,7 @@ elif select_option == "Regression":
                                         max_depth=params_best['max_depth'],min_samples_leaf=params_best['min_samples_leaf'],
                                         min_samples_split=params_best['min_samples_split'])                     
                         export_loo_results(reg, loo, "DTR_loo")
+
         if inputs['model'] == 'RandomForestRegressor':
             with col2:
                 with st.expander('Operator'):
@@ -4902,7 +4976,7 @@ elif select_option == "Transfer Learning":
         colored_header(label="Sample-based Transfer Learning ",description=" ",color_name="violet-90")
 
         file = st.file_uploader("Upload `.csv`file", type=['csv'], label_visibility="collapsed", accept_multiple_files=True)
-        if len(file) < 3:
+        if len(file) < 2:
             table = PrettyTable(['file name', 'class','descirption'])
             table.add_row(['file_1','test_data','target domain with no-label'])
             table.add_row(['file_2','target_data','target domain with label'])
@@ -4911,12 +4985,12 @@ elif select_option == "Transfer Learning":
             table.add_row(['file_n','source_data_n','n source domain'])
             st.write(table)
 
-        elif len(file) >= 3:
-            df_test = pd.read_csv(file[0])
-            df_target = pd.read_csv(file[1])
-            source_files = file[2:]
-            df = [pd.read_csv(f) for f in source_files]
-            df_source = pd.concat(df, axis=0)
+        elif len(file) >= 2:
+            df_target = pd.read_csv(file[0])
+            df_source = pd.read_csv(file[1])
+            # source_files = file[1:]
+            # df = [pd.read_csv(f) for f in source_files]
+            # df_source = pd.concat(df, axis=0)
 
             colored_header(label="Data information", description=" ",color_name="violet-70")
 
@@ -4942,11 +5016,17 @@ elif select_option == "Transfer Learning":
     # =================== model ====================================
             reg = REGRESSOR(target_features, target_targets)
 
+            reg.td_features = target_features
+            reg.td_targets = target_targets
+            reg.sd_features = source_features
+            reg.sd_targets = source_targets
+
             colored_header(label="target", description=" ", color_name="violet-70")
 
             target_selected_option = st.selectbox('target', list(reg.targets)[::-1])
 
-            reg.targets = target_targets[target_selected_option]
+            reg.td_targets = target_targets[target_selected_option]
+            reg.sd_targets = source_targets[target_selected_option]
 
             colored_header(label="Transfer", description=" ",color_name="violet-30")
 
@@ -4955,45 +5035,156 @@ elif select_option == "Transfer Learning":
             template_alg = model_platform(model_path)
 
             inputs, col2 = template_alg.show()
- 
-            with col2:
-                if inputs['max iter'] > source_features.shape[0]:
-                    st.warning('The maximum of iterations should be smaller than %d' % source_features.shape[0])
-
             if inputs['model'] == 'TrAdaboostR2':
-                TrAdaboostR2 = TrAdaboostR2()
+                DTR = tree.DecisionTreeRegressor()
+                with col2:
+                    with st.expander('Operator'):
+                        operator = st.selectbox('', ('train test split','cross val score', 'leave one out'), label_visibility= "collapsed")
+                        if operator == 'train test split':
+                            inputs['test size'] = st.slider('test size',0.1, 0.5, 0.2)  
+                            reg.Xtrain, reg.Xtest, reg.Ytrain, reg.Ytest = TTS(reg.td_features,reg.td_targets,test_size=inputs['test size'],random_state=inputs['random state'])
+
+                        elif operator == 'cross val score':
+                            cv = st.number_input('cv',1,20,5)
+                        
+                        elif operator == 'leave one out':
+                            loo = LeaveOneOut()
+                
+                colored_header(label="Training", description=" ",color_name="violet-30")
                 with st.container():
                     button_train = st.button('Train', use_container_width=True)
                 if button_train:
-                    TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
-                    
-                    Xtest = df_test[list(target_features.columns)]
-                    predict = TrAdaboostR2.predict(Xtest)
-                    prediction = pd.DataFrame(predict, columns=[reg.targets.name])
-                    try:
-                        Ytest = df_test[target_selected_option]
-                        plot = customPlot()
-                        plot.pred_vs_actual(Ytest, prediction)
-                        r2 = r2_score(Ytest, prediction)
-                        st.write('R2: {}'.format(r2))
-                        result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
+                    if operator == 'train test split':
+                        reg.model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=reg.Xtrain, yt=reg.Ytrain, verbose=-1)
+                        
+                        reg.TrAdaBoostR2()
+
+                        result_data = pd.concat([reg.Ytest, pd.DataFrame(reg.Ypred)], axis=1)
                         result_data.columns = ['actual','prediction']
+                        plot_and_export_results(reg, "TrAdaboostR2")
+
+                    elif operator == 'cross val score':
+
+                        kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+                        y_pred_list = []
+                        y_test_list = []
+
+                        for train_index, test_index in kf.split(reg.td_features.values):
+                            X_train, X_test = reg.td_features.values[train_index], reg.td_features.values[test_index]
+                            y_train, y_test = reg.td_targets.values[train_index], reg.td_targets.values[test_index]
+                            y_train = y_train.reshape(-1, 1)
+                            y_test = y_test.reshape(-1, 1)
+                            
+                            # 创建模型并训练
+                            model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
+                            model.fit(reg.sd_features.values, reg.sd_targets.values.reshape(-1, 1))
+                            
+                            y_pred = model.predict(X_test)
+                            y_pred_list.append(y_pred)
+                            y_test_list.append(y_test)
+
+                        Y_pred = np.concatenate(y_pred_list)
+                        Y_test = np.concatenate(y_test_list)
+                        st.write(f'R2: {r2_score(Y_pred, Y_test)}')
+                        fig, ax = plt.subplots(figsize = (5,4))  
+                        ax.scatter(Y_pred, Y_test, marker='o', color='#000080',zorder=1, facecolors='none')
+                        lims = [
+                            np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
+                            np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
+                                ]
+                        ax.tick_params(direction='in', length=5)
+                        ax.plot(lims, lims, zorder=8, linewidth=2, linestyle='solid', color='#FF0000')
+                        ax.set_xlim(lims)
+                        ax.set_ylim(lims)
+                        plt.xlabel("Actual")
+                        plt.ylabel("Prediction")
+                        st.pyplot(fig)
+                        
+                        with st.expander("model"):
+                            tmp_download_link = download_button(model, 'TaAdaboostR2_cv'+'.pickle', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
+                        result_data.columns = ['actual', 'prediction']
                         with st.expander('prediction'):
                             st.write(result_data)
                             tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
                             st.markdown(tmp_download_link, unsafe_allow_html=True)
-                    except KeyError:
-                        st.write(prediction)
-                        tmp_download_link = download_button(prediction, f'prediction.csv', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)         
-                    with st.expander("weak estimators"):
-                        st.write(TrAdaboostR2.estimator_weight)
-                        model_name = 'estimators'
-                        tmp_download_link = download_button(TrAdaboostR2.estimators, model_name+f'.pickle', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)
-                        data_name = 'estimator_weights'       
-                        tmp_download_link = download_button(TrAdaboostR2.estimator_weight, data_name+f'.pickle', button_text='download')
-                        st.markdown(tmp_download_link, unsafe_allow_html=True)        
+
+                    elif operator == 'leave one out':
+
+                        y_pred_list = []
+                        y_test_list = []
+                        for train_index, test_index in loo.split(reg.td_features.values):
+                            X_train, X_test = reg.td_features.values[train_index], reg.td_features.values[test_index]
+                            y_train, y_test = reg.td_targets.values[train_index], reg.td_targets.values[test_index]
+                            y_train = y_train.reshape(-1, 1)
+                            y_test = y_test.reshape(-1, 1)
+                            # 创建模型并训练
+                            model = TrAdaBoostR2(DTR, n_estimators=inputs['n_estimators'], Xt=X_train, yt=y_train, verbose=-1)
+                            model.fit(reg.sd_features.values, reg.sd_targets.values.reshape(-1,1))
+                            y_pred = model.predict(X_test)
+                            y_pred_list.append(y_pred)
+                            y_test_list.append(y_test)
+
+                        Y_pred = np.ravel(y_pred_list)
+                        Y_test = np.ravel(y_test_list)
+                        st.write(f'R2: {r2_score(Y_pred, Y_test)}')
+                        fig, ax = plt.subplots(figsize = (5,4))  
+                        ax.scatter(Y_pred, Y_test, marker='o', color='#000080',zorder=1, facecolors='none')
+                        lims = [
+                            np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
+                            np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
+                                ]
+                        ax.tick_params(direction='in', length=5)
+                        ax.plot(lims, lims, zorder=8, linewidth=2, linestyle='solid', color='#FF0000')
+                        ax.set_xlim(lims)
+                        ax.set_ylim(lims)
+                        plt.xlabel("Actual")
+                        plt.ylabel("Prediction")
+                        st.pyplot(fig)
+
+                        with st.expander("model"):
+                            tmp_download_link = download_button(model, 'TaAdaboostR2_loo'+'.pickle', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                        result_data = pd.concat([pd.DataFrame(Y_test), pd.DataFrame(Y_pred)], axis=1)
+                        result_data.columns = ['actual', 'prediction']
+                        with st.expander('prediction'):
+                            st.write(result_data)
+                            tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
+                            st.markdown(tmp_download_link, unsafe_allow_html=True)
+                # with st.container():
+                #     button_train = st.button('Train', use_container_width=True)
+                # if button_train:
+                #     TrAdaboostR2.fit(inputs, source_features, target_features, source_targets[target_selected_option], target_targets[target_selected_option], inputs['max iter'])
+                    
+                #     Xtest = df_test[list(target_features.columns)]
+                #     predict = TrAdaboostR2.predict(Xtest)
+                #     prediction = pd.DataFrame(predict, columns=[reg.targets.name])
+                #     try:
+                #         Ytest = df_test[target_selected_option]
+                #         plot = customPlot()
+                #         plot.pred_vs_actual(Ytest, prediction)
+                #         r2 = r2_score(Ytest, prediction)
+                #         st.write('R2: {}'.format(r2))
+                #         result_data = pd.concat([Ytest, pd.DataFrame(prediction)], axis=1)
+                #         result_data.columns = ['actual','prediction']
+                #         with st.expander('prediction'):
+                #             st.write(result_data)
+                #             tmp_download_link = download_button(result_data, f'prediction.csv', button_text='download')
+                #             st.markdown(tmp_download_link, unsafe_allow_html=True)
+                #     except KeyError:
+                #         st.write(prediction)
+                #         tmp_download_link = download_button(prediction, f'prediction.csv', button_text='download')
+                #         st.markdown(tmp_download_link, unsafe_allow_html=True)         
+                #     with st.expander("weak estimators"):
+                #         st.write(TrAdaboostR2.estimator_weight)
+                #         model_name = 'estimators'
+                #         tmp_download_link = download_button(TrAdaboostR2.estimators, model_name+f'.pickle', button_text='download')
+                #         st.markdown(tmp_download_link, unsafe_allow_html=True)
+                #         data_name = 'estimator_weights'       
+                #         tmp_download_link = download_button(TrAdaboostR2.estimator_weight, data_name+f'.pickle', button_text='download')
+                #         st.markdown(tmp_download_link, unsafe_allow_html=True)        
 
             elif inputs['model'] == 'TwoStageTrAdaboostR2':
                 st.write('Please wait...')

@@ -1,11 +1,10 @@
 import streamlit as st
-import numpy as np
 
 # Define possible modelsd in a dict
 # Format of the dict: model name -> model code
 
 MODEL = {
-    "model": "TrAdaboostR2",
+    "model": "LocalOutlierFactor",
 }
 
 # LightGBM can use -- categorical features -- as input directly. It doesn’t need to convert 
@@ -29,28 +28,24 @@ def show():
     # template later.
     inputs["model"] = MODEL["model"]
     
+    # st.write("preprocessing")
+    # inputs["Normalize"] = st.selectbox('normalize method', ['Z-Score Standardization','Min-Max Scale'])
     
-    st.info('TO SOLVE ** REGRESSION**')
+    st.info('TO DETECRT **OUTLIER**')
+    
+    # st.write('training')
 
+    # st.write("No additional parameters")
     col1, col2 = st.columns([2,2])
     with col1:
-        with st.expander("Hyper Parameter"):
-            
-            inputs['n_estimators'] = st.number_input('n_estimators', 1, 1000, 10)
-    
-            random_state = st.checkbox('random state 42',True)
-            if random_state:
-                inputs['random state'] = 42
-            else:
-                inputs['random state'] = None
 
+        st.write('Adopt default hyperparameters')
     return inputs,col2
+
+
 # To test the alg independent of the app or template, just run 
 # `streamlit run alg.py` from within this folder.
-
-
-
-
 if __name__ == "__main__":
     show()
-
+    
+    

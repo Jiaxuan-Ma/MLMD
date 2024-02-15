@@ -1387,7 +1387,18 @@ class REGRESSOR:
         self.Ypred= self.model.predict(self.Xtest)
         self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
         st.write('R2: {}'.format(self.score))
-        
+    
+    def TrAdaBoostR2(self):
+        self.Ytest = self.Ytest.reset_index(drop=True)
+        self.Xtest = self.Xtest.reset_index(drop=True)
+        self.Ytrain = self.Ytrain.astype('float')
+        self.Ytest = self.Ytest.astype('float')
+
+        self.model.fit(self.sd_features, self.sd_targets)
+        # st.info('train process is over')
+        self.Ypred= self.model.predict(self.Xtest)
+        self.score = r2_score(y_true=self.Ytest,y_pred=self.Ypred)
+        st.write('R2: {}'.format(self.score))        
     
 class CLUSTER():
 
