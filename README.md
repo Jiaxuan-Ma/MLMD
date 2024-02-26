@@ -18,7 +18,7 @@ The AI platform, MLMD (Machine Learning for Material Design) aims at utilizing g
 
 Stable version
 ```
-http://123.60.55.8/
+http://www.matdesign.top/
 ```
 # Local deploy
 
