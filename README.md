@@ -22,16 +22,21 @@ http://123.60.55.8/
 ```
 # Local deploy
 
-1. Install [anaconda](https://www.anaconda.com/). 
+1. Install [anaconda](https://www.anaconda.com/).
+  
 2. Create virtual envrionment
 ```
 conda create -n mlmd python=3.10
 ```
-1. Install dependent libraries
+
+3. Git clone the MLMD code library (or downloaded manually)
+
+4. Install dependent libraries in MLMD root dir
+ 
 ```
 pip install -r requirements.txt
 ```
-1. Run MLMD 
+5. Run MLMD 
 ```
 streamlit run MLMD.py
 ```
