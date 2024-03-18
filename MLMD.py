@@ -65,7 +65,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import LocalOutlierFactor
 from PIL import Image
 
-from adapt.instance_based import TwoStageTrAdaBoostR2
+from adapt.instance_based import TrAdaBoostR2
 from adapt.instance_based import TwoStageTrAdaBoostR2
 
 import xgboost as xgb
@@ -162,11 +162,8 @@ if select_option == "Home Page":
     **Developers**: Jiaxuan Ma (PhD Candidate), Bin Cao (PhD Candidate), Yuan Tian (Doctor), Jie Xiong (Assist Prof), Sheng Sun (Prof)
 
     #### Funding
-    This work was nancially supported by the National Key Research and Development
-    Program of China (No. 2022YFB3707803), the National Natural Science Foundation of
-    China Project (No. 12072179 and 11672168), the Key Research Project of Zhejiang Lab
-    (No. 2021PE0AC02), Shanghai Pujiang Program Grant (23PJ1403500), and Shanghai
-    Engineering Research Center for Integrated Circuits and Advanced Display Materials.
+    This work was supported by the National Key Research and Development Program of China (Grant No. 2022YFB3707803), the National Natural Science Foundation of China (Grant Nos. 12072179 and 11672168), 
+    the Key Research Project of Zhejiang Laboratory (Grant No. 2021PE0AC02), Shanghai Pujiang Program (Grant No. 23PJ1403500), and Shanghai Engineering Research Center for Integrated Circuits and Advanced Display Materials.
     ''')
 
 
