@@ -15,26 +15,28 @@ The AI platform, MLMD (Machine Learning for Material Design) aims at utilizing g
 
 
 # Remote access
-The remote access is unstable, and we recommend deploying mlmd on a local laptop.
-```
-https://mgi-mlmd.streamlit.app/
-```
+
 Stable version
 ```
-http://123.60.55.8/
+matdesign.top
 ```
 # Local deploy
 
-1. Install [anaconda](https://www.anaconda.com/). 
+1. Install [anaconda](https://www.anaconda.com/).
+  
 2. Create virtual envrionment
 ```
-conda create -n MLMD python=3.9
+conda create -n mlmd python=3.10
 ```
-1. Install dependent libraries
+
+3. Git clone the MLMD code library (or downloaded manually)
+
+4. Install dependent libraries in MLMD root dir
+ 
 ```
 pip install -r requirements.txt
 ```
-1. Run MLMD 
+5. Run MLMD 
 ```
 streamlit run MLMD.py
 ```
