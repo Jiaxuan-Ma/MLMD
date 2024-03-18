@@ -5283,7 +5283,7 @@ elif select_option == "Surrogate Optimization":
             table.add_row(['file_3','model','model'])
             st.write(table)
         
-        if len(file) >= 3:
+        elif len(file) >= 3:
             df = pd.read_csv(file[0])
             check_string_NaN(df)
 
@@ -5338,14 +5338,15 @@ elif select_option == "Surrogate Optimization":
 
             with st.container():
                 button_train = st.button('Opt', use_container_width=True)
-            if button_train:  
+
+            if button_train: 
                 def opt_func(x):
                     x = x.reshape(1,-1)
                     y_pred = model.predict(x)
                     if inputs['objective'] == 'max':
                         y_pred = -y_pred
                     return y_pred
-                
+
                 plot = customPlot()  
                 if inputs['model'] == 'PSO':    
                     
@@ -5364,11 +5365,11 @@ elif select_option == "Surrogate Optimization":
                     truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
                     best_x = truncate_func(best_x).reshape(1,-1)
 
-                    best_x = pd.DataFrame(best_x, columns = features_name)
-                    if preprocess == 'StandardScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
-                    elif preprocess == 'MinMaxScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
+                    # best_x = pd.DataFrame(best_x, columns = features_name)
+                    # if preprocess == 'StandardScaler':
+                    #     best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    # elif preprocess == 'MinMaxScaler':
+                    #     best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
 
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
@@ -5431,11 +5432,11 @@ elif select_option == "Surrogate Optimization":
                     truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
                     best_x = truncate_func(best_x).reshape(1,-1)
                     
-                    best_x = pd.DataFrame(best_x, columns = features_name)
-                    if preprocess == 'StandardScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
-                    elif preprocess == 'MinMaxScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
+                    # best_x = pd.DataFrame(best_x, columns = features_name)
+                    # if preprocess == 'StandardScaler':
+                    #     best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    # elif preprocess == 'MinMaxScaler':
+                    #     best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
 
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
@@ -5462,11 +5463,6 @@ elif select_option == "Surrogate Optimization":
 
                     best_x = pd.DataFrame(best_x, columns = features_name)
 
-                    if preprocess == 'StandardScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
-                    elif preprocess == 'MinMaxScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
-
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
                     st.markdown(tmp_download_link, unsafe_allow_html=True)
@@ -5490,11 +5486,11 @@ elif select_option == "Surrogate Optimization":
                     truncate_func = np.vectorize(lambda x: '{:,.4f}'.format(x))
                     best_x = truncate_func(best_x).reshape(1,-1)
 
-                    best_x = pd.DataFrame(best_x, columns = features_name)
-                    if preprocess == 'StandardScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
-                    elif preprocess == 'MinMaxScaler':
-                        best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
+                    # best_x = pd.DataFrame(best_x, columns = features_name)
+                    # if preprocess == 'StandardScaler':
+                    #     best_x = inverse_normalize(best_x, scaler, 'StandardScaler')
+                    # elif preprocess == 'MinMaxScaler':
+                    #     best_x = inverse_normalize(best_x, scaler, 'MinMaxScaler')
                     
                     st.write(best_x)         
                     tmp_download_link = download_button(best_x, f'recommended samples.csv', button_text='download')
