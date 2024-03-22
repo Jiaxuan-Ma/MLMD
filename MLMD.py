@@ -424,10 +424,9 @@ elif select_option == "Basic Data":
                 tmp_download_link = download_button(abnormal, f'abnormal.csv', button_text='download')
                 st.markdown(tmp_download_link, unsafe_allow_html=True) 
 
-
 elif select_option == "Feature Engineering":
     with st.sidebar:
-        sub_option = option_menu(None, ["Missing Value","Feature Transform", "Duplicate Value", "Feature Correlation", "Feature & Target Correlation", "One-hot Coding", "Feature Importance Rank"])
+        sub_option = option_menu(None, ["Feature Transform", "Duplicate Value", "Feature Correlation", "Feature & Target Correlation", "One-hot Coding", "Feature Importance Rank","Missing Value"])
 
     if sub_option == "Missing Value":
         colored_header(label="Missing Value",description=" ",color_name="violet-90")
