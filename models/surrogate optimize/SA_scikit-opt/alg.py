@@ -39,8 +39,8 @@ def show():
             inputs['T max'] = st.number_input('T max', 1, 10, 1)
             inputs['q'] = st.number_input('q', 0.0, 2.0, 0.99)
             
-            inputs['L']  = st.number_input('L', 0, 1000, 300)
-            inputs['max stay counter'] = st.number_input('max stay counter', 0, 1000, 150)
+            inputs['L']  = st.number_input('L', 0, 1000, 100)
+            inputs['max stay counter'] = st.number_input('max stay counter', 0, 1000, 50)
             # inputs['lb']  = st.number_input('lb',  )  # 跟据虚拟样本空间的最大值和最小值进行调整
             # inputs['ub'] = st.number_input('ub', )
     return inputs,col2
