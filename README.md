@@ -23,14 +23,9 @@ properties prediction. It also provides a web-based friendly interface without n
 
 <img src="https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa138ee2-b1a6-494d-a5de-741d1a54af14" width="500px">
 
+**Given the limitation of computational resources, we strongly recommend deploying MLMD on a local machine!!!**
 
-## Remote access
-
-Stable version
-```
-https://matdesign.top
-```
-## Local deploy
+## Local deploy（本地部署）
 
 1. Install [anaconda](https://www.anaconda.com/) on local machine(本地电脑安装anaconda)
   
@@ -47,6 +42,13 @@ pip install -r requirements.txt
 5. Run MLMD(运行MLMD)
 ```
 streamlit run MLMD.py
+```
+
+## Remote access（远程访问）
+
+Stable version
+```
+https://matdesign.top
 ```
 
 ## License
