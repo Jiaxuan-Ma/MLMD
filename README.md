@@ -28,7 +28,7 @@ properties prediction. It also provides a web-based friendly interface without n
 
 Stable version
 ```
-http://matdesign.top
+[MLMD Online](http://matdesign.top)
 ```
 ## Local deploy
 
