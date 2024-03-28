@@ -28,7 +28,7 @@ properties prediction. It also provides a web-based friendly interface without n
 
 Stable version
 ```
-matdesign.top
+http://matdesign.top
 ```
 ## Local deploy
 
