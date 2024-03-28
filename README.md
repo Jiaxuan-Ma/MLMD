@@ -50,7 +50,7 @@ streamlit run MLMD.py
 
 Stable version
 ```
-https://matdesign.top
+matdesign.top
 ```
 
 ## License
