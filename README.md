@@ -25,7 +25,7 @@ properties prediction. It also provides a web-based friendly interface without n
 
 ---
 
-**Given the limitation of computational resources, we strongly recommend deploying MLMD on a local machine!!!**
+**Given the limitation of computational resources, we strongly recommend deploying MLMD on your local machine!!!**
 
 ## Local deploy（本地部署）
 
