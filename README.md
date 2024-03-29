@@ -25,7 +25,6 @@ properties prediction. It also provides a web-based friendly interface without n
 
 ---
 
-**Given the limitation of computational resources, we strongly recommend deploying MLMD on your local machine!!!**
 
 ## Local deploy（本地部署）
 
@@ -47,6 +46,8 @@ streamlit run MLMD.py
 ```
 
 ## Remote access（远程访问）
+
+**Given the limitation of computational resources, we strongly recommend deploying MLMD on your local machine!!!**
 
 Stable version
 ```
