@@ -53,7 +53,8 @@ Stable version
 ```
 matdesign.top
 ```
-
+## Contact
+WeChat Official Accounts： **AI for Mechanics**
 ## License
 This code is licensed under the MIT license. Feel free to use all or portions for your research or related projects so long as you provide the following citation information:
 
