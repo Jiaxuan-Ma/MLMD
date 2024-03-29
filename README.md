@@ -54,7 +54,14 @@ Stable version
 matdesign.top
 ```
 ## Contact
-WeChat Official Accounts： **AI for Mechanics**
+WeChat Official Accounts： 
+
+<img width="100" alt="截屏2024-03-30 00 22 30" src="https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/6f9f99e9-ee24-426a-8198-76f5a1ac7460">
+AI for Mechanics
+
+<img width="100" alt="截屏2024-03-30 00 24 00" src="https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/c518c16f-fcd5-45a8-9a65-6cad1bb72d53">
+SciMindBin
+
 ## License
 This code is licensed under the MIT license. Feel free to use all or portions for your research or related projects so long as you provide the following citation information:
 
