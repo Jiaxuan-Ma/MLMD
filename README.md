@@ -6,7 +6,7 @@
 # MLMD: a programming-free AI platform to predict and design materials
 
 MLMD is capable of effectively discovering novel materials with high-potential advanced properties end-to-end, utilizing model inference, surrogate optimization, 
-and even working in situations of data scarcity based on active learning. Additionally, it integrates data analysis, descriptor refactoring, hyper-parameters auto-optimizing, and
+and even working in situations of data scarcity based on [active learning](https://colab.research.google.com/drive/1OSc-phxm7QLOm8ceGJiIMGGz9riuwP6Q?usp=sharing). Additionally, it integrates data analysis, descriptor refactoring, hyper-parameters auto-optimizing, and
 properties prediction. It also provides a web-based friendly interface without need programming and can be used anywhere, anytime.
 
 材料基因工程的研发理念深刻变革了材料研发范式，提高了新材料的研发效率，降低了研发成本。材料基因工程研发理念的核心是材料信息学，人工智能技术是材料信息学的核心工具。但是材料领域试验科研人员往往缺乏编程基础，这一门槛限制了利用材料基因理念辅助材料设计的发展。因此，我们开发了一个基于web端的界面友好的AI材料设计平台MLMD(Machine Learning for Materials Design)。平台集成了材料信息学常用的机器学习算法，包含异常值筛选、特征描述符重构、特征相关性分析和特征重要性排序等常用的特征工程算法，并可实现回归预测、分类预测和聚类等。平台还针对材料设计的需要，集成了随机优化算法用于单目标或者多目标特性的材料设计，开发了[贝叶斯主动学习模块](https://colab.research.google.com/drive/1OSc-phxm7QLOm8ceGJiIMGGz9riuwP6Q?usp=sharing)和基于迁移学习材料设计模块解决材料领域小数据的问题。
