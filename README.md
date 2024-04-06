@@ -26,7 +26,7 @@ properties prediction. It also provides a web-based friendly interface without n
 ---
 ## Introduction video to MLMD
 
-![bilibili](https://space.bilibili.com/455499402/channel/series)
+https://space.bilibili.com/455499402/channel/series
 
 ## Local deploy（本地部署）
 
