@@ -24,7 +24,9 @@ properties prediction. It also provides a web-based friendly interface without n
 <img src="https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/fa138ee2-b1a6-494d-a5de-741d1a54af14" width="500px">
 
 ---
+## Introduction video to MLMD
 
+![bilibili](https://space.bilibili.com/455499402/channel/series)
 
 ## Local deploy（本地部署）
 
