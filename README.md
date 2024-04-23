@@ -70,7 +70,7 @@ SciMindBin
 
 ## License
 This code is licensed under the MIT license. Feel free to use all or portions for your research or related projects so long as you provide the following citation information:
-
+## Cite
 Ma, J.∔, Cao, B.∔, Dong, S. et al. MLMD: a programming-free AI platform to predict and design materials. npj Comput Mater 10, 59 (2024). https://doi.org/10.1038/s41524-024-01243-4
 ```
 @article{Ma2024a,
