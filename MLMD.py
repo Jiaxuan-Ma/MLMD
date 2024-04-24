@@ -152,6 +152,31 @@ if select_option == "Home Page":
     st.write('''![](https://github.com/Jiaxuan-Ma/MLMD/assets/61132191/4733175e-1d24-46a1-8bf7-6a01fb284af4?raw=true)''')
     st.write(
         '''In order to ensure the sum of mass fraction of all compositions satisfa 100 \% in optimization, the base element column needs to be removed when using the **surrogate optimization module**.''')
+    
+    
+    colored_header(label="Citation",description="",color_name="violet-90")
+    st.markdown(
+        '''
+        Ma, J.∔, Cao, B.∔, Dong, S. et al. MLMD: a programming-free AI platform to predict and design materials. npj Comput Mater 10, 59 (2024). https://doi.org/10.1038/s41524-024-01243-4
+        ```
+        @article{Ma2024a,
+        title = {MLMD: A Programming-Free AI Platform to Predict and Design Materials},
+        shorttitle = {MLMD},
+        author = {Ma, Jiaxuan and Cao, Bin and Dong, Shuya and Tian, Yuan and Wang, Menghuan and Xiong, Jie and Sun, Sheng},
+        year = {2024},
+        month = mar,
+        journal = {npj Computational Materials},
+        volume = {10},
+        number = {1},
+        pages = {59},
+        issn = {2057-3960},
+        doi = {10.1038/s41524-024-01243-4}
+        }
+        ```       
+        '''
+    )
+
+
     colored_header(label="Acknowledgements",description="",color_name="violet-90")
 
     st.markdown(
