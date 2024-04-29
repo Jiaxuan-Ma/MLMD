@@ -177,21 +177,6 @@ if select_option == "Home Page":
     )
 
 
-    colored_header(label="Acknowledgements",description="",color_name="violet-90")
-
-    st.markdown(
-    '''
-    #### Contributors
-    **Research Group**: Materials and mechanics informatics lab (MMIL), Shanghai Unversity
-
-    **Developers**: Jiaxuan Ma (PhD Candidate), Bin Cao (PhD Candidate), Yuan Tian (Doctor), Jie Xiong (Assist Prof), Sheng Sun (Prof)
-
-    #### Funding
-    This work was supported by the National Key Research and Development Program of China (Grant No. 2022YFB3707803), the National Natural Science Foundation of China (Grant Nos. 12072179 and 11672168), 
-    the Key Research Project of Zhejiang Laboratory (Grant No. 2021PE0AC02), Shanghai Pujiang Program (Grant No. 23PJ1403500), and Shanghai Engineering Research Center for Integrated Circuits and Advanced Display Materials.
-    ''')
-
-
 elif select_option == "Basic Data":
     with st.sidebar:
         sub_option = option_menu(None, ["Data visualization", "Outlier detection", "Databases"])
