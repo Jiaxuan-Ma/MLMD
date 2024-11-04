@@ -34,7 +34,7 @@ https://space.bilibili.com/455499402/channel/series
   
 2. Create virtual envrionment in terminal "Anaconda Prompt" (找到黑色终端Anaconda Promot使用conda创建mlmd环境)
 ```
-conda create -n mlmd python=3.
+conda create -n mlmd python=3.9
 ```
 3. Git clone the MLMD code library (or downloaded manually)(git clone或者手动下载MLMD库)
 
