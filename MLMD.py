@@ -130,18 +130,15 @@ footer {visibility:hidden;}
 st.markdown(sysmenu,unsafe_allow_html=True)
 
 with st.sidebar:
-    st.image('logo.jpg')
     select_option = option_menu("MLMD", ["Home Page", "Basic Data", "Feature Engineering","Cluster & ReduceDim", "Regression", "Classification", "Transfer Learning", "Model Inference","Surrogate Optimization","Active Learning","Interpretable Machine Learning"],
                     icons=['house', 'clipboard-data', 'menu-button-wide','circle','bezier2', 'subtract', 'arrow-repeat', 'app', 'microsoft','search','book-half'],
                     menu_icon="boxes", default_index=0)
-#     st.write('''
-#     **Contact**: 
+    st.write('''
+           **Contact**: 
 
-#     terry.jx.ma@gmail.com (Jiaxuan Ma)
-             
-#     george-jie.xiong@connect.polyu.hk (Jie Xiong)         
-
-# ''')
+terry.jx.ma@gmail.com (Jiaxuan Ma)
+                     
+''')
 if select_option == "Home Page":
     st.write('''![](https://user-images.githubusercontent.com/61132191/231174459-96d33cdf-9f6f-4296-ba9f-31d11056ef12.jpg?raw=true)''')
 
@@ -176,22 +173,6 @@ if select_option == "Home Page":
         ```       
         '''
     )
-
-
-    colored_header(label="Acknowledgements",description="",color_name="violet-90")
-
-    st.markdown(
-    '''
-    #### Contributors
-    **Research Group**: Materials and mechanics informatics lab (MMIL), Shanghai Unversity
-
-    **Developers**: Jiaxuan Ma (PhD Candidate), Bin Cao (PhD Candidate), Yuan Tian (Doctor), Jie Xiong (Assist Prof), Sheng Sun (Prof),  Peng Di (Prof).
-
-    #### Funding
-    This work was supported by the National Key Research and Development Program of China (Grant No. 2022YFB3707803), the National Natural Science Foundation of China (Grant Nos. 12072179 and 11672168), 
-    the Key Research Project of Zhejiang Laboratory (Grant No. 2021PE0AC02), Shanghai Pujiang Program (Grant No. 23PJ1403500), and Shanghai Engineering Research Center for Integrated Circuits and Advanced Display Materials.
-    ''')
-
 
 elif select_option == "Basic Data":
     with st.sidebar:
