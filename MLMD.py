@@ -3445,7 +3445,7 @@ elif select_option == "Classification":
         st.write(table)
     if file is not None:
         df = pd.read_csv(file)
-        check_string(df)
+        # check_string(df)
         colored_header(label="Data information", description=" ",color_name="violet-70")
         nrow = st.slider("rows", 1, len(df), 5)
         df_nrow = df.head(nrow)
